@@ -104,6 +104,40 @@ Templates HTML/CSS prontos para uso em canais do Discord, localizados em `docs/m
 
 ---
 
+## 🇧🇷 Asset Localization (Cultura & Otimização)
+
+Estratégia de "abrasileiramento" e otimização de assets para um servidor seguro e performático.
+
+### 🚗 Gestão de Veículos (Debadging)
+- **Diretório:** `[godz_assets]/[vehicles]`
+- **Protocolo:** Todos os veículos reais (Ferrari, BMW, etc.) passam por *debadging*:
+  - Remoção de logos reais via edição de `.ytd`.
+  - Substituição por marcas "Lore-Friendly" (Grotti, Ubermacht) ou branding **GODZ**.
+  - Garante conformidade com as regras de Copyright do FiveM.
+
+### 👕 Fardamentos e Vestuário
+- **Recurso:** `[godz_assets]/godz_clothing`
+- **Conteúdo:**
+  - Uniformes padronizados para Polícia (Militar/Civil) e EMS com insígnias **GODZ**.
+  - Skins de facção (coletes, bandanas) com branding **GODZ Illegal**.
+- **Configuração:** `cfg/uniforms.lua` define presets para facilitar o serviço.
+
+### 🏙️ Mapeamento Brasileiro
+- **Diretório:** `[godz_assets]/[maps_custom]`
+- **Foco:** Imersão cultural sem riscos legais.
+- **Diretrizes:**
+  - Favelas e Praças brasileiras.
+  - Remoção de marcas reais em props (McDonald's, Shell, etc.).
+  - Substituição por marcas do universo GTA ou GODZ.
+
+### ⚡ Otimização de Texturas
+- **Auditoria Contínua:** Monitoramento de arquivos `.ytd`.
+- **Limite de Segurança:** Arquivos acima de **16MB** são sinalizados para compressão.
+- **Objetivo:** Prevenir "Texture Loss" (cidade piscando/sumindo) e garantir FPS estável.
+- **Status Atual:** Nenhum arquivo crítico detectado na base atual.
+
+---
+
 ## 📦 Estrutura GODZ (Pastas e Recursos)
 
 Organização profissional e intuitiva:
