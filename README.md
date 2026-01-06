@@ -76,6 +76,34 @@ Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **P
 
 ---
 
+## 🎨 GODZ Media Kit (Identidade Visual)
+
+Consolidação da marca GODZ com padronização visual em todos os sistemas.
+
+### 🖌️ Identidade Visual
+- **Paleta Oficial (CSS Variables):**
+  - `var(--godz-primary)`: Roxo Neon (#9b59b6)
+  - `var(--godz-accent)`: Ciano Neon (#00e5ff)
+  - `var(--godz-glass-bg)`: Fundo Glassmorphism (Dark)
+- **Recursos Padronizados:**
+  - `godz_interface`: HUD e Watermark.
+  - `godz_notify`: Notificações.
+  - `godz_mdt`: Tablet Policial.
+  - `godz_bank`: Sistema Bancário.
+  - `godz_connect`: Tela de Loading Animada.
+
+### 🖼️ Banners Discord
+Templates HTML/CSS prontos para uso em canais do Discord, localizados em `docs/media/discord_banners.html`.
+- **Estilos:** Glassmorphism com ícones e cores temáticas.
+- **Categorias:** Status, Polícia, EMS, Crime.
+
+### 📺 Watermark In-Game
+- Logo **GODZ RP** elegante no canto superior direito.
+- Visibilidade inteligente (oculta em menus).
+- Design minimalista em Glassmorphism.
+
+---
+
 ## 📦 Estrutura GODZ (Pastas e Recursos)
 
 Organização profissional e intuitiva:
@@ -208,18 +236,22 @@ Organização profissional e intuitiva:
 
 ---
 
-## 🧠 GODZ AI (Inteligência Artificial Local)
+## 🧠 GODZ AI (Inteligência Artificial Local & Discord)
 
-- Módulo de inteligência artificial rodando localmente, integrado ao servidor via `start.bat`.
-- **Funcionalidades:**
-  - 🤖 **Auto-Start:** O `start.bat` gerencia o ciclo de vida da IA automaticamente.
-  - 🧠 **Cérebro Neural:** Utiliza o modelo `Microsoft Phi-3 Mini` via `transformers` para processamento de linguagem natural.
-  - 🛡️ **Guardian Sentinel:** Análise vetorial de movimento para detectar SpeedHack e Teleporte.
-  - 🕵️ **Auditoria Financeira:** Análise heurística de transações bancárias para detectar lavagem de dinheiro e bugs.
-  - 💬 **Suporte Inteligente:** Responde dúvidas dos jogadores baseando-se no arquivo `REGRAS.txt`.
-- **Instalação do Modelo:**
-  - Na primeira execução, o script baixará automaticamente o modelo (~2.5GB). Certifique-se de ter espaço em disco.
-  - Requer Python 3.8+ e drivers NVIDIA (opcional, mas recomendado para GPU).
+- Módulo de inteligência artificial rodando localmente, integrado ao servidor e ao Discord.
+- **Funcionalidades IA:**
+  - 🤖 **Auto-Start:** Gerenciamento automático de ciclo de vida via `start.bat`.
+  - 🧠 **Cérebro Neural:** Modelo `Phi-3` para interações de suporte inteligente.
+  - 🛡️ **Guardian Sentinel:** Detecção vetorial de hacks com alertas via Webhook.
+  - 🕵️ **Auditoria:** Score de risco financeiro para transações suspeitas.
+- **Funcionalidades Discord:**
+  - 📡 **Webhooks:** Alertas em tempo real de cheats e economia suspeita com Embeds Neon.
+  - 🤖 **Bot de Status:** Atualiza a presença do bot com "Jogadores Online" e "Saúde da Economia".
+- **Configuração (Obrigatória):**
+  - Edite o arquivo `godz_ai_bridge.py` e preencha as variáveis:
+    - `DISCORD_TOKEN`: Token do seu Bot Discord (Developer Portal).
+    - `DISCORD_WEBHOOK_AUDIT`: URL do Webhook para logs de auditoria.
+    - `DISCORD_WEBHOOK_SENTINEL`: URL do Webhook para logs de hacks.
 - **Arquivo de Controle:** [godz_ai_bridge.py](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/godz_ai_bridge.py)
 
 ---

@@ -4,6 +4,9 @@ import json
 import logging
 import time
 import threading
+import requests
+import asyncio
+import discord
 from flask import Flask, request, jsonify
 import numpy as np
 
@@ -18,6 +21,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
 print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
+
+# ==================================================================================
+# CONFIGURAÇÃO DISCORD (Preencha aqui)
+# ==================================================================================
+DISCORD_TOKEN = "SEU_TOKEN_AQUI"
+DISCORD_WEBHOOK_AUDIT = "SEU_WEBHOOK_AUDIT_AQUI"
+DISCORD_WEBHOOK_SENTINEL = "SEU_WEBHOOK_SENTINEL_AQUI"
+DISCORD_GUILD_ID = 0 # ID do Servidor para contagem (Opcional)
+
+# Cores Neon
+COLOR_NEON_PURPLE = 0x9b59b6
+COLOR_NEON_RED = 0xff0000
+COLOR_NEON_GREEN = 0x00ff00
 
 # ==================================================================================
 # 1. INTEGRAÇÃO COM MODELO LOCAL (Transformers / Ollama)
@@ -74,6 +90,70 @@ try:
 except Exception as e:
     print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}REGRAS.txt não encontrado. Criando padrão...")
     RULES_CONTENT = "Respeite as regras do servidor GODZ."
+
+# ==================================================================================
+# 3. DISCORD BOT & WEBHOOKS
+# ==================================================================================
+
+def send_discord_webhook(url, embed):
+    """Envia um Embed para um Webhook do Discord"""
+    if "SEU_WEBHOOK" in url or not url:
+        return
+    
+    payload = {
+        "embeds": [embed],
+        "username": "GODZ AI Sentinel",
+        "avatar_url": "https://i.imgur.com/YourLogoHere.png" # Placeholder
+    }
+    
+    try:
+        requests.post(url, json=payload)
+    except Exception as e:
+        logger.error(f"Erro ao enviar Webhook: {e}")
+
+class GodzDiscordBot(discord.Client):
+    def __init__(self):
+        intents = discord.Intents.default()
+        super().__init__(intents=intents)
+        self.economy_health = 100
+
+    async def on_ready(self):
+        print(f"{Fore.MAGENTA}[GODZ BOT] {Fore.WHITE}Conectado como {self.user}")
+        self.loop.create_task(self.update_status_loop())
+
+    async def update_status_loop(self):
+        while not self.is_closed():
+            try:
+                # Tentar pegar contagem de players localmente
+                player_count = 0
+                try:
+                    res = requests.get("http://127.0.0.1:30120/players.json", timeout=2)
+                    if res.status_code == 200:
+                        player_count = len(res.json())
+                except:
+                    pass
+
+                status_text = f"GODZ RP | {player_count} Players | Econ: {self.economy_health}%"
+                await self.change_presence(activity=discord.Game(name=status_text))
+            except Exception as e:
+                print(f"{Fore.RED}[GODZ BOT] Erro no loop de status: {e}")
+            
+            await asyncio.sleep(60) # Atualiza a cada 60s
+
+def run_discord_bot():
+    if "SEU_TOKEN" in DISCORD_TOKEN:
+        print(f"{Fore.YELLOW}[GODZ BOT] {Fore.WHITE}Token não configurado. Bot de Status desativado.")
+        return
+
+    bot = GodzDiscordBot()
+    try:
+        bot.run(DISCORD_TOKEN)
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ BOT] Erro ao iniciar Bot: {e}")
+
+# Iniciar Bot em Thread Separada
+threading.Thread(target=run_discord_bot, daemon=True).start()
+
 
 # ==================================================================================
 # ENDPOINTS
@@ -158,11 +238,27 @@ def ai_audit():
         risk_score = min(risk_score, 100)
         
         if risk_score > 30: # Limite de alerta
-            suspicious_alerts.append({
+            alert = {
                 "transaction": tx,
                 "risk_score": risk_score,
                 "reasons": reasons
-            })
+            }
+            suspicious_alerts.append(alert)
+
+            # Disparar Webhook
+            embed = {
+                "title": "🚨 Alerta de Auditoria Financeira",
+                "description": f"Transação suspeita detectada com Score de Risco **{risk_score}/100**",
+                "color": COLOR_NEON_RED,
+                "fields": [
+                    {"name": "Remetente", "value": str(tx.get('sender')), "inline": True},
+                    {"name": "Destinatário", "value": str(tx.get('receiver')), "inline": True},
+                    {"name": "Valor", "value": f"${amount:,.2f}", "inline": True},
+                    {"name": "Motivos", "value": ", ".join(reasons), "inline": False}
+                ],
+                "footer": {"text": "GODZ AI Audit System"}
+            }
+            send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
             
     return jsonify({"alerts": suspicious_alerts, "total_scanned": len(transactions)})
 
@@ -213,6 +309,21 @@ def ai_sentinel():
         if max_dist_tick > 500 and np.max(time_deltas) < 1.0: # Teleporte: >500m em <1s
             flags.append("TELEPORT_DETECTED")
             
+        if flags:
+            # Disparar Webhook
+            embed = {
+                "title": "🛡️ GODZ Sentinel Alert",
+                "description": f"Atividade anormal detectada para o User ID **{data.get('user_id')}**",
+                "color": COLOR_NEON_RED,
+                "fields": [
+                    {"name": "Velocidade Máx", "value": f"{max_speed_kmh:.2f} km/h", "inline": True},
+                    {"name": "Distância Instantânea", "value": f"{max_dist_tick:.2f} m", "inline": True},
+                    {"name": "Flags", "value": ", ".join(flags), "inline": False}
+                ],
+                "footer": {"text": "GODZ AI Sentinel System"}
+            }
+            send_discord_webhook(DISCORD_WEBHOOK_SENTINEL, embed)
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
         

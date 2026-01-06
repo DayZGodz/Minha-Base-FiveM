@@ -1,60 +1,240 @@
-* { box-sizing: border-box; }
-html, body { width: 100%; height: 100%; margin: 0; background: transparent; }
-.hud { position: absolute; bottom: 3vh; left: 3vh; display: flex; }
-.card { backdrop-filter: blur(10px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px 18px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
-.row { display: flex; align-items: center; gap: 10px; margin: 8px 0; color: #e6e6e6; font-family: Arial, Helvetica, sans-serif; font-weight: 600; }
-.bar { flex: 1; height: 12px; background: rgba(255,255,255,0.12); border-radius: 8px; overflow: hidden; }
-.fill { height: 100%; width: 0%; transition: width 0.25s ease; background: linear-gradient(90deg, #00ffc6, #00b3ff); }
-.hud.hidden { display: none; }
+:root {
+    --godz-primary: #9b59b6;
+    --godz-secondary: #8e44ad;
+    --godz-accent: #00e5ff;
+    --godz-success: #2ecc71;
+    --godz-danger: #e74c3c;
+    --godz-warning: #f1c40f;
+    --godz-glass-bg: rgba(20, 20, 20, 0.85);
+    --godz-glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --godz-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
 
-.xp-toast {
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#hud-container {
     position: absolute;
-    top: 5vh;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(20, 20, 20, 0.85);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Deixar cliques passarem */
+    display: block; /* Começa visível */
+}
+
+/* Watermark GODZ */
+#godz-watermark {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    background: var(--godz-glass-bg);
+    border: var(--godz-glass-border);
+    padding: 8px 15px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    box-shadow: var(--godz-glass-shadow);
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+#godz-watermark img {
+    height: 25px;
+    margin-right: 10px;
+}
+
+#godz-watermark span {
+    color: var(--godz-text-color);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#godz-watermark .accent {
+    color: var(--godz-accent);
+}
+
+/* Status Bar Container (Bottom Left) */
+#status-container {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.status-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: var(--godz-glass-bg);
+    border: var(--godz-glass-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: var(--godz-glass-shadow);
+}
+
+.status-circle i {
+    font-size: 1.2rem;
+    color: #fff;
+    z-index: 2;
+}
+
+/* SVG Progress Rings */
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 0.35s;
+    transform-origin: 50% 50%;
+    stroke-linecap: round;
+}
+
+/* Colors for specific status */
+.health i { color: #ff6b6b; }
+.health .progress-ring__circle { stroke: #ff6b6b; }
+
+.armor i { color: #4ecdc4; }
+.armor .progress-ring__circle { stroke: #4ecdc4; }
+
+.hunger i { color: #ffe66d; }
+.hunger .progress-ring__circle { stroke: #ffe66d; }
+
+.thirst i { color: #45b7d1; }
+.thirst .progress-ring__circle { stroke: #45b7d1; }
+
+.stamina i { color: #a0a0a0; }
+.stamina .progress-ring__circle { stroke: #a0a0a0; }
+
+/* Vehicle HUD (Bottom Right) */
+#vehicle-hud {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    background: var(--godz-glass-bg);
+    border: var(--godz-glass-border);
+    border-radius: 15px;
     padding: 15px 25px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    transition: opacity 0.5s, transform 0.5s;
-    min-width: 250px;
+    align-items: flex-end;
+    box-shadow: var(--godz-glass-shadow);
+    backdrop-filter: blur(10px);
+    transition: opacity 0.3s;
 }
 
-.xp-toast.hidden {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-20px);
-    pointer-events: none;
-}
-
-.xp-info {
+.speed-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
+}
+
+.speed-value {
+    font-size: 3rem;
+    font-weight: 800;
     color: #fff;
-    font-family: 'Poppins', sans-serif;
+    text-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+.speed-unit {
+    font-size: 1rem;
+    color: #bdc3c7;
+    margin-left: 5px;
     font-weight: 600;
 }
 
-.xp-gain {
-    color: #00ffc6;
+.fuel-container {
+    width: 100%;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
-.xp-bar-bg {
-    width: 100%;
+.fuel-icon {
+    font-size: 0.9rem;
+    color: var(--godz-warning);
+    margin-right: 8px;
+}
+
+.fuel-bar-bg {
+    width: 80px;
     height: 6px;
     background: rgba(255,255,255,0.1);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 }
 
-.xp-bar-fill {
+.fuel-bar-fill {
     height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #00b3ff, #00ffc6);
-    transition: width 0.5s ease;
+    background: linear-gradient(90deg, #f1c40f, #e67e22);
+    width: 50%;
+    transition: width 0.5s;
+}
+
+/* Street Name */
+#street-container {
+    margin-top: 5px;
+    font-size: 0.9rem;
+    color: #bdc3c7;
+    font-weight: 500;
+    text-align: right;
+}
+
+#street-container i {
+    color: var(--godz-primary);
+    margin-right: 5px;
+}
+
+/* XP Notification Area (Top Center) */
+#xp-container {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+}
+
+.xp-notify {
+    background: linear-gradient(90deg, rgba(155, 89, 182, 0.8), rgba(142, 68, 173, 0.8));
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px 20px;
+    border-radius: 30px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    animation: slideDownFade 0.5s ease-out, fadeOut 0.5s ease-in 2.5s forwards;
+    box-shadow: 0 0 15px rgba(155, 89, 182, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.xp-notify i {
+    color: #f1c40f;
+}
+
+@keyframes slideDownFade {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-10px); }
 }

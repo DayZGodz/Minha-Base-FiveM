@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
+:root {
+    --godz-primary: #9b59b6;
+    --godz-secondary: #8e44ad;
+    --godz-accent: #00e5ff;
+    --godz-success: #2ecc71;
+    --godz-danger: #e74c3c;
+    --godz-warning: #f1c40f;
+    --godz-glass-bg: rgba(20, 20, 20, 0.95);
+    --godz-glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --godz-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -21,10 +33,10 @@ body {
 .hidden { display: none !important; }
 
 .glass {
-    background: rgba(20, 25, 40, 0.85);
+    background: var(--godz-glass-bg);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: var(--godz-glass-border);
+    box-shadow: var(--godz-glass-shadow);
     border-radius: 8px;
 }
 
@@ -51,7 +63,7 @@ body {
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #3498db;
+    color: var(--godz-accent);
     margin-bottom: 40px;
     display: flex;
     align-items: center;
@@ -81,13 +93,13 @@ nav {
 }
 
 .nav-btn:hover, .nav-btn.active {
-    background: rgba(52, 152, 219, 0.2);
-    color: #3498db;
+    background: rgba(155, 89, 182, 0.2);
+    color: var(--godz-primary);
 }
 
 .close-btn {
     background: rgba(231, 76, 60, 0.2);
-    color: #e74c3c;
+    color: var(--godz-danger);
     border: none;
     padding: 15px;
     border-radius: 8px;

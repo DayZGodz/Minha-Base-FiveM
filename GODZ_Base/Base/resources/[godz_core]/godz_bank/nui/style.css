@@ -1,5 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
 
+:root {
+    --godz-primary: #9b59b6;
+    --godz-secondary: #8e44ad;
+    --godz-accent: #00e5ff;
+    --godz-success: #2ecc71;
+    --godz-danger: #e74c3c;
+    --godz-warning: #f1c40f;
+    --godz-glass-bg: rgba(20, 20, 20, 0.85);
+    --godz-glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --godz-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -23,11 +35,11 @@ body {
 }
 
 .glass {
-    background: rgba(16, 18, 27, 0.7);
+    background: var(--godz-glass-bg);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    border: var(--godz-glass-border);
+    box-shadow: var(--godz-glass-shadow);
     border-radius: 12px;
 }
 
@@ -58,7 +70,7 @@ body {
 .logo {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #00ffaa;
+    color: var(--godz-primary);
     display: flex;
     align-items: center;
     gap: 10px;
