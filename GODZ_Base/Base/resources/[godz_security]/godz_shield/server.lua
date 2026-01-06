@@ -5,11 +5,44 @@ vRP = Proxy.getInterface("vRP")
 vRPclient = Tunnel.getInterface("vRP")
 
 -----------------------------------------------------------------------------------------------------------------------------------------
+-- MASTER CONFIG SYNC
+-----------------------------------------------------------------------------------------------------------------------------------------
+local MasterConfig = { whitelists = { ignored_by_sentinel = {} } }
+
+Citizen.CreateThread(function()
+    Wait(2000) -- Aguarda API subir
+    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
+        if err == 200 then
+            local data = json.decode(text)
+            if data then
+                MasterConfig = data
+                print("^2[GODZ SHIELD] ^7Whitelist sincronizada com a IA.")
+            end
+        else
+            print("^1[GODZ SHIELD] ^7Falha ao sincronizar config com IA (Erro " .. tostring(err) .. ")")
+        end
+    end)
+end)
+
+local function IsWhitelisted(user_id)
+    if not MasterConfig.whitelists or not MasterConfig.whitelists.ignored_by_sentinel then return false end
+    for _, id in pairs(MasterConfig.whitelists.ignored_by_sentinel) do
+        if tonumber(id) == tonumber(user_id) then return true end
+    end
+    return false
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
 -- BAN FUNCTION
 -----------------------------------------------------------------------------------------------------------------------------------------
 local function BanPlayer(source, reason)
     local user_id = vRP.getUserId(source)
     if user_id then
+        if IsWhitelisted(user_id) then
+            print("^3[GODZ SHIELD] ^7Banimento evitado para Staff ID: " .. user_id .. " (Whitelist Ativa)")
+            return
+        end
+
         print("^1[GODZ SHIELD] BANINDO JOGADOR ID: " .. user_id .. " | MOTIVO: " .. reason .. "^0")
         
         -- Tenta usar a função nativa de banimento do vRP se existir, caso contrário bane via SQL ou kick

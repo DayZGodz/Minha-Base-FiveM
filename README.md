@@ -358,6 +358,22 @@ Sistema de missões procedurais geradas por IA para manter o servidor sempre mov
 4. Inicie o servidor e verifique o console para garantir que todos os recursos `godz_` foram carregados corretamente.
 5. Diretório raiz de execução: `GODZ_Base`.
 
+### ⚡ Configuração em um Clique (Discord Setup)
+
+O Ecossistema GODZ possui um comando exclusivo para configurar toda a infraestrutura do seu Discord automaticamente.
+
+1.  **Pré-requisito:** Configure o `DISCORD_TOKEN` no arquivo `GODZ_MASTER_CONFIG.json` (raiz da base).
+2.  Inicie o servidor e a IA (`start.bat`).
+3.  No seu Discord, digite:
+    ```
+    /setup_godz
+    ```
+4.  **O que acontece:**
+    *   Cria a categoria **GODZ | ECOSSISTEMA**.
+    *   Cria os canais de logs (Audit, Sentinel, Bank, Support, Staff, News).
+    *   Gera Webhooks automaticamente para cada canal.
+    *   **Sincronização:** Atualiza o `GODZ_MASTER_CONFIG.json` com os novos links, dispensando configuração manual.
+
 ---
 
 ## 💼 GODZ Jobs Pro (Progressão de Carreira)

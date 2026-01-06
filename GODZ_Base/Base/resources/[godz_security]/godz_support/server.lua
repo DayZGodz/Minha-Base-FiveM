@@ -3,6 +3,25 @@ local Proxy = module("vrp", "lib/Proxy")
 
 vRP = Proxy.getInterface("vRP")
 
+local MasterConfig = { webhooks = {} }
+
+Citizen.CreateThread(function()
+    Wait(2000)
+    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
+        if err == 200 then
+            local data = json.decode(text)
+            if data then
+                MasterConfig = data
+                -- Atualiza webhook se disponível
+                if MasterConfig.webhooks and MasterConfig.webhooks.support and MasterConfig.webhooks.support ~= "" then
+                    Config.Webhooks.Tickets = MasterConfig.webhooks.support
+                    print("^2[GODZ SUPPORT] ^7Webhook sincronizado com IA: " .. MasterConfig.webhooks.support)
+                end
+            end
+        end
+    end)
+end)
+
 local temp_tickets = {}
 
 -- Inicialização do Banco de Dados

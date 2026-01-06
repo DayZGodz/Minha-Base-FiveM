@@ -9,9 +9,34 @@ Tunnel.bindInterface("godz_bank", src)
 
 -- Configurações Econômicas
 local TAX_RATE = 0.05 -- 5% de Imposto em transferências
+local MasterConfig = { whitelists = { ignored_by_auditor = {} } }
+
+Citizen.CreateThread(function()
+    Wait(2000)
+    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
+        if err == 200 then
+            local data = json.decode(text)
+            if data then
+                MasterConfig = data
+                print("^2[GODZ BANK] ^7Auditor Whitelist sincronizada.")
+            end
+        end
+    end)
+end)
+
+local function IsAuditorWhitelisted(user_id)
+    if not MasterConfig.whitelists or not MasterConfig.whitelists.ignored_by_auditor then return false end
+    for _, id in pairs(MasterConfig.whitelists.ignored_by_auditor) do
+        if tonumber(id) == tonumber(user_id) then return true end
+    end
+    return false
+end
 
 -- Helper: Add Log
 function AddBankLog(sender_id, receiver_id, type, value)
+    -- Se for Staff na whitelist, não gera log (Otimização e evitar spam no Auditor)
+    if IsAuditorWhitelisted(sender_id) then return end
+
     MySQL.Async.execute("INSERT INTO godz_bank_logs (sender_id, receiver_id, type, value) VALUES (@sender_id, @receiver_id, @type, @value)", {
         ['@sender_id'] = sender_id,
         ['@receiver_id'] = receiver_id,

@@ -7,6 +7,7 @@ import threading
 import requests
 import asyncio
 import discord
+from discord.ext import commands
 from flask import Flask, request, jsonify
 import numpy as np
 
@@ -23,17 +24,44 @@ logger = logging.getLogger()
 print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
 
 # ==================================================================================
-# CONFIGURAÇÃO DISCORD (Preencha aqui)
+# 0. MASTER CONFIGURATION (JSON)
 # ==================================================================================
-DISCORD_TOKEN = "SEU_TOKEN_AQUI"
-DISCORD_WEBHOOK_AUDIT = "SEU_WEBHOOK_AUDIT_AQUI"
-DISCORD_WEBHOOK_SENTINEL = "SEU_WEBHOOK_SENTINEL_AQUI"
-DISCORD_GUILD_ID = 0 
+MASTER_CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "GODZ_MASTER_CONFIG.json")
+MASTER_CONFIG = {}
+
+def load_master_config():
+    global MASTER_CONFIG
+    try:
+        with open(MASTER_CONFIG_PATH, "r", encoding="utf-8") as f:
+            MASTER_CONFIG = json.load(f)
+        print(f"{Fore.GREEN}[GODZ CONFIG] {Fore.WHITE}Master Config carregada.")
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro ao carregar Master Config: {e}")
+        MASTER_CONFIG = {"webhooks": {}, "permissions": {}, "whitelists": {}}
+
+def save_master_config():
+    try:
+        with open(MASTER_CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(MASTER_CONFIG, f, indent=4)
+        print(f"{Fore.GREEN}[GODZ CONFIG] {Fore.WHITE}Master Config salva com sucesso.")
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro ao salvar Master Config: {e}")
+
+load_master_config()
+
+# ==================================================================================
+# CONFIGURAÇÃO DISCORD (Carregada do JSON)
+# ==================================================================================
+DISCORD_TOKEN = MASTER_CONFIG.get("discord_token", "")
+DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("webhooks", {}).get("audit", "")
+DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("webhooks", {}).get("sentinel", "")
+DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("webhooks", {}).get("news", "")
 
 # Cores Neon
 COLOR_NEON_PURPLE = 0x9b59b6
 COLOR_NEON_RED = 0xff0000
 COLOR_NEON_GREEN = 0x00ff00
+COLOR_NEON_CYAN = 0x00e5ff
 
 # ==================================================================================
 # 1. INTEGRAÇÃO COM MODELO LOCAL (Transformers / Ollama)
@@ -111,14 +139,20 @@ def send_discord_webhook(url, embed):
     except Exception as e:
         logger.error(f"Erro ao enviar Webhook: {e}")
 
-class GodzDiscordBot(discord.Client):
+class GodzDiscordBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
-        super().__init__(intents=intents)
+        intents.guilds = True  # Necessário para criar canais
+        super().__init__(command_prefix="!", intents=intents)
         self.economy_health = 100
 
     async def on_ready(self):
         print(f"{Fore.MAGENTA}[GODZ BOT] {Fore.WHITE}Conectado como {self.user}")
+        try:
+            synced = await self.tree.sync()
+            print(f"{Fore.MAGENTA}[GODZ BOT] {Fore.WHITE}Comandos Slash sincronizados: {len(synced)}")
+        except Exception as e:
+            print(f"{Fore.RED}[GODZ BOT] Erro ao sincronizar comandos: {e}")
         self.loop.create_task(self.update_status_loop())
 
     async def update_status_loop(self):
@@ -140,11 +174,85 @@ class GodzDiscordBot(discord.Client):
             await asyncio.sleep(60)
 
 def run_discord_bot():
-    if "SEU_TOKEN" in DISCORD_TOKEN:
+    if not DISCORD_TOKEN or "SEU_TOKEN" in DISCORD_TOKEN:
         print(f"{Fore.YELLOW}[GODZ BOT] {Fore.WHITE}Token não configurado. Bot de Status desativado.")
         return
 
     bot = GodzDiscordBot()
+
+    @bot.tree.command(name="setup_godz", description="Configura automaticamente o ecossistema GODZ no Discord.")
+    async def setup_godz(interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("❌ Apenas administradores podem usar este comando.", ephemeral=True)
+            return
+
+        await interaction.response.send_message("⚙️ Iniciando configuração do Ecossistema GODZ...", ephemeral=True)
+        guild = interaction.guild
+        
+        # 1. Criar Categoria
+        category_name = "GODZ | ECOSSISTEMA"
+        category = discord.utils.get(guild.categories, name=category_name)
+        if not category:
+            category = await guild.create_category(category_name)
+            await interaction.followup.send(f"✅ Categoria **{category_name}** criada.")
+        else:
+            await interaction.followup.send(f"ℹ️ Categoria **{category_name}** já existe.")
+
+        # 2. Criar Canais e Webhooks
+        channels_config = {
+            "godz-logs": "audit",
+            "godz-shield": "sentinel",
+            "godz-bank": "bank",
+            "godz-support": "support",
+            "godz-staff": "staff",
+            "godz-news": "news"
+        }
+
+        updated_count = 0
+        
+        for channel_name, config_key in channels_config.items():
+            channel = discord.utils.get(guild.text_channels, name=channel_name, category=category)
+            if not channel:
+                # Permissões: Apenas Staff vê logs (exemplo simplificado: @everyone view=False)
+                overwrites = {
+                    guild.default_role: discord.PermissionOverwrite(read_messages=False),
+                    guild.me: discord.PermissionOverwrite(read_messages=True)
+                }
+                if channel_name == "godz-news": # News é público
+                    overwrites = {}
+
+                channel = await guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
+                await interaction.followup.send(f"✅ Canal **{channel_name}** criado.")
+            
+            # Criar Webhook
+            webhooks = await channel.webhooks()
+            webhook = None
+            if webhooks:
+                webhook = webhooks[0]
+            else:
+                webhook = await channel.create_webhook(name=f"GODZ {config_key.title()}")
+                await interaction.followup.send(f"🔗 Webhook para **{channel_name}** gerado.")
+
+            # Atualizar JSON
+            MASTER_CONFIG["webhooks"][config_key] = webhook.url
+            updated_count += 1
+
+        # 3. Salvar Configuração
+        save_master_config()
+        
+        # Recarregar variáveis globais
+        global DISCORD_WEBHOOK_AUDIT, DISCORD_WEBHOOK_SENTINEL, DISCORD_WEBHOOK_NEWS
+        DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG["webhooks"].get("audit", "")
+        DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG["webhooks"].get("sentinel", "")
+        DISCORD_WEBHOOK_NEWS = MASTER_CONFIG["webhooks"].get("news", "")
+
+        embed = discord.Embed(
+            title="✅ Setup GODZ Concluído",
+            description=f"O ecossistema foi configurado com sucesso!\n**{updated_count}** Webhooks foram sincronizados com o servidor FiveM.",
+            color=COLOR_NEON_CYAN
+        )
+        await interaction.followup.send(embed=embed)
+
     try:
         bot.run(DISCORD_TOKEN)
     except Exception as e:
@@ -156,6 +264,10 @@ threading.Thread(target=run_discord_bot, daemon=True).start()
 # ==================================================================================
 # ENDPOINTS
 # ==================================================================================
+
+@app.route('/config', methods=['GET'])
+def get_config():
+    return jsonify(MASTER_CONFIG)
 
 @app.route('/status', methods=['GET'])
 def status():
@@ -222,10 +334,13 @@ def dispatch_ticket():
 @app.route('/ai_economy_simulation', methods=['POST'])
 def ai_economy_simulation():
     data = request.json
-    # (Mantendo a lógica existente da economia, simplificada aqui para não apagar se existisse, 
-    # mas como estou reescrevendo o arquivo, preciso garantir que o código anterior esteja aqui se for importante.
-    # O código anterior foi lido e estava funcional. Vou reincluir a lógica.)
     
+    # Whitelist check for Auditor
+    user_id = data.get('user_id')
+    if user_id and user_id in MASTER_CONFIG.get("whitelists", {}).get("ignored_by_auditor", []):
+        logger.info(f"Auditor ignorando staff ID: {user_id}")
+        return jsonify({"status": "ignored", "reason": "staff_whitelist"})
+
     salaries = data.get('salaries', {})
     drugs = data.get('drugs', {})
     vehicles = data.get('vehicles', {})
@@ -266,6 +381,30 @@ def ai_economy_simulation():
         send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
     
     return jsonify({"status": "success", "report": report_lines})
+
+@app.route('/sentinel_check', methods=['POST'])
+def sentinel_check():
+    data = request.json
+    user_id = data.get('user_id')
+    flag_type = data.get('flag_type')
+    details = data.get('details')
+    
+    # Whitelist Check
+    if user_id and user_id in MASTER_CONFIG.get("whitelists", {}).get("ignored_by_sentinel", []):
+        logger.info(f"Sentinel ignorando staff ID: {user_id}")
+        return jsonify({"status": "ignored", "reason": "staff_whitelist"})
+
+    embed = {
+        "title": f"🛡️ GODZ Sentinel Alert | {flag_type}",
+        "description": f"**Jogador:** {user_id}\n**Detalhes:** {details}",
+        "color": COLOR_NEON_RED,
+        "footer": {"text": "GODZ Anti-Cheat AI"}
+    }
+
+    if DISCORD_WEBHOOK_SENTINEL:
+        send_discord_webhook(DISCORD_WEBHOOK_SENTINEL, embed)
+        
+    return jsonify({"status": "alert_sent"})
 
 @app.route('/generate_mission', methods=['POST'])
 def generate_mission():

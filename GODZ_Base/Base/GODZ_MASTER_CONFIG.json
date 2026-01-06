@@ -1,0 +1,38 @@
+{
+    "discord_token": "SEU_TOKEN_AQUI",
+    "guild_id": 0,
+    "webhooks": {
+        "audit": "",
+        "sentinel": "",
+        "bank": "",
+        "support": "",
+        "staff": "",
+        "news": ""
+    },
+    "permissions": {
+        "ceos": [
+            1,
+            2
+        ],
+        "admins": [
+            3,
+            4
+        ],
+        "moderators": [
+            5,
+            6
+        ]
+    },
+    "whitelists": {
+        "ignored_by_sentinel": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "ignored_by_auditor": [
+            1,
+            2
+        ]
+    }
+}
