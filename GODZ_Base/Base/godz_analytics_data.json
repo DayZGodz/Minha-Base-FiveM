@@ -1,9 +1,9 @@
 {
     "_metadata": {
+        "description": "Dados estatísticos do servidor coletados a cada 30 minutos.",
+        "usage": "Utilizado pelo comando /stats e relatórios de IA.",
         "generated_by": "GODZ AI",
-        "last_updated": "Auto-Generated",
-        "warning": "NAO EDITE MANUALMENTE ESTE ARQUIVO. Dados gerados pela IA.",
-        "description": "Armazena historico de economia e atividade de jogadores para relatorios executivos."
+        "warning": "Não edite manualmente."
     },
     "history": [],
     "player_last_seen": {}

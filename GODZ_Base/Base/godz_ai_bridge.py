@@ -41,10 +41,25 @@ def load_master_config():
         print(f"{Fore.RED}Detalhes: {e.msg}")
         print(f"{Fore.RED}Linha: {e.lineno}, Coluna: {e.colno}")
         print(f"{Fore.YELLOW}Verifique se não esqueceu uma vírgula ou aspas.")
-        MASTER_CONFIG = {"SERVER_SETTINGS": {}, "WEBHOOKS": {}, "STAFF_PERMISSIONS": {}, "SECURITY_CONFIG": {}}
+        # Tentar identificar a seção
+        try:
+            with open(MASTER_CONFIG_PATH, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                error_line = lines[e.lineno - 1].strip()
+                print(f"{Fore.RED}Conteúdo da linha: {error_line}")
+                # Heurística simples para identificar seção
+                for i in range(e.lineno - 1, -1, -1):
+                    if "SERVER_INFO" in lines[i]: print(f"{Fore.YELLOW}Possível erro na seção: [SERVER_INFO]"); break
+                    if "PERMISSIONS" in lines[i]: print(f"{Fore.YELLOW}Possível erro na seção: [PERMISSIONS]"); break
+                    if "ECONOMY" in lines[i]: print(f"{Fore.YELLOW}Possível erro na seção: [ECONOMY]"); break
+                    if "SECURITY" in lines[i]: print(f"{Fore.YELLOW}Possível erro na seção: [SECURITY]"); break
+                    if "WEBHOOKS" in lines[i]: print(f"{Fore.YELLOW}Possível erro na seção: [WEBHOOKS]"); break
+        except:
+            pass
+        MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
     except Exception as e:
         print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
-        MASTER_CONFIG = {"SERVER_SETTINGS": {}, "WEBHOOKS": {}, "STAFF_PERMISSIONS": {}, "SECURITY_CONFIG": {}}
+        MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
 
 def save_master_config():
     try:
@@ -84,7 +99,7 @@ load_analytics_data()
 # ==================================================================================
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
 # ==================================================================================
-DISCORD_TOKEN = MASTER_CONFIG.get("SERVER_SETTINGS", {}).get("discord_token", "")
+DISCORD_TOKEN = MASTER_CONFIG.get("SERVER_INFO", {}).get("discord_token", "")
 DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
 DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
 DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")
@@ -420,7 +435,7 @@ def ai_economy_simulation():
     
     # Whitelist check for Auditor
     user_id = data.get('user_id')
-    ignored_auditor = MASTER_CONFIG.get("SECURITY_CONFIG", {}).get("ignored_by_auditor", [])
+    ignored_auditor = MASTER_CONFIG.get("SECURITY", {}).get("ignored_by_auditor", [])
     if user_id and user_id in ignored_auditor:
         logger.info(f"Auditor ignorando staff ID: {user_id}")
         return jsonify({"status": "ignored", "reason": "staff_whitelist"})
@@ -474,7 +489,7 @@ def sentinel_check():
     details = data.get('details')
     
     # Whitelist Check
-    ignored_sentinel = MASTER_CONFIG.get("SECURITY_CONFIG", {}).get("ignored_by_sentinel", [])
+    ignored_sentinel = MASTER_CONFIG.get("SECURITY", {}).get("ignored_by_sentinel", [])
     if user_id and user_id in ignored_sentinel:
         logger.info(f"Sentinel ignorando staff ID: {user_id}")
         return jsonify({"status": "ignored", "reason": "staff_whitelist"})

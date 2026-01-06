@@ -1,66 +1,66 @@
 {
-    "SERVER_SETTINGS": {
-        "_desc": "Configurações gerais do servidor e tokens de acesso.",
+    "SERVER_INFO": {
+        "server_name": "GODZ Roleplay",
+        "_server_name_desc": "Nome oficial que aparecerá na HUD e Discord",
         "discord_token": "SEU_TOKEN_AQUI",
-        "_hint_discord_token": "Token do Bot Discord (Obtenha em discord.com/developers).",
+        "_discord_token_desc": "Token do Bot Discord (Obtenha em discord.com/developers)",
         "guild_id": 0,
-        "_hint_guild_id": "ID do Servidor Discord principal.",
+        "_guild_id_desc": "ID do Servidor Discord principal"
+    },
+    "PERMISSIONS": {
+        "ceos": [
+            1,
+            2
+        ],
+        "_ceos_desc": "Donos/Fundadores (Acesso total)",
+        "admins": [
+            3,
+            4
+        ],
+        "_admins_desc": "Administradores (Gerenciamento geral)",
+        "moderators": [
+            5,
+            6
+        ],
+        "_moderators_desc": "Moderadores (Suporte básico)"
+    },
+    "ECONOMY": {
         "tuning_prices": {
-            "_desc": "Preços base para customização de veículos (godz_tuning).",
             "engine_base": 5000,
             "turbo_base": 15000,
             "brakes_base": 2000,
             "transmission_base": 3000,
             "suspension_base": 2500,
             "armor_base": 10000
-        }
+        },
+        "_tuning_prices_desc": "Preços base para customização de veículos (godz_tuning)"
     },
-    "STAFF_PERMISSIONS": {
-        "_desc": "IDs dos jogadores com permissões administrativas.",
-        "ceos": [
-            1,
-            2
-        ],
-        "_hint_ceos": "Donos/Fundadores (Acesso total).",
-        "admins": [
-            3,
-            4
-        ],
-        "_hint_admins": "Administradores (Gerenciamento geral).",
-        "moderators": [
-            5,
-            6
-        ],
-        "_hint_moderators": "Moderadores (Suporte básico)."
-    },
-    "SECURITY_CONFIG": {
-        "_desc": "Listas de exceção para sistemas de segurança (Sentinel/Auditor).",
+    "SECURITY": {
         "ignored_by_sentinel": [
             1,
             2,
             3,
             4
         ],
-        "_hint_ignored_by_sentinel": "IDs ignorados pelo Anti-Cheat.",
+        "_ignored_by_sentinel_desc": "IDs ignorados pelo Anti-Cheat",
         "ignored_by_auditor": [
             1,
             2
         ],
-        "_hint_ignored_by_auditor": "IDs ignorados pela IA de Economia."
+        "_ignored_by_auditor_desc": "IDs ignorados pela IA de Economia"
     },
     "WEBHOOKS": {
-        "_desc": "URLs dos Webhooks para logs no Discord.",
         "audit": "",
-        "_hint_audit": "Log de Auditoria Econômica.",
+        "_audit_desc": "Log de Auditoria Econômica",
         "sentinel": "",
-        "_hint_sentinel": "Log do Anti-Cheat.",
+        "_sentinel_desc": "Log do Anti-Cheat",
         "bank": "",
-        "_hint_bank": "Log de Transações Bancárias.",
+        "_bank_desc": "Log de Transações Bancárias",
         "support": "",
-        "_hint_support": "Log de Tickets de Suporte.",
+        "_support_desc": "Log de Tickets de Suporte",
         "staff": "",
-        "_hint_staff": "Log de Ações da Staff.",
+        "_staff_desc": "Log de Ações da Staff",
         "news": "",
-        "_hint_news": "Canal de Notícias Automáticas."
+        "_news_desc": "Canal de Notícias Automáticas"
     }
 }
