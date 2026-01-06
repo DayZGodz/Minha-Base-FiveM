@@ -143,6 +143,22 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🚑 GODZ EMS (Saúde e Resgate Avançado)
+
+- Sistema médico completo focado em RP sério e procedimentos realistas.
+- **Funcionalidades:**
+  - 📱 **Tablet de Prontuário:** Interface Glassmorphism para consulta de pacientes (Nome, Sangue, Histórico). Acesso via `/ems`.
+  - 🛏️ **Sistema de Macas:** 
+    - `/maca`: Retira/Guarda a maca da ambulância.
+    - `/pushmaca`: Empurra/Solta a maca.
+    - `/putmaca`: Coloca o paciente mais próximo na maca.
+  - 💉 **Tratamento e Alta:** Sistema de cobrança automática via `godz_bank` ao dar alta no hospital.
+  - 🩸 **Histórico Médico:** Registra automaticamente todos os tratamentos no banco de dados.
+- **Comandos:** `/ems`, `/maca`, `/pushmaca`, `/putmaca`.
+- **Dependências:** `godz_bank` (Pagamentos), `godz_logs` (Auditoria).
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
