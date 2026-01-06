@@ -1,10 +1,10 @@
 @echo off
 
-echo ===---------[BASE UNITY]---------===
-echo     Base Vrpex (final version)
-echo     Bugs Fixed Version: 3.0.4
-echo     Developed by: Unity Dev 
-echo     Discord: discord.gg/kYFy8JwVfd
+echo ===---------[GODZ BASE]---------===
+echo     GODZ DEV BASE VRPEX (release)
+echo     Performance/Seguranca/Otimização
+echo     Developed by: GODZ Dev 
+echo     Discord: github.com/DayZGodz
 echo ===---------------------------------===
 
 pause
