@@ -167,6 +167,23 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🏦 GODZ Smart Bank (Finanças Digitais)
+
+- Sistema bancário moderno com interface Glassmorphism.
+- **Funcionalidades:**
+  - 💸 **Pix (Transferência por ID):** Envio instantâneo de dinheiro.
+  - 📜 **Histórico Detalhado:** Logs de todas as transações (Depósito, Saque, Pix).
+  - 💳 **Empréstimos:** Sistema de crédito com limite de $50k e juros semanais.
+  - 🏧 **Integração ATM:** Acesso via caixas eletrônicos com animação realista.
+- **Acesso:**
+  - Use o "Third Eye" (ALT) em qualquer ATM do mapa.
+  - Aplicativo no GODZ Phone (em breve).
+- **Arquivos:**
+  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_bank/server.lua)
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_bank/client.lua)
+
+---
+
 ## 🔔 GODZ Notify (Modern UI)
 
 - Sistema de notificações flutuantes com design Glassmorphism.

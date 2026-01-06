@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ Bank</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="bank-card">
+            <div class="header">
+                <div class="logo">
+                    <i class="fas fa-university"></i> GODZ BANK
+                </div>
+                <div class="user-info">
+                    <span id="user-name">Bem-vindo</span>
+                </div>
+                <button class="close-btn" onclick="closeBank()"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="balance-section">
+                <div class="card glass">
+                    <div class="label">Saldo Bancário</div>
+                    <div class="value" id="bank-balance">$0</div>
+                </div>
+                <div class="card glass">
+                    <div class="label">Carteira</div>
+                    <div class="value" id="wallet-balance">$0</div>
+                </div>
+            </div>
+
+            <div class="actions-grid">
+                <button class="action-btn" onclick="showModal('transfer')">
+                    <i class="fas fa-exchange-alt"></i> Transferir (Pix)
+                </button>
+                <button class="action-btn" onclick="showModal('deposit')">
+                    <i class="fas fa-arrow-down"></i> Depositar
+                </button>
+                <button class="action-btn" onclick="showModal('withdraw')">
+                    <i class="fas fa-arrow-up"></i> Sacar
+                </button>
+                <button class="action-btn" onclick="showModal('loan')">
+                    <i class="fas fa-hand-holding-usd"></i> Empréstimos
+                </button>
+            </div>
+
+            <div class="transactions-section glass">
+                <h3>Histórico Recente</h3>
+                <div class="transactions-list" id="transactions-list">
+                    <!-- Logs here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div id="modal-transfer" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Transferência Pix</h3>
+                <input type="number" id="transfer-id" placeholder="ID do Destinatário">
+                <input type="number" id="transfer-amount" placeholder="Valor">
+                <div class="modal-actions">
+                    <button onclick="confirmAction('transfer')">Confirmar</button>
+                    <button class="cancel" onclick="hideModals()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-deposit" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Depositar</h3>
+                <input type="number" id="deposit-amount" placeholder="Valor">
+                <div class="modal-actions">
+                    <button onclick="confirmAction('deposit')">Confirmar</button>
+                    <button class="cancel" onclick="hideModals()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-withdraw" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Sacar</h3>
+                <input type="number" id="withdraw-amount" placeholder="Valor">
+                <div class="modal-actions">
+                    <button onclick="confirmAction('withdraw')">Confirmar</button>
+                    <button class="cancel" onclick="hideModals()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-loan" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Empréstimo</h3>
+                <p>Débito Atual: <span id="loan-debt">$0</span></p>
+                <input type="number" id="loan-amount" placeholder="Valor (Max $50k)">
+                <div class="modal-actions">
+                    <button onclick="confirmAction('takeLoan')">Pegar Empréstimo</button>
+                    <button onclick="confirmAction('payLoan')">Pagar Débito</button>
+                    <button class="cancel" onclick="hideModals()">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
