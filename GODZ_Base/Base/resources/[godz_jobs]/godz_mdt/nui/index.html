@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ MDT</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="tablet-frame">
+            <div class="sidebar">
+                <div class="logo">
+                    <i class="fas fa-police-box"></i> GODZ POLICE
+                </div>
+                <nav>
+                    <button class="nav-btn active" onclick="switchTab('home')"><i class="fas fa-home"></i> Início</button>
+                    <button class="nav-btn" onclick="switchTab('search')"><i class="fas fa-search"></i> Investigar</button>
+                    <button class="nav-btn" onclick="switchTab('warrants')"><i class="fas fa-file-contract"></i> Mandados</button>
+                </nav>
+                <button class="close-btn" onclick="closeMDT()"><i class="fas fa-power-off"></i> Desligar</button>
+            </div>
+            
+            <div class="content">
+                <!-- HOME TAB -->
+                <div id="tab-home" class="tab-content active">
+                    <h1>Bem-vindo ao Sistema MDT</h1>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <div class="info">
+                                <h3>Oficiais Online</h3>
+                                <span>--</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-file-contract"></i>
+                            <div class="info">
+                                <h3>Mandados Ativos</h3>
+                                <span id="total-warrants">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEARCH TAB -->
+                <div id="tab-search" class="tab-content">
+                    <div class="search-bar">
+                        <input type="number" id="search-input" placeholder="Digite o Passaporte (ID)">
+                        <button onclick="searchUser()"><i class="fas fa-search"></i> Buscar</button>
+                    </div>
+                    
+                    <div id="search-result" class="hidden">
+                        <div class="profile-header glass">
+                            <img id="profile-img" src="" alt="Profile">
+                            <div class="profile-info">
+                                <h2 id="profile-name">Nome Sobrenome</h2>
+                                <p>ID: <span id="profile-id">0</span> | Idade: <span id="profile-age">0</span></p>
+                                <p>RG: <span id="profile-reg">ABC</span> | Tel: <span id="profile-phone">000-000</span></p>
+                            </div>
+                            <div class="profile-actions">
+                                <button onclick="showFineModal()" class="btn-danger"><i class="fas fa-gavel"></i> Multar</button>
+                                <button onclick="showWarrantModal()" class="btn-warning"><i class="fas fa-exclamation-triangle"></i> Mandado</button>
+                            </div>
+                        </div>
+
+                        <div class="details-grid">
+                            <div class="section glass">
+                                <h3><i class="fas fa-university"></i> Dados Bancários</h3>
+                                <p>Saldo: <span id="bank-balance" class="highlight">$0</span></p>
+                                <div class="logs-list" id="bank-logs">
+                                    <!-- Logs -->
+                                </div>
+                            </div>
+
+                            <div class="section glass">
+                                <h3><i class="fas fa-car"></i> Veículos</h3>
+                                <div class="vehicle-list" id="vehicle-list">
+                                    <!-- Vehicles -->
+                                </div>
+                            </div>
+                            
+                             <div class="section glass">
+                                <h3><i class="fas fa-file-contract"></i> Mandados do Cidadão</h3>
+                                <div class="warrant-list" id="user-warrants-list">
+                                    <!-- User Warrants -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WARRANTS TAB -->
+                <div id="tab-warrants" class="tab-content">
+                    <h2>Mandados de Prisão Ativos</h2>
+                    <div class="warrant-list-full" id="all-warrants-list">
+                        <!-- All Warrants -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODALS -->
+        <div id="modal-fine" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Aplicar Multa</h3>
+                <input type="number" id="fine-amount" placeholder="Valor">
+                <input type="text" id="fine-reason" placeholder="Motivo">
+                <div class="actions">
+                    <button onclick="applyFine()">Confirmar</button>
+                    <button class="cancel" onclick="hideModals()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-warrant" class="modal hidden">
+            <div class="modal-content glass">
+                <h3>Emitir Mandado</h3>
+                <textarea id="warrant-reason" placeholder="Descrição do crime/motivo"></textarea>
+                <div class="actions">
+                    <button onclick="createWarrant()">Emitir</button>
+                    <button class="cancel" onclick="hideModals()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -113,6 +113,23 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🚓 GODZ MDT (Sistema Policial de Elite)
+
+- Tablet policial avançado com integração total de dados.
+- **Funcionalidades:**
+  - 🕵️ **Investigação Profunda:** Busca por ID/Nome retorna foto, identidade, carros e **histórico bancário (Pix)**.
+  - 📜 **Mandados de Prisão:** Criação e baixa de mandados em tempo real, sincronizados no banco de dados.
+  - 💸 **Multas Integradas:** Aplicação de multas que descontam diretamente do `godz_bank`.
+  - 🖥️ **Interface Glassmorphism:** Design escuro e imersivo para policiais.
+- **Comando:** `/mdt` (Requer permissão `policia.permissao`).
+- **Arquivos:**
+  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_jobs%5D/godz_mdt/server.lua)
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_jobs%5D/godz_mdt/client.lua)
+
+![GODZ MDT Preview](https://placeholder.com/mdt-preview.png)
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
