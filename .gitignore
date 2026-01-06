@@ -1,5 +1,37 @@
+# FiveM Server Cache and Logs
+cache/
+server-cache/
+server-cache-priv/
+log/
+logs/
+*.log
+crash-reports/
 
-/UnityCleanV2/artifacts
-UnityCleanV2/Base/config/keys.cfg
-/UnityCleanV2/Base/cache
-/UnityCleanV2/Base/.vscode
+# System Files
+Thumbs.db
+.DS_Store
+
+# Node Modules
+node_modules/
+
+# Server Artifacts (Excluding citizen if customized, but typically ignored. User edited scheduler.lua so keeping citizen)
+# citizen/ 
+alpine/
+run.cmd
+run.sh
+LICENSE
+version.txt
+
+# Editor/IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Extra
+*.rar
+*.zip
+*.7z
