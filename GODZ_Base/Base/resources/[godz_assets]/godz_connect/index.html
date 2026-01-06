@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ Connect</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Video -->
+    <div class="video-background">
+        <video autoplay muted loop id="bg-video">
+            <source src="assets/background.mp4" type="video/mp4">
+            <!-- Fallback para imagem se o vídeo não carregar -->
+            <img src="assets/background.jpg" alt="Background" class="fallback-img">
+        </video>
+        <div class="video-overlay"></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Logo Section -->
+        <div class="logo-container">
+            <h1 class="godz-logo">GODZ <span class="highlight">RP</span></h1>
+            <div class="pulse-ring"></div>
+            <p class="server-status">ESTABELECENDO CONEXÃO SEGURA...</p>
+        </div>
+
+        <!-- Info Panel (Left) -->
+        <div class="glass-panel info-panel">
+            <div class="panel-header">
+                <i class="fas fa-info-circle"></i> REGRAS RÁPIDAS
+            </div>
+            <ul class="rules-list">
+                <li><i class="fas fa-check"></i> Valorize a vida em primeiro lugar (Amor à Vida).</li>
+                <li><i class="fas fa-check"></i> Respeite o RP dos outros jogadores.</li>
+                <li><i class="fas fa-check"></i> Proibido RDM e VDM.</li>
+                <li><i class="fas fa-check"></i> Uso obrigatório de microfone.</li>
+                <li><i class="fas fa-check"></i> Siga as diretrizes do Discord.</li>
+            </ul>
+            <div class="discord-box">
+                <i class="fab fa-discord"></i> discord.gg/DayZGodz
+            </div>
+        </div>
+
+        <!-- Music Player (Right Bottom) -->
+        <div class="glass-panel music-player">
+            <div class="track-info">
+                <div class="icon-music"><i class="fas fa-music"></i></div>
+                <div class="text-info">
+                    <span id="track-name">GODZ Vibes</span>
+                    <span id="artist-name">Official Soundtrack</span>
+                </div>
+            </div>
+            <div class="controls">
+                <button id="mute-btn" onclick="toggleMute()"><i class="fas fa-volume-up"></i></button>
+                <input type="range" id="volume-slider" min="0" max="100" value="20" oninput="setVolume(this.value)">
+            </div>
+            <audio id="bg-music" loop>
+                <source src="assets/music.mp3" type="audio/mp3">
+            </audio>
+        </div>
+
+        <!-- Loading Progress (Bottom Center) -->
+        <div class="loading-container">
+            <div class="loading-text">
+                <span id="loading-status">Carregando recursos...</span>
+                <span id="loading-percent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar"></div>
+            </div>
+            <div class="current-resource" id="current-resource">Inicializando...</div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

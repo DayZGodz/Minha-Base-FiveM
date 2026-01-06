@@ -151,6 +151,22 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🎬 GODZ Connect (Loading Screen)
+
+- Tela de carregamento moderna e imersiva para o servidor.
+- Design Glassmorphism consistente com a HUD.
+- **Funcionalidades:**
+  - Vídeo de fundo em loop (suporta MP4).
+  - Player de música com controle de volume e mute.
+  - Barra de progresso real baseada nos eventos de carregamento do FiveM.
+  - Painel de regras rápidas e link do Discord.
+- **Customização:**
+  - Substitua o vídeo em: `resources/[godz_assets]/godz_connect/assets/background.mp4`.
+  - Substitua a música em: `resources/[godz_assets]/godz_connect/assets/music.mp3`.
+  - Edite as regras no arquivo `index.html`.
+
+---
+
 ## ⚙️ GODZ Auto-Updater
 
 - Ferramenta de automação para manutenção de artefatos do servidor.
