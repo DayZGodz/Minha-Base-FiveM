@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ Housing</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="app" style="display: none;">
+        <div class="container">
+            <header>
+                <h1><i class="fas fa-couch"></i> GODZ Decor</h1>
+                <div class="actions">
+                    <button id="btn-save" class="btn-success"><i class="fas fa-save"></i> Salvar</button>
+                    <button id="btn-close" class="btn-danger"><i class="fas fa-times"></i> Fechar</button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <aside class="categories">
+                    <button class="cat-btn active" data-cat="all">Todos</button>
+                    <button class="cat-btn" data-cat="sala">Sala</button>
+                    <button class="cat-btn" data-cat="cozinha">Cozinha</button>
+                    <button class="cat-btn" data-cat="quarto">Quarto</button>
+                    <button class="cat-btn" data-cat="eletronicos">Eletrônicos</button>
+                    <button class="cat-btn" data-cat="decoracao">Decoração</button>
+                </aside>
+                
+                <main class="items-grid" id="items-grid">
+                    <!-- Items injected by JS -->
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

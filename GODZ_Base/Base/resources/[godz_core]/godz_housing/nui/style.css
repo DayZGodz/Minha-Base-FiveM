@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+}
+
+.container {
+    width: 80%;
+    height: 80%;
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    color: white;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+header h1 {
+    font-weight: 600;
+    font-size: 24px;
+    color: #00ff88;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-left: 10px;
+}
+
+.btn-success {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.btn-success:hover {
+    background: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+.btn-danger {
+    background: rgba(255, 50, 50, 0.2);
+    color: #ff3232;
+    border: 1px solid rgba(255, 50, 50, 0.3);
+}
+
+.btn-danger:hover {
+    background: rgba(255, 50, 50, 0.4);
+    box-shadow: 0 0 15px rgba(255, 50, 50, 0.4);
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.categories {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cat-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #ccc;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cat-btn:hover, .cat-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding-left: 15px;
+}
+
+.items-grid {
+    flex: 1;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 150px;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.item-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+    border: 1px solid transparent;
+}
+
+.item-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+.item-icon {
+    font-size: 32px;
+    color: #00ff88;
+    margin-bottom: 10px;
+}
+
+.item-name {
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.item-price {
+    font-size: 12px;
+    color: #888;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}

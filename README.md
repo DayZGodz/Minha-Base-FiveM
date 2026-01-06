@@ -173,6 +173,24 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🏠 GODZ Housing (Sistema de Propriedades)
+
+- Sistema de propriedades revolucionário com shells instanciados e modo decoração.
+- **Funcionalidades:**
+  - 🛋️ **Shells Instanciados:** Utiliza Routing Buckets para isolar jogadores, permitindo centenas de casas sem impacto no FPS.
+  - 🎨 **Modo Decoração (NUI):** Interface Glassmorphism para posicionar móveis com precisão (rotação, altura).
+  - 🎯 **Integração Total (Third Eye):** Sem markers no chão. Entrada, saída e garagem via `godz_target`.
+  - 🔑 **Sistema de Chaves:** Compartilhamento de chaves via inventário. Acesso policial via mandado no MDT.
+  - 📦 **Persistência Inteligente:** Móveis salvos no banco de dados com coordenadas JSON precisas.
+- **Integrações:**
+  - `godz_bank`: Compra e venda automatizada.
+  - `godz_target`: Interação exclusiva.
+- **Arquivos:**
+  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_housing/server.lua)
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_housing/client.lua)
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
