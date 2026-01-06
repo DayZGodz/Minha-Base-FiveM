@@ -151,6 +151,20 @@ Organização profissional e intuitiva:
 
 ---
 
+## ⚙️ GODZ Auto-Updater
+
+- Ferramenta de automação para manutenção de artefatos do servidor.
+- Script: `update_artifacts.ps1` (localizado na raiz `01_BASE_PRINCIPAL`).
+- Funcionalidades:
+  - Baixa automaticamente a build recomendada/latest do FiveM Windows.
+  - Extrai e atualiza a pasta `GODZ_Base/artifacts`.
+  - Limpa arquivos temporários para economizar espaço.
+- Integração:
+  - O `start.bat` agora pergunta se deseja verificar atualizações antes de iniciar o servidor.
+  - Responda `S` (Sim) para atualizar ou `N` (Não) para iniciar imediatamente.
+
+---
+
 ## 🔄 Changelog Recente (Refatoração GODZ)
 
 - **Rebranding Total:** Padronização de nomes para `godz_*` (ex: `vrp_inventory` -> `godz_inventory`).
