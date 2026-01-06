@@ -28,6 +28,11 @@ Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **P
 - **GCPhone vRP:** Celular funcional com formato brasileiro (XXX-XXXX), Twitter, WhatsApp e Câmera.
 - **Logs Centralizados:** Integração direta com Discord Webhooks para monitoramento em tempo real (Admin, Chat, Kills, Inventário).
 
+### 💎 Experiência Visual e HUD
+> Identidade visual única e consistente.
+- **Unity Notify:** Sistema de notificações exclusivo (NUI) com design moderno (Glassmorphism/Azul), substituindo todas as mensagens padrão do vRP.
+- **Consistência Visual:** Padronização de cores e fontes entre Inventário, Celular e Notificações para uma experiência de usuário coesa.
+
 ### 🏘️ Imersão & Mundo
 > Um ambiente vivo e detalhado sem pesar o FPS.
 - **Sistema de Shells:** Interiores otimizados via shells para propriedades e interações, reduzindo a necessidade de MLOs pesados.
