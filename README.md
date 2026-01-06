@@ -97,8 +97,8 @@ Organização profissional e intuitiva:
 ### [godz_jobs]
 > Empregos legais e serviços públicos.
 - `godz_dispatch`: Central de despacho policial.
-- `godz_garages`: Sistema de garagens e veículos.
 - `godz_police`: Scripts auxiliares de polícia.
+- `godz_mdt`: Tablet policial (MDT).
 
 ### [godz_assets]
 > Recursos visuais e interativos.
@@ -106,7 +106,8 @@ Organização profissional e intuitiva:
 - `godz_phone`: Smartphone funcional.
 - `godz_vehicles`: Veículos customizados.
 - `godz_maps`: Mapeamentos exclusivos.
- - `godz_interface`: HUD moderna em Glassmorphism (Saúde, Colete, Fome, Sede, Oxigênio).
+- `godz_interface`: HUD moderna em Glassmorphism.
+- `godz_garages`: Sistema de garagens e veículos.
 
 ### [godz_security]
 > Proteção e integridade.
