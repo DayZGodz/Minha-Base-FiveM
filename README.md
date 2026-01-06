@@ -374,6 +374,21 @@ O Ecossistema GODZ possui um comando exclusivo para configurar toda a infraestru
     *   Gera Webhooks automaticamente para cada canal.
     *   **Sincronização:** Atualiza o `GODZ_MASTER_CONFIG.json` com os novos links, dispensando configuração manual.
 
+### 📊 GODZ Analytics (Business Intelligence)
+
+O sistema monitora a saúde do servidor em tempo real e detecta tendências de abandono (Churn).
+
+1.  **Coleta de Dados:** O módulo `godz_modules/analytics` envia a cada 30 minutos:
+    *   Total de jogadores online.
+    *   Economia Ativa (Soma das carteiras + bancos de quem está online).
+    *   Top 3 Empregos mais populares.
+2.  **Relatório Executivo:**
+    *   Comando Discord: `/stats` (Apenas CEOs/Admins).
+    *   Exibe gráficos de crescimento (📈/📉) comparando com as últimas 24 horas.
+    *   **Alerta de Churn:** Avisa se jogadores regulares não logaram nos últimos 3 dias.
+3.  **Processamento IA:**
+    *   Os dados são armazenados em `godz_analytics_data.json` e processados pelo `godz_ai_bridge.py`.
+
 ---
 
 ## 💼 GODZ Jobs Pro (Progressão de Carreira)

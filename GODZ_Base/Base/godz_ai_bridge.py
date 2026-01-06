@@ -10,6 +10,7 @@ import discord
 from discord.ext import commands
 from flask import Flask, request, jsonify
 import numpy as np
+from datetime import datetime, timedelta
 
 # Configuração de Logs e Cores
 from colorama import init, Fore, Style
@@ -48,6 +49,31 @@ def save_master_config():
         print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro ao salvar Master Config: {e}")
 
 load_master_config()
+
+# ==================================================================================
+# 0.1 ANALYTICS DATA
+# ==================================================================================
+ANALYTICS_DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "godz_analytics_data.json")
+ANALYTICS_DATA = {"history": [], "player_last_seen": {}}
+
+def load_analytics_data():
+    global ANALYTICS_DATA
+    try:
+        if os.path.exists(ANALYTICS_DATA_PATH):
+            with open(ANALYTICS_DATA_PATH, "r", encoding="utf-8") as f:
+                ANALYTICS_DATA = json.load(f)
+            print(f"{Fore.GREEN}[GODZ ANALYTICS] {Fore.WHITE}Dados históricos carregados.")
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ ANALYTICS] {Fore.WHITE}Erro ao carregar dados: {e}")
+
+def save_analytics_data():
+    try:
+        with open(ANALYTICS_DATA_PATH, "w", encoding="utf-8") as f:
+            json.dump(ANALYTICS_DATA, f, indent=4)
+    except Exception as e:
+        logger.error(f"Erro ao salvar analytics: {e}")
+
+load_analytics_data()
 
 # ==================================================================================
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
@@ -253,6 +279,55 @@ def run_discord_bot():
         )
         await interaction.followup.send(embed=embed)
 
+    @bot.tree.command(name="stats", description="Exibe relatório executivo de métricas (CEO Only).")
+    async def stats(interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("❌ Apenas CEOs/Admins.", ephemeral=True)
+            return
+            
+        history = ANALYTICS_DATA["history"]
+        if not history:
+             await interaction.response.send_message("📊 Sem dados suficientes para gerar relatório.", ephemeral=True)
+             return
+             
+        latest = history[-1]
+        
+        # Compare with 24h ago (approx 48 entries)
+        past = history[0]
+        if len(history) > 48:
+            past = history[-48]
+            
+        growth_players = latest["online_players"] - past["online_players"]
+        growth_eco = latest["economy_balance"] - past["economy_balance"]
+        
+        emoji_players = "📈" if growth_players >= 0 else "📉"
+        emoji_eco = "📈" if growth_eco >= 0 else "📉"
+        
+        jobs = latest["active_jobs"]
+        sorted_jobs = sorted(jobs.items(), key=lambda item: item[1], reverse=True)[:3]
+        jobs_str = "\n".join([f"**{k}:** {v}" for k,v in sorted_jobs])
+        
+        embed = discord.Embed(title="📊 GODZ Executive Report", color=COLOR_NEON_CYAN)
+        embed.add_field(name="👥 Jogadores Online", value=f"**{latest['online_players']}** ({emoji_players} {growth_players:+})", inline=True)
+        embed.add_field(name="💰 Economia Ativa", value=f"**${latest['economy_balance']:,.0f}** ({emoji_eco} {growth_eco:+})", inline=True)
+        embed.add_field(name="👷 Top Empregos", value=jobs_str or "Nenhum", inline=False)
+        
+        churn_count = 0
+        now = datetime.now()
+        for uid, date_str in ANALYTICS_DATA["player_last_seen"].items():
+            try:
+                last_seen = datetime.strptime(date_str, "%Y-%m-%d")
+                if (now - last_seen).days > 3:
+                    churn_count += 1
+            except:
+                pass
+                
+        if churn_count > 0:
+            embed.add_field(name="⚠️ Risco de Churn", value=f"**{churn_count}** Jogadores ausentes > 3 dias", inline=False)
+            
+        embed.set_footer(text=f"Atualizado em {datetime.now().strftime('%H:%M')}")
+        await interaction.response.send_message(embed=embed)
+
     try:
         bot.run(DISCORD_TOKEN)
     except Exception as e:
@@ -446,6 +521,36 @@ def generate_mission():
             send_discord_webhook(DISCORD_WEBHOOK_NEWS, embed)
             
     return jsonify({"mission": mission})
+
+@app.route('/analytics_ingest', methods=['POST'])
+def analytics_ingest():
+    data = request.json
+    timestamp = datetime.now().isoformat()
+    
+    # 1. Update History
+    snapshot = {
+        "timestamp": timestamp,
+        "online_players": data.get("online_players", 0),
+        "economy_balance": data.get("economy_balance", 0),
+        "active_jobs": data.get("active_jobs", {})
+    }
+    ANALYTICS_DATA["history"].append(snapshot)
+    
+    # Keep only last 30 days of history (approx 1440 entries at 30min intervals)
+    if len(ANALYTICS_DATA["history"]) > 1440: 
+        ANALYTICS_DATA["history"] = ANALYTICS_DATA["history"][-1440:]
+    
+    # 2. Update Player Last Seen & Detect Churn
+    active_ids = data.get("active_user_ids", [])
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    
+    # Update active
+    for uid in active_ids:
+        ANALYTICS_DATA["player_last_seen"][str(uid)] = current_date
+    
+    save_analytics_data()
+    logger.info(f"Analytics recebido: {len(active_ids)} players, ${snapshot['economy_balance']}")
+    return jsonify({"status": "received"})
 
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor rodando na porta 5000...")
