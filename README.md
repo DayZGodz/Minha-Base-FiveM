@@ -159,6 +159,19 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🛠️ GODZ Admin (Painel de Gestão de Elite)
+
+- Ferramenta administrativa completa com interface Glassmorphism e Noclip otimizado.
+- **Funcionalidades:**
+  - 🖥️ **Tablet Admin:** Interface visual para gestão de jogadores, itens e veículos. Acesso via `/admin`.
+  - 👻 **Noclip Otimizado:** Sistema que oculta ID e personagem, com velocidade ajustável (Shift).
+  - 👥 **Gestão de Players:** Botões rápidos para Goto, Bring, Revive, Kick e Ban.
+  - 🛡️ **Integração de Segurança:** Exibe alertas do `godz_shield` diretamente no painel.
+- **Comandos:** `/admin` (Painel), `/noclip` (Modo Fantasma).
+- **Dependências:** `godz_shield` (Opcional, para alertas).
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
