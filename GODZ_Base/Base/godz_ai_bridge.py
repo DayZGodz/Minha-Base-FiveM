@@ -481,6 +481,38 @@ def sentinel_check():
         
     return jsonify({"status": "alert_sent"})
 
+@app.route('/analyze_chest_activity', methods=['POST'])
+def analyze_chest_activity():
+    data = request.json
+    user_id = data.get('user_id')
+    faction = data.get('faction')
+    item = data.get('item')
+    amount = data.get('amount')
+    
+    # Lógica de detecção de anomalia (Limpa-Baú)
+    # Regra simples: Retirada > 100 itens ou itens específicos de alto valor em massa
+    
+    is_anomaly = False
+    if amount > 100:
+        is_anomaly = True
+    
+    if is_anomaly:
+        logger.warning(f"ANOMALIA DETECTADA: {user_id} retirou {amount}x {item} de {faction}")
+        
+        embed = {
+            "title": "🚨 GODZ Chest Security | Limpa-Baú?",
+            "description": f"**Jogador:** {user_id}\n**Facção:** {faction}\n**Ação:** Retirou **{amount}x {item}**\n\n⚠️ Movimentação atípica detectada pela IA.",
+            "color": COLOR_NEON_RED,
+            "footer": {"text": "GODZ Security AI"}
+        }
+        
+        if DISCORD_WEBHOOK_SENTINEL:
+            send_discord_webhook(DISCORD_WEBHOOK_SENTINEL, embed)
+            
+        return jsonify({"alert": True, "reason": "high_volume"})
+        
+    return jsonify({"alert": False})
+
 @app.route('/generate_mission', methods=['POST'])
 def generate_mission():
     data = request.json

@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'GODZ Team'
-description 'GODZ Factions - Gestão Avançada de Grupos'
+description 'GODZ Tuning - Customização de Alta Performance'
 version '1.0.0'
 
 shared_scripts {
@@ -24,5 +24,6 @@ ui_page 'nui/index.html'
 files {
     'nui/index.html',
     'nui/style.css',
-    'nui/script.js'
+    'nui/script.js',
+    'nui/img/*.png' -- Assumindo que haverá imagens futuramente
 }

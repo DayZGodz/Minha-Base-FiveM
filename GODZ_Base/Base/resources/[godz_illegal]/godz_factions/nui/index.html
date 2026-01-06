@@ -1,39 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Unity Factions</title>
+    <title>GODZ Factions</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> <!-- Optional for icons -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="app" style="display: none;">
-        <div class="container">
-            <header>
-                <h1 id="faction-name">NOME DA FACÇÃO</h1>
-                <div class="hire-controls">
-                    <input type="number" id="hire-id" placeholder="ID do Passaporte">
-                    <button id="btn-hire">CONTRATAR</button>
+    <div id="app" class="container" style="display: none;">
+        <header>
+            <div class="logo">
+                <h1>GODZ FACTIONS</h1>
+                <span id="faction-name">CARREGANDO...</span>
+            </div>
+            <button class="close-btn" onclick="closeNUI()">ESC</button>
+        </header>
+
+        <main>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <h3>Membros Online</h3>
+                    <span id="online-count">0</span>
                 </div>
-            </header>
-            
-            <div class="members-list">
-                <div class="list-header">
-                    <span>ID</span>
-                    <span>NOME</span>
-                    <span>CARGO</span>
-                    <span>FARM (ITENS)</span>
-                    <span>AÇÕES</span>
-                </div>
-                <div id="members-container">
-                    <!-- Members injected via JS -->
+                <div class="stat-card">
+                    <h3>Saldo do Baú</h3>
+                    <span id="chest-balance">$0</span>
                 </div>
             </div>
-            
-            <button class="close-btn" onclick="closeMenu()">FECHAR</button>
-        </div>
+
+            <div class="members-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cargo</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="members-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
     </div>
     <script src="script.js"></script>
 </body>

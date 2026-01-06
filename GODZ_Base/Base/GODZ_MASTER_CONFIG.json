@@ -34,5 +34,13 @@
             1,
             2
         ]
+    },
+    "tuning_prices": {
+        "engine_base": 5000,
+        "turbo_base": 15000,
+        "brakes_base": 2000,
+        "transmission_base": 3000,
+        "suspension_base": 2500,
+        "armor_base": 10000
     }
 }

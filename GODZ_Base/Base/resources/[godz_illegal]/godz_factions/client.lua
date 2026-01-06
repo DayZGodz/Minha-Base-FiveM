@@ -1,44 +1,85 @@
-local Tunnel = module("vrp","lib/Tunnel")
-local Proxy = module("vrp","lib/Proxy")
+local Tunnel = module("vrp", "lib/Tunnel")
+local Proxy = module("vrp", "lib/Proxy")
 vRP = Proxy.getInterface("vRP")
 
-local Config = module("godz_factions", "config")
-local menuOpen = false
+local isDashboardOpen = false
 
-RegisterCommand(Config.Command, function()
-    TriggerServerEvent("godz_factions:requestData")
+-- Command to open dashboard
+RegisterCommand("fmenu", function()
+    TriggerServerEvent("godz_factions:getDashboardData")
 end)
 
-RegisterNetEvent("godz_factions:openMenu")
-AddEventHandler("godz_factions:openMenu", function(data)
+RegisterNetEvent("godz_factions:openDashboard")
+AddEventHandler("godz_factions:openDashboard", function(data)
+    isDashboardOpen = true
     SetNuiFocus(true, true)
     SendNUIMessage({
         action = "open",
-        data = data
-    })
-    menuOpen = true
-end)
-
-RegisterNetEvent("godz_factions:updateMembers")
-AddEventHandler("godz_factions:updateMembers", function(members)
-    SendNUIMessage({
-        action = "updateMembers",
-        members = members
+        faction = data.faction,
+        members = data.members
     })
 end)
 
 RegisterNUICallback("close", function(data, cb)
+    isDashboardOpen = false
     SetNuiFocus(false, false)
-    menuOpen = false
     cb("ok")
 end)
 
-RegisterNUICallback("hire", function(data, cb)
-    TriggerServerEvent("godz_factions:hireMember", data.target_id)
+RegisterNUICallback("manageMember", function(data, cb)
+    TriggerServerEvent("godz_factions:manageMember", data)
     cb("ok")
 end)
 
-RegisterNUICallback("fire", function(data, cb)
-    TriggerServerEvent("godz_factions:fireMember", data.target_id)
-    cb("ok")
+-- Zones & Target
+Citizen.CreateThread(function()
+    -- Inicializar Targets das Zonas
+    if exports["godz_target"] then
+        for zoneName, zoneData in pairs(Config.Zones) do
+            exports["godz_target"]:AddCircleZone("FactionZone_"..zoneName, zoneData.coords, 2.0, {
+                name = "FactionZone_"..zoneName,
+                debugPoly = false,
+            }, {
+                options = {
+                    {
+                        event = "godz_factions:checkZone", -- Evento intermediário para passar dados
+                        icon = "fas fa-flag",
+                        label = "Interagir com Zona",
+                        zoneName = zoneName
+                    }
+                },
+                distance = 2.5
+            })
+        end
+    end
+
+    -- Loop de Marcadores (Visual apenas ou Fallback)
+    while true do
+        local idle = 1000
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        
+        for zoneName, zoneData in pairs(Config.Zones) do
+            local dist = #(coords - zoneData.coords)
+            if dist < zoneData.radius then
+                idle = 5
+                DrawMarker(27, zoneData.coords.x, zoneData.coords.y, zoneData.coords.z - 0.95, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 155, 89, 182, 100, 0, 0, 0, 1)
+                
+                -- Fallback se não tiver target
+                if not exports["godz_target"] and dist < 1.5 then
+                    if IsControlJustPressed(0, 38) then -- E
+                         TriggerServerEvent("godz_factions:interactZone", zoneName)
+                    end
+                end
+            end
+        end
+        Wait(idle)
+    end
+end)
+
+RegisterNetEvent("godz_factions:checkZone")
+AddEventHandler("godz_factions:checkZone", function(data)
+    if data and data.zoneName then
+        TriggerServerEvent("godz_factions:interactZone", data.zoneName)
+    end
 end)

@@ -1,25 +1,15 @@
-local Config = {}
+Config = {}
 
-Config.Command = "faccao" -- Command to open the menu
+-- Configurações locais que não dependem da Master Config
+Config.Debug = false
 
--- Definition of Factions
--- [FactionID] = { name = "Display Name", leaderGroup = "groupName", memberGroup = "groupName" }
-Config.Factions = {
-    ["police"] = {
-        name = "Polícia Militar",
-        leaderGroup = "comandante", -- Example leader group
-        memberGroup = "policia"     -- Example member group
-    },
-    ["medico"] = {
-        name = "Hospital",
-        leaderGroup = "diretor",
-        memberGroup = "medico"
-    },
-    ["burguer"] = {
-        name = "BurguerShot",
-        leaderGroup = "burguer1",
-        memberGroup = "burguer"
+-- Zonas de Dominação (Exemplo)
+Config.Zones = {
+    ["biqueira_sul"] = {
+        coords = vector3(100.0, -1900.0, 20.0),
+        radius = 5.0,
+        owner_group = "ballas", -- Será validado com Master Config
+        farm_item = "folha_coca",
+        farm_amount = 1
     }
 }
-
-return Config

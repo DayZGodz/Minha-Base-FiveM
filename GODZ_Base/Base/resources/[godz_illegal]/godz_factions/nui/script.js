@@ -1,58 +1,60 @@
-$(document).ready(function(){
-    window.addEventListener('message', function(event){
-        var item = event.data;
-        if(item.action == 'open'){
-            $('#app').fadeIn(200);
-            $('#faction-name').text(item.data.factionName);
-            renderMembers(item.data.members);
-        } else if(item.action == 'updateMembers') {
-            renderMembers(item.members);
-        } else if(item.action == 'close') {
-            $('#app').fadeOut(200);
-        }
-    });
-
-    $('#btn-hire').click(function(){
-        var id = $('#hire-id').val();
-        if(id){
-            $.post('http://godz_factions/hire', JSON.stringify({ target_id: id }));
-            $('#hire-id').val('');
-        }
-    });
-
-    $(document).keyup(function(e) {
-        if (e.key === "Escape") closeMenu();
-    });
+window.addEventListener("message", function(event) {
+    if (event.data.action == "open") {
+        document.getElementById("app").style.display = "flex";
+        setupDashboard(event.data);
+    }
 });
 
-function renderMembers(members) {
-    var container = $('#members-container');
-    container.empty();
-
-    members.sort((a, b) => b.farm - a.farm); // Sort by farm contribution
-
-    members.forEach(member => {
-        var role = member.is_leader ? '<span class="status-leader">LÍDER</span>' : '<span class="status-member">MEMBRO</span>';
-        var actions = member.is_leader ? '' : `<button class="btn-fire" onclick="fireMember(${member.user_id})">DEMITIR</button>`;
-        
-        var html = `
-        <div class="member-row">
-            <div>${member.user_id}</div>
-            <div>${member.name}</div>
-            <div>${role}</div>
-            <div>${member.farm}</div>
-            <div>${actions}</div>
-        </div>
-        `;
-        container.append(html);
+function closeNUI() {
+    document.getElementById("app").style.display = "none";
+    fetch(`https://${GetParentResourceName()}/close`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({})
     });
 }
 
-function fireMember(id) {
-    $.post('http://godz_factions/fire', JSON.stringify({ target_id: id }));
+function setupDashboard(data) {
+    document.getElementById("faction-name").innerText = data.faction.toUpperCase();
+    document.getElementById("online-count").innerText = data.members.length;
+    
+    const tbody = document.getElementById("members-body");
+    tbody.innerHTML = "";
+    
+    data.members.forEach(member => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>#${member.user_id}</td>
+            <td>${member.name}</td>
+            <td>${member.role}</td>
+            <td><span class="status-online">${member.status.toUpperCase()}</span></td>
+            <td>
+                <button class="btn-action btn-kick" onclick="manageMember(${member.user_id}, 'kick')">DEMITIR</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
-function closeMenu() {
-    $('#app').fadeOut(200);
-    $.post('http://godz_factions/close', JSON.stringify({}));
+function manageMember(targetId, action) {
+    fetch(`https://${GetParentResourceName()}/manageMember`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({
+            target_id: targetId,
+            action: action
+        })
+    }).then(() => {
+        // Opcional: Recarregar ou remover linha visualmente
+    });
 }
+
+document.onkeyup = function(data) {
+    if (data.which == 27) {
+        closeNUI();
+    }
+};
