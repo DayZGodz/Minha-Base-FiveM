@@ -1,76 +1,35 @@
 :root {
-    /* Cores Principais - Neon & Glassmorphism */
-    --godz-primary: #9b59b6;       /* Roxo Neon */
-    --godz-secondary: #8e44ad;     /* Roxo Escuro */
-    --godz-accent: #00e5ff;        /* Ciano Neon */
+    --godz-primary: #9b59b6;       /* Roxo Neon Principal */
+    --godz-secondary: #8e44ad;     /* Roxo Secundário */
+    --godz-accent: #00e5ff;        /* Ciano Neon para Destaques */
     --godz-success: #2ecc71;       /* Verde Sucesso */
     --godz-danger: #e74c3c;        /* Vermelho Erro */
     --godz-warning: #f1c40f;       /* Amarelo Alerta */
+    --godz-info: #3498db;          /* Azul Informação */
     
-    /* Fundos Glassmorphism */
     --godz-glass-bg: rgba(20, 20, 20, 0.85);
+    --godz-glass-bg-dark: rgba(10, 10, 10, 0.95);
     --godz-glass-border: 1px solid rgba(255, 255, 255, 0.1);
     --godz-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     
-    /* Tipografia */
-    --godz-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --godz-text-color: #ecf0f1;
-    --godz-text-muted: #bdc3c7;
-
-    /* Animações */
-    --godz-transition: all 0.3s ease-in-out;
+    --godz-text-color: #ffffff;
+    --godz-text-muted: rgba(255, 255, 255, 0.7);
+    
+    --godz-font-main: 'Montserrat', sans-serif;
+    --godz-font-secondary: 'Rajdhani', sans-serif;
 }
 
-/* Classes Utilitárias */
-.godz-glass {
+.godz-glass-panel {
     background: var(--godz-glass-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: var(--godz-glass-border);
     box-shadow: var(--godz-glass-shadow);
-    border-radius: 12px;
     color: var(--godz-text-color);
-    font-family: var(--godz-font);
 }
 
-.godz-btn {
-    background: linear-gradient(135deg, var(--godz-secondary), var(--godz-primary));
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: var(--godz-transition);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.godz-btn:hover {
-    box-shadow: 0 0 15px var(--godz-primary);
-    transform: translateY(-2px);
-}
-
-.godz-title {
-    color: var(--godz-accent);
-    text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--godz-primary);
-    padding-bottom: 5px;
-    display: inline-block;
-}
-
-.godz-glow-anim {
-    animation: godz-glow 2s infinite alternate;
-}
-
-@keyframes godz-glow {
-    from {
-        box-shadow: 0 0 10px var(--godz-primary), 0 0 20px var(--godz-primary);
-    }
-    to {
-        box-shadow: 0 0 20px var(--godz-accent), 0 0 30px var(--godz-accent);
-    }
+.godz-text-gradient {
+    background: linear-gradient(45deg, var(--godz-primary), var(--godz-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
