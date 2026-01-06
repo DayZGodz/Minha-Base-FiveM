@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>GODZ Missions</title>
+</head>
+<body>
+    <div id="app">
+        <div class="mission-card">
+            <div class="header">
+                <h1 id="missionTitle">NOVA MISSÃO</h1>
+            </div>
+            
+            <div class="content">
+                <div class="info-row">
+                    <span class="label">OBJETIVO</span>
+                    <p id="missionDesc">Recupere o pacote...</p>
+                </div>
+                
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <span class="label">RECOMPENSA</span>
+                        <span class="value money" id="missionReward">$5,000</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="label">TEMPO ESTIMADO</span>
+                        <span class="value" id="missionTime">10 min</span>
+                    </div>
+                    <div class="detail-box">
+                        <span class="label">LOCAL</span>
+                        <span class="value" id="missionLoc">Paleto Bay</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-accept" onclick="acceptMission()">ACEITAR</button>
+                <button class="btn-decline" onclick="closeUI()">RECUSAR</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

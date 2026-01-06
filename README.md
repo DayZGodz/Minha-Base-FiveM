@@ -320,6 +320,29 @@ Sistema de atendimento ao jogador de nível empresarial, integrando Jogo, Discor
 
 ---
 
+## 🎯 GODZ Missions (Gameplay Dinâmico)
+
+Sistema de missões procedurais geradas por IA para manter o servidor sempre movimentado.
+
+### 🤖 Gerador de Missões IA
+- **Procedural:** Endpoint `/generate_mission` no `godz_ai_bridge.py` cria missões únicas baseadas no nível do jogador.
+- **Tipos de Missão:** Entrega, Recuperação de Veículo, Sabotagem.
+- **Dificuldade Adaptativa:** Recompensas e tempo ajustam-se conforme o progresso no `godz_jobs`.
+
+### 📍 Interação Imersiva (Target)
+- **NPCs:** Espalhados pelo mapa, interagem via `godz_target` (Third Eye).
+- **Interface:** NUI em Glassmorphism exibe Objetivo, Tempo e Recompensa antes do aceite.
+
+### 💎 Recompensas e Economia
+- **Pagamento Automático:** Integração direta com `godz_bank`.
+- **Itens Raros:** Chance de drop de blueprints ou itens ilegais via `godz_inventory`.
+
+### 🚨 Eventos Globais (Discord)
+- **Notícias em Tempo Real:** Missões de nível "Raro" ou "Lendário" enviam um alerta automático no canal de Notícias do Discord.
+- **Movimentação:** Incentiva o PVP e a disputa por objetivos no mapa.
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.

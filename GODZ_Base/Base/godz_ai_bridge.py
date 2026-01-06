@@ -267,6 +267,47 @@ def ai_economy_simulation():
     
     return jsonify({"status": "success", "report": report_lines})
 
+@app.route('/generate_mission', methods=['POST'])
+def generate_mission():
+    data = request.json
+    player_level = data.get('level', 1)
+    
+    # Templates de missões baseados em nível
+    mission_templates = [
+        {"type": "delivery", "desc": "Entregue este pacote suspeito em {location}.", "reward": 500 * player_level, "time": 600, "rare": False},
+        {"type": "recovery", "desc": "Recupere o veículo roubado em {location}.", "reward": 1000 * player_level, "time": 900, "rare": False},
+        {"type": "sabotage", "desc": "Sabote o sistema de segurança em {location}.", "reward": 2000 * player_level, "time": 1200, "rare": True}
+    ]
+    
+    locations = ["Paleto Bay", "Sandy Shores", "Porto de LS", "Vinewood Hills"]
+    
+    # Seleção Procedural
+    template = np.random.choice(mission_templates)
+    location = np.random.choice(locations)
+    
+    mission = {
+        "title": f"Operação {template['type'].title()}",
+        "description": template['desc'].format(location=location),
+        "reward": template['reward'],
+        "time": template['time'],
+        "is_rare": template['rare'],
+        "location": location
+    }
+    
+    # Evento Global (Se for Rara)
+    if mission['is_rare']:
+        embed = {
+            "title": "🚨 GODZ BREAKING NEWS",
+            "description": f"Uma operação de **Grande Porte** foi iniciada em **{location}**!\nFiquem atentos a movimentações suspeitas.",
+            "color": COLOR_NEON_RED,
+            "image": {"url": "https://i.imgur.com/YourBanner.png"},
+            "footer": {"text": "GODZ News Network"}
+        }
+        if DISCORD_WEBHOOK_NEWS:
+            send_discord_webhook(DISCORD_WEBHOOK_NEWS, embed)
+            
+    return jsonify({"mission": mission})
+
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor rodando na porta 5000...")
     app.run(host='0.0.0.0', port=5000)

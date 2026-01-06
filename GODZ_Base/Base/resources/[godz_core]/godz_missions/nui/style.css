@@ -1,0 +1,153 @@
+:root {
+    --godz-primary: #9b59b6;
+    --godz-accent: #00e5ff;
+    --godz-success: #2ecc71;
+    --godz-danger: #e74c3c;
+    --godz-glass-bg: rgba(20, 20, 20, 0.9);
+    --godz-font: 'Montserrat', sans-serif;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--godz-font);
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+}
+
+#app {
+    display: none;
+}
+
+.mission-card {
+    width: 500px;
+    background: var(--godz-glass-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 30px;
+    color: white;
+    transform: scale(0.9);
+    animation: popIn 0.3s forwards;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--godz-primary), var(--godz-accent));
+}
+
+@keyframes popIn {
+    to { transform: scale(1); }
+}
+
+.header h1 {
+    margin: 0 0 20px 0;
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(45deg, #fff, var(--godz-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.info-row {
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.label {
+    display: block;
+    font-size: 10px;
+    color: var(--godz-accent);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #eee;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.detail-box {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.value {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.money {
+    color: var(--godz-success);
+}
+
+.actions {
+    display: flex;
+    gap: 15px;
+}
+
+button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.btn-accept {
+    background: var(--godz-accent);
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
+.btn-accept:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.5);
+}
+
+.btn-decline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-decline:hover {
+    background: rgba(231, 76, 60, 0.2);
+    color: var(--godz-danger);
+    border-color: var(--godz-danger);
+}
