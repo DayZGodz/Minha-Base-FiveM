@@ -1,5 +1,13 @@
 local last = { health = -1, armor = -1, hunger = -1, thirst = -1, oxygen = -1 }
 local showing = true
+local currentHunger = 0
+local currentThirst = 0
+
+RegisterNetEvent("godz:updateStatus")
+AddEventHandler("godz:updateStatus",function(h,t)
+    currentHunger = h
+    currentThirst = t
+end)
 
 Citizen.CreateThread(function()
     while true do
@@ -14,8 +22,8 @@ Citizen.CreateThread(function()
             local t = GetPlayerUnderwaterTimeRemaining(PlayerId())
             oxy = math.max(0, math.min(100, math.floor((t / 10) * 100)))
         end
-        local hunger = 100
-        local thirst = 100
+        local hunger = currentHunger
+        local thirst = currentThirst
 
         if healthPct ~= last.health or armor ~= last.armor or hunger ~= last.hunger or thirst ~= last.thirst or oxy ~= last.oxygen then
             SendNUIMessage({ action = "update", health = healthPct, armor = armor, hunger = hunger, thirst = thirst, oxygen = oxy, show = showing })
