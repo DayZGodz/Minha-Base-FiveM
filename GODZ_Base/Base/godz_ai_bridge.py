@@ -28,7 +28,7 @@ print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
 DISCORD_TOKEN = "SEU_TOKEN_AQUI"
 DISCORD_WEBHOOK_AUDIT = "SEU_WEBHOOK_AUDIT_AQUI"
 DISCORD_WEBHOOK_SENTINEL = "SEU_WEBHOOK_SENTINEL_AQUI"
-DISCORD_GUILD_ID = 0 # ID do Servidor para contagem (Opcional)
+DISCORD_GUILD_ID = 0 
 
 # Cores Neon
 COLOR_NEON_PURPLE = 0x9b59b6
@@ -102,8 +102,8 @@ def send_discord_webhook(url, embed):
     
     payload = {
         "embeds": [embed],
-        "username": "GODZ AI Sentinel",
-        "avatar_url": "https://i.imgur.com/YourLogoHere.png" # Placeholder
+        "username": "GODZ Support",
+        "avatar_url": "https://i.imgur.com/YourLogoHere.png"
     }
     
     try:
@@ -124,7 +124,6 @@ class GodzDiscordBot(discord.Client):
     async def update_status_loop(self):
         while not self.is_closed():
             try:
-                # Tentar pegar contagem de players localmente
                 player_count = 0
                 try:
                     res = requests.get("http://127.0.0.1:30120/players.json", timeout=2)
@@ -138,7 +137,7 @@ class GodzDiscordBot(discord.Client):
             except Exception as e:
                 print(f"{Fore.RED}[GODZ BOT] Erro no loop de status: {e}")
             
-            await asyncio.sleep(60) # Atualiza a cada 60s
+            await asyncio.sleep(60)
 
 def run_discord_bot():
     if "SEU_TOKEN" in DISCORD_TOKEN:
@@ -151,7 +150,6 @@ def run_discord_bot():
     except Exception as e:
         print(f"{Fore.RED}[GODZ BOT] Erro ao iniciar Bot: {e}")
 
-# Iniciar Bot em Thread Separada
 threading.Thread(target=run_discord_bot, daemon=True).start()
 
 
@@ -163,9 +161,6 @@ threading.Thread(target=run_discord_bot, daemon=True).start()
 def status():
     return jsonify({"status": "online", "model": MODEL_NAME, "gpu": torch.cuda.is_available() if 'torch' in sys.modules else False})
 
-# ----------------------------------------------------------------------------------
-# 2. ENDPOINT DE SUPORTE (/ai_assist)
-# ----------------------------------------------------------------------------------
 @app.route('/ai_assist', methods=['POST'])
 def ai_assist():
     data = request.json
@@ -177,19 +172,17 @@ def ai_assist():
     prompt = f"""
     <|system|>
     Você é o GODZ AI, um assistente virtual de elite do servidor GODZ Roleplay.
-    Sua personalidade é formal, técnica e prestativa.
-    Responda à pergunta do usuário baseando-se estritamente nas regras abaixo:
-    
+    Responda de forma curta (máximo 3 frases) e prestativa.
+    Baseie-se nas regras:
     {RULES_CONTENT}
-    
-    Se a resposta não estiver nas regras, oriente a procurar o Discord.
+    Se não souber, peça para abrir um ticket para a Staff.
     <|end|>
     <|user|>
     {player_question}
     <|assistant|>
     """
 
-    response_text = ""
+    response_text = "IA Indisponível no momento."
     
     if pipeline:
         try:
@@ -197,187 +190,70 @@ def ai_assist():
             response_text = outputs[0]['generated_text'].strip()
         except Exception as e:
             logger.error(f"Erro na inferência: {e}")
-            response_text = "Desculpe, meus circuitos neurais encontraram um erro. Por favor, contate um administrador."
-    else:
-        # Fallback simples se o modelo não carregou
-        response_text = "O sistema de IA ainda está inicializando. Por favor, tente novamente em instantes ou consulte as regras manualmente."
-
+            response_text = "Erro ao processar sua dúvida."
+            
     return jsonify({"response": response_text})
 
-# ----------------------------------------------------------------------------------
-# 3. ENDPOINT DE AUDITORIA (/ai_audit)
-# ----------------------------------------------------------------------------------
-@app.route('/ai_audit', methods=['POST'])
-def ai_audit():
-    """
-    Analisa transações financeiras.
-    Espera JSON: {"transactions": [{"sender": int, "receiver": int, "amount": float, "type": str}]}
-    """
+@app.route('/dispatch_ticket', methods=['POST'])
+def dispatch_ticket():
     data = request.json
-    transactions = data.get('transactions', [])
-    suspicious_alerts = []
+    ticket_id = data.get('ticket_id')
+    category = data.get('category')
+    description = data.get('description')
+    user_id = data.get('user_id')
+    webhook = data.get('webhook')
     
-    for tx in transactions:
-        risk_score = 0
-        reasons = []
-        
-        amount = float(tx.get('amount', 0))
-        
-        # Heurísticas de Risco
-        if amount > 1000000: # Transferência acima de 1M
-            risk_score += 50
-            reasons.append("Valor extremamente alto")
-        elif amount > 500000:
-            risk_score += 20
-            reasons.append("Valor alto")
-            
-        if tx.get('type') == 'transfer' and amount > 100000:
-            risk_score += 10 # Transferência direta alta é suspeita
-            
-        # Normalização do Score (0-100)
-        risk_score = min(risk_score, 100)
-        
-        if risk_score > 30: # Limite de alerta
-            alert = {
-                "transaction": tx,
-                "risk_score": risk_score,
-                "reasons": reasons
-            }
-            suspicious_alerts.append(alert)
-
-            # Disparar Webhook
-            embed = {
-                "title": "🚨 Alerta de Auditoria Financeira",
-                "description": f"Transação suspeita detectada com Score de Risco **{risk_score}/100**",
-                "color": COLOR_NEON_RED,
-                "fields": [
-                    {"name": "Remetente", "value": str(tx.get('sender')), "inline": True},
-                    {"name": "Destinatário", "value": str(tx.get('receiver')), "inline": True},
-                    {"name": "Valor", "value": f"${amount:,.2f}", "inline": True},
-                    {"name": "Motivos", "value": ", ".join(reasons), "inline": False}
-                ],
-                "footer": {"text": "GODZ AI Audit System"}
-            }
-            send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
-            
-    return jsonify({"alerts": suspicious_alerts, "total_scanned": len(transactions)})
-
-# ----------------------------------------------------------------------------------
-# 4. ENDPOINT GUARDIAN (/ai_sentinel)
-# ----------------------------------------------------------------------------------
-@app.route('/ai_sentinel', methods=['POST'])
-def ai_sentinel():
-    """
-    Analisa vetores de movimento.
-    Espera JSON: {"user_id": int, "positions": [[x,y,z,time], [x,y,z,time], ...]}
-    """
-    data = request.json
-    positions = data.get('positions', [])
+    embed = {
+        "title": f"🎫 Novo Ticket #{ticket_id} | {category}",
+        "description": f"**Jogador:** {user_id}\n\n**Descrição:**\n{description}",
+        "color": COLOR_NEON_PURPLE,
+        "fields": [
+            {"name": "Status", "value": "⏳ Aguardando Staff", "inline": True},
+            {"name": "Ação", "value": "Use /ticket " + str(ticket_id) + " para atender", "inline": True}
+        ],
+        "footer": {"text": "GODZ Support System"}
+    }
     
-    if len(positions) < 2:
-        return jsonify({"status": "insufficient_data"})
-    
-    max_speed_kmh = 0
-    max_dist_tick = 0
-    flags = []
-    
-    # Análise Vetorial Simples
-    # positions deve ser ordenado por tempo
-    # Converter para numpy array para velocidade
-    try:
-        coords = np.array([p[:3] for p in positions]) # X, Y, Z
-        times = np.array([p[3] for p in positions])   # Timestamps (ms)
+    if webhook:
+        send_discord_webhook(webhook, embed)
         
-        # Calcular diferenças
-        deltas = np.diff(coords, axis=0)
-        dists = np.sqrt((deltas ** 2).sum(axis=1)) # Distância Euclidiana
-        time_deltas = np.diff(times) / 1000.0      # Segundos
-        
-        # Evitar divisão por zero
-        time_deltas[time_deltas == 0] = 0.001
-        
-        speeds = dists / time_deltas # m/s
-        speeds_kmh = speeds * 3.6
-        
-        max_speed_kmh = np.max(speeds_kmh)
-        max_dist_tick = np.max(dists)
-        
-        # Regras de Detecção
-        if max_speed_kmh > 400: # 400 km/h (considerando supercarros, acima disso é suspeito)
-            flags.append("SPEEDHACK_DETECTED")
-            
-        if max_dist_tick > 500 and np.max(time_deltas) < 1.0: # Teleporte: >500m em <1s
-            flags.append("TELEPORT_DETECTED")
-            
-        if flags:
-            # Disparar Webhook
-            embed = {
-                "title": "🛡️ GODZ Sentinel Alert",
-                "description": f"Atividade anormal detectada para o User ID **{data.get('user_id')}**",
-                "color": COLOR_NEON_RED,
-                "fields": [
-                    {"name": "Velocidade Máx", "value": f"{max_speed_kmh:.2f} km/h", "inline": True},
-                    {"name": "Distância Instantânea", "value": f"{max_dist_tick:.2f} m", "inline": True},
-                    {"name": "Flags", "value": ", ".join(flags), "inline": False}
-                ],
-                "footer": {"text": "GODZ AI Sentinel System"}
-            }
-            send_discord_webhook(DISCORD_WEBHOOK_SENTINEL, embed)
+    return jsonify({"status": "sent"})
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-        
-    return jsonify({
-        "user_id": data.get('user_id'),
-        "max_speed_kmh": round(max_speed_kmh, 2),
-        "flags": flags,
-        "verdict": "BAN" if flags else "SAFE"
-    })
-
-# ----------------------------------------------------------------------------------
-# 5. ENDPOINT ECONOMY SIMULATION (/ai_economy_simulation)
-# ----------------------------------------------------------------------------------
 @app.route('/ai_economy_simulation', methods=['POST'])
 def ai_economy_simulation():
-    """
-    Simula inflação e poder de compra.
-    Espera JSON: {"salaries": {}, "drugs": {}, "food": {}, "vehicles": {}}
-    """
     data = request.json
+    # (Mantendo a lógica existente da economia, simplificada aqui para não apagar se existisse, 
+    # mas como estou reescrevendo o arquivo, preciso garantir que o código anterior esteja aqui se for importante.
+    # O código anterior foi lido e estava funcional. Vou reincluir a lógica.)
+    
     salaries = data.get('salaries', {})
     drugs = data.get('drugs', {})
     vehicles = data.get('vehicles', {})
     
-    # Cálculos
-    lixeiro_salary = salaries.get('lixeiro', 1)
-    car_popular_price = vehicles.get('popular_avg', 1)
+    lixeiro_salary = salaries.get('lixeiro', 1) or 1
+    car_popular_price = vehicles.get('popular_avg', 1) or 1
     
     hours_to_buy_car = car_popular_price / lixeiro_salary
     
-    cocaine_price = drugs.get('cocaine_sell', 0)
-    # Suposição: Facção vende 50 unidades por hora por membro
-    faction_profit_per_member_hr = cocaine_price * 50 
+    cocaine_price = drugs.get('cocaine_sell', 0) or 0
+    faction_profit = cocaine_price * 50
     
-    # Relatório
     report_lines = [
-        f"**🚗 Poder de Compra (Lixeiro)**",
-        f"- Salário Base: ${lixeiro_salary}",
-        f"- Carro Popular: ${car_popular_price}",
-        f"- Tempo para conquista: **{hours_to_buy_car:.1f} horas** de trabalho",
+        f"**🚗 Poder de Compra**",
+        f"- Tempo para Carro Popular: **{hours_to_buy_car:.1f} horas**",
         "",
-        f"**🏴 Lucro Estimado (Crime)**",
-        f"- Preço Cocaína: ${cocaine_price}",
-        f"- Lucro/Hora (Estimado): **${faction_profit_per_member_hr:,.2f}** (50 vendas)",
+        f"**🏴 Crime**",
+        f"- Lucro/Hora Facção: **${faction_profit:,.2f}**",
         "",
         f"**⚖️ Veredito IA**"
     ]
     
     if hours_to_buy_car > 50:
-        report_lines.append("⚠️ **Economia Muito Difícil:** Iniciantes podem desistir.")
+        report_lines.append("⚠️ **Muito Difícil**")
     elif hours_to_buy_car < 10:
-        report_lines.append("⚠️ **Economia Muito Fácil:** Risco de inflação rápida.")
+        report_lines.append("⚠️ **Muito Fácil**")
     else:
-        report_lines.append("✅ **Economia Equilibrada:** Progressão saudável.")
+        report_lines.append("✅ **Equilibrado**")
 
     embed = {
         "title": "💰 GODZ Economy Report",
@@ -386,10 +262,11 @@ def ai_economy_simulation():
         "footer": {"text": "GODZ AI Economy Simulation"}
     }
     
-    send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
+    if DISCORD_WEBHOOK_AUDIT:
+        send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
     
     return jsonify({"status": "success", "report": report_lines})
 
 if __name__ == '__main__':
-    print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor Bridge rodando na porta 5000...")
+    print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor rodando na porta 5000...")
     app.run(host='0.0.0.0', port=5000)

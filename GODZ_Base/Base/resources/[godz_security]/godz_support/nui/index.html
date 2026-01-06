@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>GODZ Support</title>
+</head>
+<body>
+    <div id="app">
+        <div class="ticket-container">
+            <div class="header">
+                <h1>GODZ <span style="color: var(--godz-accent)">Support</span></h1>
+                <div class="close-btn" onclick="closeUI()">✖</div>
+            </div>
+
+            <div class="content">
+                <div class="categories" id="categoryList">
+                    <!-- Categories injected via JS -->
+                </div>
+
+                <div class="form-area">
+                    <div class="input-group">
+                        <label>Descreva seu problema:</label>
+                        <textarea id="ticketDescription" placeholder="Seja detalhado para agilizar o atendimento..."></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="submitTicket()">Abrir Chamado</button>
+                </div>
+            </div>
+
+            <!-- AI Response Overlay -->
+            <div class="ai-response" id="aiOverlay">
+                <div class="ai-header">
+                    <div class="ai-avatar">🤖</div>
+                    <div>
+                        <h2 style="margin:0; color:var(--godz-accent)">GODZ AI Assistant</h2>
+                        <span style="font-size:12px; opacity:0.7">Sugestão Automática</span>
+                    </div>
+                </div>
+                <div class="ai-content" id="aiText">
+                    <!-- AI response text -->
+                </div>
+                <div class="ai-actions">
+                    <button class="btn-resolve" onclick="resolveTicket()">✅ Resolvido! Obrigado</button>
+                    <button class="btn-escalate" onclick="escalateTicket()">👤 Falar com Staff</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

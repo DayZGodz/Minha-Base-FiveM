@@ -290,6 +290,36 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🎫 GODZ Support (Gestão de Comunidade)
+
+Sistema de atendimento ao jogador de nível empresarial, integrando Jogo, Discord e Inteligência Artificial.
+
+### 🤖 Atendimento Híbrido (IA + Humano)
+- **Triagem Inteligente:** Ao abrir um ticket de "Dúvida", a **GODZ AI** analisa a pergunta e tenta responder instantaneamente baseada nas regras do servidor (`REGRAS.txt`).
+- **Resolução Automática:** Se a resposta da IA for satisfatória, o ticket é fechado sem ocupar a Staff.
+- **Escalonamento:** Se o jogador não ficar satisfeito, o ticket é enviado para a fila de atendimento humano.
+
+### 🖥️ Painel In-Game (Glassmorphism)
+- **Comando:** `/calladmin` ou `F10`.
+- **Categorias:**
+  - 🐛 **Bugs:** Relatório técnico para desenvolvimento.
+  - 🚨 **Denúncia:** Report de anti-rp com prioridade.
+  - ❓ **Dúvida:** Atendimento primário via IA.
+  - 🔧 **Suporte:** Problemas de conexão/FPS.
+
+### 📡 Integração Discord (Webhook Avançado)
+- **Embeds Ricos:** Tickets enviados para o Discord contêm:
+  - ID do Jogador e Ticket.
+  - Categoria e Descrição detalhada.
+  - Status e Instruções para a Staff.
+- **Notificações:** A Staff é notificada instantaneamente sobre tickets pendentes.
+
+### 📊 Logs de Produtividade (SQL)
+- **Rastreabilidade Total:** Todo ticket (aberto, resolvido por IA ou Staff) é gravado no banco de dados `godz_support_tickets`.
+- **Auditoria:** Permite gerar relatórios de "Tickets por Dia" ou "Eficiência da IA".
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
