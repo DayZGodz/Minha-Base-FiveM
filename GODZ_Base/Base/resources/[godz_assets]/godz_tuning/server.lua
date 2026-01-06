@@ -44,13 +44,15 @@ Citizen.CreateThread(function()
     else
         print("^1[GODZ Tuning] Erro ao carregar GODZ_MASTER_CONFIG.json. Usando valores padrao.^0")
         MasterConfig = {
-            tuning_prices = {
-                engine_base = 5000,
-                turbo_base = 15000,
-                brakes_base = 2000,
-                transmission_base = 3000,
-                suspension_base = 2500,
-                armor_base = 10000
+            ECONOMY = {
+                tuning_prices = {
+                    engine_base = 5000,
+                    turbo_base = 15000,
+                    brakes_base = 2000,
+                    transmission_base = 3000,
+                    suspension_base = 2500,
+                    armor_base = 10000
+                }
             }
         }
     end
@@ -59,7 +61,11 @@ end)
 RegisterNetEvent("godz_tuning:requestConfig")
 AddEventHandler("godz_tuning:requestConfig", function()
     local source = source
-    TriggerClientEvent("godz_tuning:receiveConfig", source, MasterConfig.tuning_prices or {})
+    local prices = {}
+    if MasterConfig.ECONOMY and MasterConfig.ECONOMY.tuning_prices then
+        prices = MasterConfig.ECONOMY.tuning_prices
+    end
+    TriggerClientEvent("godz_tuning:receiveConfig", source, prices)
 end)
 
 RegisterNetEvent("godz_tuning:applyMod")
@@ -95,8 +101,8 @@ AddEventHandler("godz_tuning:applyMod", function(modType, modIndex, modLevel, ve
     -- Calcular Preço
     local price = 0
     local prices = {}
-    if MasterConfig.ECONOMY and MasterConfig.ECONOMY.tuning_prices then
-        prices = MasterConfig.ECONOMY.tuning_prices
+    if MasterConfig.SERVER_SETTINGS and MasterConfig.SERVER_SETTINGS.tuning_prices then
+        prices = MasterConfig.SERVER_SETTINGS.tuning_prices
     end
     
     if modType == "engine" then

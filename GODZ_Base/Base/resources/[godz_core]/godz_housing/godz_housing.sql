@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 CREATE TABLE IF NOT EXISTS `godz_housing_homes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) DEFAULT NULL,
@@ -7,7 +9,9 @@ CREATE TABLE IF NOT EXISTS `godz_housing_homes` (
   `garage` text DEFAULT NULL, -- JSON {x,y,z,h}
   `shell` varchar(50) NOT NULL DEFAULT 'shell_v16_mid',
   `max_keys` int(11) NOT NULL DEFAULT 3,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_housing_owner` (`owner_id`),
+  CONSTRAINT `fk_housing_owner` FOREIGN KEY (`owner_id`) REFERENCES `vrp_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `godz_housing_keys` (
@@ -17,7 +21,8 @@ CREATE TABLE IF NOT EXISTS `godz_housing_keys` (
   PRIMARY KEY (`id`),
   KEY `home_id` (`home_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_housing_keys_home` FOREIGN KEY (`home_id`) REFERENCES `godz_housing_homes` (`id`) ON DELETE CASCADE
+  CONSTRAINT `fk_housing_keys_home` FOREIGN KEY (`home_id`) REFERENCES `godz_housing_homes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_housing_keys_user` FOREIGN KEY (`user_id`) REFERENCES `vrp_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `godz_housing_furniture` (
@@ -30,3 +35,5 @@ CREATE TABLE IF NOT EXISTS `godz_housing_furniture` (
   KEY `home_id` (`home_id`),
   CONSTRAINT `fk_housing_furniture_home` FOREIGN KEY (`home_id`) REFERENCES `godz_housing_homes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;
