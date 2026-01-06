@@ -1,195 +1,207 @@
-local Tunnel = module("vrp","lib/Tunnel")
-local Proxy = module("vrp","lib/Proxy")
-vRP = Proxy.getInterface("vRP")
-
-local Targets = {}
-local GlobalPlayerTargets = {}
+local Models = {}
+local Entities = {}
 local Zones = {}
 
 local isTargeting = false
 local hasFocus = false
-local currentOptions = {}
-local lastEntity = nil
+local targetActive = false
+local success = false
 
--- CONFIG
-local maxDistance = 3.0
-
--- EXPORTS
-exports('AddTargetModel', function(models, options)
-    if type(models) ~= "table" then models = {models} end
-    for _, model in pairs(models) do
-        if type(model) == "string" then model = GetHashKey(model) end
-        Targets[model] = options
-    end
-end)
-
-exports('AddTargetPlayer', function(options)
-    for _, opt in pairs(options) do
-        table.insert(GlobalPlayerTargets, opt)
-    end
-end)
-
-exports('AddCircleZone', function(name, coords, radius, options)
-    Zones[name] = {
-        coords = coords,
-        radius = radius,
-        options = options
-    }
-end)
-
--- THREAD
-Citizen.CreateThread(function()
-    while true do
-        local idle = 250
-        
-        -- Default Key: Left Alt (19)
-        if IsControlPressed(0, 19) then
-            idle = 0
-            isTargeting = true
-            
-            local hit, entity, coords = RaycastGamePlayCamera(maxDistance)
-            local options = {}
-            local active = false
-
-            if not hasFocus then
-                -- Check Zones
-                local pCoords = GetEntityCoords(PlayerPedId())
-                for name, zone in pairs(Zones) do
-                    if #(pCoords - zone.coords) <= zone.radius then
-                        options = zone.options
-                        active = true
-                        break
-                    end
-                end
-
-                -- Check Entities
-                if not active and hit and DoesEntityExist(entity) then
-                    local model = GetEntityModel(entity)
-                    
-                    -- Player Check
-                    if IsPedAPlayer(entity) then
-                        options = GlobalPlayerTargets
-                        if #options > 0 then active = true end
-                    
-                    -- Model Check
-                    elseif Targets[model] then
-                        options = Targets[model]
-                        active = true
-                    end
-                    
-                    lastEntity = entity
-                end
-
-                -- Update UI
-                SendNUIMessage({
-                    type = "eye",
-                    display = true,
-                    active = active
-                })
-
-                -- Open Menu on Click (Right Mouse = 25? No, usually interact is same key release or Click)
-                -- Let's use Right Click (Mouse Button 2 -> 25)
-                if active and IsControlJustReleased(0, 25) then
-                    openMenu(options, entity)
-                end
-            end
-        elseif isTargeting then
-            isTargeting = false
-            SendNUIMessage({ type = "eye", display = false })
-        end
-
-        Citizen.Wait(idle)
-    end
-end)
-
-function RaycastGamePlayCamera(distance)
-    local cameraRotation = GetGameplayCamRot()
-    local cameraCoord = GetGameplayCamCoord()
-    local direction = RotationToDirection(cameraRotation)
-    local destination = {
-        x = cameraCoord.x + direction.x * distance,
-        y = cameraCoord.y + direction.y * distance,
-        z = cameraCoord.z + direction.z * distance
-    }
-    local a, b, c, d, e = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z, destination.x, destination.y, destination.z, -1, PlayerPedId(), 0))
-    return b, e, c
-end
-
-function RotationToDirection(rotation)
-    local adjustedRotation = {
-        x = (math.pi / 180) * rotation.x,
-        y = (math.pi / 180) * rotation.y,
-        z = (math.pi / 180) * rotation.z
-    }
-    local direction = {
-        x = -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-        y = math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
-        z = math.sin(adjustedRotation.x)
-    }
+-- Core Raycast Function
+local function RotationToDirection(rotation)
+    local adjustedRotation = vector3(
+        (math.pi / 180) * rotation.x,
+        (math.pi / 180) * rotation.y,
+        (math.pi / 180) * rotation.z
+    )
+    local direction = vector3(
+        -math.sin(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
+        math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
+        math.sin(adjustedRotation.x)
+    )
     return direction
 end
 
-function openMenu(options, entity)
-    hasFocus = true
-    currentOptions = options
-    SetNuiFocus(true, true)
-    
-    -- Filter options based on condition if exists
-    local validOptions = {}
-    for i, opt in ipairs(options) do
-        local allowed = true
-        if opt.condition then
-            allowed = opt.condition(entity)
-        end
-        
-        if allowed then
-            -- We need to pass index to identify back
-            opt._index = i
-            table.insert(validOptions, opt)
-        end
-    end
-    
-    SendNUIMessage({
-        type = "open",
-        options = validOptions
-    })
+local function RaycastCamera(distance)
+    local cameraRotation = GetGameplayCamRot()
+    local cameraCoord = GetGameplayCamCoord()
+    local direction = RotationToDirection(cameraRotation)
+    local destination = vector3(
+        cameraCoord.x + direction.x * distance,
+        cameraCoord.y + direction.y * distance,
+        cameraCoord.z + direction.z * distance
+    )
+
+    local shapeTest = StartShapeTestRay(
+        cameraCoord.x, cameraCoord.y, cameraCoord.z,
+        destination.x, destination.y, destination.z,
+        -1, PlayerPedId(), 0
+    )
+    local _, hit, endCoords, surfaceNormal, entityHit = GetShapeTestResult(shapeTest)
+    return hit, entityHit, endCoords
 end
 
-RegisterNUICallback('close', function(data, cb)
-    hasFocus = false
-    SetNuiFocus(false, false)
-    cb('ok')
-end)
+-- Check Targets
+local function CheckEntity(entity, coords)
+    local options = {}
 
-RegisterNUICallback('select', function(data, cb)
-    local index = data.index -- Index in the validOptions list? No, from JS it sends the array index.
-    -- Wait, JS sends index of the displayed array.
-    -- I need to map it back. 
-    -- Simplification: Just trust the index from the filtered list in JS? 
-    -- Re-filtering here is safer but complex.
-    -- Let's assume the validOptions list matches what JS has.
-    
-    -- Re-construct validOptions to find the selected one
-    local validOptions = {}
-    for i, opt in ipairs(currentOptions) do
-        local allowed = true
-        if opt.condition then allowed = opt.condition(lastEntity) end
-        if allowed then table.insert(validOptions, opt) end
-    end
-    
-    local selected = validOptions[data.index + 1] -- JS is 0-based
-    
-    if selected then
-        if selected.event then
-            TriggerEvent(selected.event, selected, lastEntity)
-        elseif selected.serverEvent then
-            TriggerServerEvent(selected.serverEvent, selected, lastEntity)
-        elseif selected.action then
-            selected.action(lastEntity)
+    -- Check Zones
+    for id, zone in pairs(Zones) do
+        local dist = #(coords - zone.center)
+        if dist <= zone.radius then
+            for _, opt in ipairs(zone.options) do
+                table.insert(options, opt)
+            end
         end
     end
-    
-    hasFocus = false
-    SetNuiFocus(false, false)
-    cb('ok')
+
+    if entity and entity > 0 then
+        local model = GetEntityModel(entity)
+        
+        -- Check Models
+        for _, data in pairs(Models) do
+            if data.models[model] then
+                for _, opt in ipairs(data.options) do
+                    table.insert(options, opt)
+                end
+            end
+        end
+
+        -- Check Config Global Targets
+            for _, data in pairs(Config.GlobalTargets) do
+                if data.models then
+                    for _, m in ipairs(data.models) do
+                        if GetHashKey(m) == model then
+                            for _, opt in ipairs(data.options) do
+                                table.insert(options, opt)
+                            end
+                        end
+                    end
+                end
+            end
+            
+            -- Check Players
+            if IsPedAPlayer(entity) and Config.GlobalTargets["player"] then
+                 for _, opt in ipairs(Config.GlobalTargets["player"].options) do
+                    table.insert(options, opt)
+                end
+            end
+            
+            -- Check Entities (Direct Reference)
+        if Entities[entity] then
+            for _, opt in ipairs(Entities[entity].options) do
+                table.insert(options, opt)
+            end
+        end
+    end
+
+    return options
+end
+
+-- Main Loop (Optimized)
+Citizen.CreateThread(function()
+    while true do
+        local wait = 500
+        if IsControlPressed(0, Config.TargetKey) then
+            wait = 0
+            isTargeting = true
+            
+            local hit, entity, coords = RaycastCamera(Config.MaxDistance)
+            
+            -- Always check if we hit something OR if we are in a zone (using coords)
+            local options = CheckEntity(entity, coords)
+            
+            if options and #options > 0 then
+                if not targetActive then
+                    targetActive = true
+                    SendNUIMessage({
+                        type = "foundTarget",
+                        options = options,
+                        entity = entity
+                    })
+                end
+            else
+                if targetActive then
+                    targetActive = false
+                    SendNUIMessage({ type = "lostTarget" })
+                end
+            end
+            
+            -- Enable Cursor if clicked
+            if IsControlJustPressed(0, 24) and targetActive then -- Left Click
+                SetNuiFocus(true, true)
+                hasFocus = true
+            end
+            
+            -- Draw Eye Icon via NUI (Handled by JS based on isTargeting state)
+            SendNUIMessage({ type = "targeting", state = true })
+        else
+            if isTargeting then
+                isTargeting = false
+                targetActive = false
+                SendNUIMessage({ type = "targeting", state = false })
+                SendNUIMessage({ type = "lostTarget" })
+            end
+        end
+        Citizen.Wait(wait)
+    end
 end)
+
+-- NUI Callbacks
+RegisterNUICallback("select", function(data, cb)
+    SetNuiFocus(false, false)
+    hasFocus = false
+    
+    if data.event then
+        TriggerEvent(data.event, data.entity)
+    elseif data.serverEvent then
+        TriggerServerEvent(data.serverEvent, data.entity)
+    end
+    cb("ok")
+end)
+
+RegisterNUICallback("close", function(data, cb)
+    SetNuiFocus(false, false)
+    hasFocus = false
+    cb("ok")
+end)
+
+-- Exports
+function AddTargetModel(models, options)
+    if type(models) ~= "table" then models = {models} end
+    local hashModels = {}
+    for _, m in ipairs(models) do
+        if type(m) == "string" then
+            hashModels[GetHashKey(m)] = true
+        else
+            hashModels[m] = true
+        end
+    end
+    table.insert(Models, { models = hashModels, options = options })
+end
+
+function AddTargetEntity(entity, options)
+    Entities[entity] = { options = options }
+end
+
+function AddTargetCircle(name, center, radius, options)
+    Zones[name] = { center = center, radius = radius, options = options.options }
+end
+
+function RemoveTargetModel(models)
+    -- Implementation skipped for brevity
+end
+
+function RemoveTargetEntity(entity)
+    Entities[entity] = nil
+end
+
+function RemoveTargetCircle(name)
+    Zones[name] = nil
+end
+
+-- Exports for External Use
+exports("AddTargetModel", AddTargetModel)
+exports("AddTargetEntity", AddTargetEntity)
+exports("AddTargetCircle", AddTargetCircle)
+

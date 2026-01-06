@@ -97,3 +97,8 @@ RegisterNUICallback("fine", function(data, cb)
         cb(success)
     end)
 end)
+
+RegisterNetEvent("godz_mdt:openFromVehicle")
+AddEventHandler("godz_mdt:openFromVehicle", function()
+    ToggleMDT()
+end)

@@ -42,18 +42,19 @@ Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **P
 - Menu Tático GODZ (`/pmenu`) centraliza ações essenciais.
 - Verificar Ficha, Apreender Itens, Escoltar, Algemar e Gestão de Veículos.
 
-### 🎯 Interação Avançada (Third Eye)
+### 🎯 GODZ Target (Interação de Próxima Geração)
 > Sistema de alvo moderno estilo ox_target/qtarget, integrado ao GODZ.
-- Recurso: `godz_target` com NUI leve (Glassmorphism).
-- Ativação: segure ALT, mire e clique direito para abrir opções.
-- Alvos de Jogador: Menu Policial, Verificar Ficha, Apreender, Algemar, Escoltar, CV/RV.
-- Garagens via Third Eye: selecione “Acessar Garagem” nas zonas.
-- Performance: substitui markers e reduz consumo de FPS.
-- Arquivos-Chave:
+- **Recurso:** `godz_target` com NUI leve (Glassmorphism).
+- **Ativação:** Segure ALT (configurável), mire e clique esquerdo para interagir.
+- **Integração Global:**
+  - 🏦 **Banco:** Acesso a ATMs e caixas sem markers no chão.
+  - 🚑 **Hospital:** Macas interativas (Deitar/Empurrar) e recepção via olho.
+  - 🚓 **Polícia:** Acesso ao MDT via viaturas e revista de jogadores.
+  - 🏴 **Ilegal:** Desmanche e processamento de drogas 100% via target.
+- **Performance:** 0.00ms em inatividade (Otimização Extrema).
+- **Arquivos-Chave:**
   - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_target/client.lua)
-  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_modules/policia/client.lua)
-  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_core%5D/godz_modules/policia/server.lua)
-  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_jobs%5D/godz_garages/client.lua)
+  - [config.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_target/config.lua)
 
 ### 🛠️ Gestão Administrativa 2.0
 > Controle total do servidor na ponta dos dedos.

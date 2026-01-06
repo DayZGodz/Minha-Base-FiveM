@@ -90,7 +90,8 @@ RegisterCommand("ems", function()
 end)
 
 -- Stretcher System
-RegisterCommand("maca", function()
+RegisterNetEvent("godz_ems:toggleStretcher")
+AddEventHandler("godz_ems:toggleStretcher", function()
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped)
     local forward = GetEntityForwardVector(ped)
@@ -101,7 +102,7 @@ RegisterCommand("maca", function()
         stretcherObject = nil
         TriggerEvent("godz_notify:notify", "aviso", "Maca", "Maca recolhida.")
     else
-        local model = GetHashKey("prop_gascyl_01a") -- Fallback prop if stretcher not avail, but trying stretcher
+        local model = GetHashKey("prop_gascyl_01a") -- Fallback
         local stretcherModel = GetHashKey("prop_stretcher_01")
         if IsModelInCdimage(stretcherModel) then model = stretcherModel end
         
@@ -111,6 +112,64 @@ RegisterCommand("maca", function()
         stretcherObject = CreateObject(model, spawnCoords.x, spawnCoords.y, spawnCoords.z, true, true, true)
         PlaceObjectOnGroundProperly(stretcherObject)
         TriggerEvent("godz_notify:notify", "sucesso", "Maca", "Maca retirada da ambulância.")
+    end
+end)
+
+-- Target Integration
+Citizen.CreateThread(function()
+    if exports["godz_target"] then
+        -- Reception Zone
+        exports["godz_target"]:AddTargetCircle("hospital_reception", vector3(307.0, -595.0, 43.0), 1.5, {
+            options = {
+                {
+                    event = "godz_ems:reception", -- Event to be implemented or linked to notify
+                    icon = "fas fa-clipboard-list",
+                    label = "Atendimento"
+                }
+            }
+        })
+
+        -- Stretcher Model
+        exports["godz_target"]:AddTargetModel({"prop_stretcher_01", "prop_gascyl_01a"}, {
+            {
+                event = "godz_ems:useStretcher",
+                icon = "fas fa-procédure",
+                label = "Deitar/Levantar"
+            },
+            {
+                event = "godz_ems:pushStretcher",
+                icon = "fas fa-hands",
+                label = "Empurrar/Soltar"
+            }
+        })
+    end
+end)
+
+RegisterNetEvent("godz_ems:useStretcher")
+AddEventHandler("godz_ems:useStretcher", function(entity)
+    -- Logic to attach player to stretcher
+    local ped = PlayerPedId()
+    if IsEntityAttachedToEntity(ped, entity) then
+        DetachEntity(ped, true, true)
+        ClearPedTasks(ped)
+    else
+        AttachEntityToEntity(ped, entity, 0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+        RequestAnimDict("anim@gangops@morgue@table@")
+        while not HasAnimDictLoaded("anim@gangops@morgue@table@") do Citizen.Wait(10) end
+        TaskPlayAnim(ped, "anim@gangops@morgue@table@", "body_search", 8.0, -8.0, -1, 1, 0, false, false, false)
+    end
+end)
+
+RegisterNetEvent("godz_ems:pushStretcher")
+AddEventHandler("godz_ems:pushStretcher", function(entity)
+    -- Logic to attach stretcher to player (pushing)
+    local ped = PlayerPedId()
+    if isPushing then
+        DetachEntity(entity, true, true)
+        isPushing = false
+    else
+        AttachEntityToEntity(entity, ped, GetPedBoneIndex(ped, 17916), 0.0, 1.5, -1.0, 0.0, 0.0, 90.0, false, false, false, false, 2, true)
+        isPushing = true
     end
 end)
 

@@ -1,101 +1,80 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
-}
-
 body {
-    background: transparent;
+    margin: 0;
     font-family: 'Poppins', sans-serif;
-    width: 100vw;
-    height: 100vh;
+    user-select: none;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-/* EYE ICON */
-#target-eye {
+.hidden {
+    display: none !important;
+}
+
+#eye {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgba(255, 255, 255, 0.8);
     font-size: 24px;
-    transition: 0.2s;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     pointer-events: none;
 }
 
-.eye-hidden {
-    opacity: 0;
+#eye.active {
+    color: #3498db;
+    text-shadow: 0 0 10px #3498db;
 }
 
-.eye-visible {
-    opacity: 1;
-}
-
-.eye-active {
-    color: #00d2ff;
-    font-size: 28px;
-    text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
-}
-
-/* MENU */
-#target-menu {
+#menu {
     position: absolute;
-    left: 55%; /* Offset from center */
     top: 50%;
+    left: 55%; /* Offset to right of eye */
     transform: translateY(-50%);
-    width: 250px;
-    background: rgba(16, 18, 27, 0.8);
-    backdrop-filter: blur(15px);
-    border-radius: 12px;
+    background: rgba(20, 25, 40, 0.9);
+    backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 10px;
+    width: 250px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
 }
 
-.menu-hidden {
-    display: none !important;
-}
-
-.menu-title {
-    color: #888;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
+.menu-header {
+    color: #aaa;
+    font-size: 0.8em;
+    padding-bottom: 5px;
     margin-bottom: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.menu-option {
-    background: rgba(255, 255, 255, 0.05);
+.option {
+    display: flex;
+    align-items: center;
     padding: 12px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
     color: white;
     cursor: pointer;
-    transition: 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    transition: all 0.2s;
 }
 
-.menu-option:hover {
-    background: rgba(0, 210, 255, 0.2);
-    color: #00d2ff;
+.option:hover {
+    background: rgba(52, 152, 219, 0.2);
     transform: translateX(5px);
 }
 
-.menu-option i {
-    width: 20px;
+.option i {
+    width: 25px;
     text-align: center;
+    margin-right: 10px;
+    color: #3498db;
+}
+
+.option:last-child {
+    margin-bottom: 0;
 }

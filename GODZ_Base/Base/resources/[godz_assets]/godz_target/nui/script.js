@@ -1,52 +1,59 @@
-window.addEventListener('message', function(event) {
-    const data = event.data;
+let currentEntity = null;
 
-    if (data.type === 'eye') {
-        const eye = document.getElementById('target-eye');
-        if (data.display) {
-            eye.className = data.active ? 'eye-visible eye-active' : 'eye-visible';
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'targeting') {
+        if (event.data.state) {
+            $('#eye').removeClass('hidden');
         } else {
-            eye.className = 'eye-hidden';
+            $('#eye').addClass('hidden');
+            $('#eye').removeClass('active');
+            $('#menu').addClass('hidden');
         }
-    } else if (data.type === 'open') {
-        openMenu(data.options);
-    } else if (data.type === 'close') {
-        closeMenu();
+    } else if (event.data.type === 'foundTarget') {
+        $('#eye').addClass('active');
+        currentEntity = event.data.entity;
+        renderOptions(event.data.options);
+        $('#menu').removeClass('hidden');
+    } else if (event.data.type === 'lostTarget') {
+        $('#eye').removeClass('active');
+        $('#menu').addClass('hidden');
+        currentEntity = null;
     }
 });
 
-function openMenu(options) {
-    const container = document.getElementById('options-container');
-    container.innerHTML = '';
-    
-    document.getElementById('target-menu').classList.remove('menu-hidden');
-    document.getElementById('target-eye').className = 'eye-hidden'; // Hide eye when menu is open
-
+function renderOptions(options) {
+    let html = '';
     options.forEach((opt, index) => {
-        const div = document.createElement('div');
-        div.className = 'menu-option';
-        div.innerHTML = `<i class="${opt.icon || 'fas fa-circle'}"></i> ${opt.label}`;
-        div.onclick = () => selectOption(index);
-        container.appendChild(div);
+        html += `
+            <div class="option" onclick="selectOption(${index})">
+                <i class="${opt.icon || 'fas fa-circle'}"></i>
+                <span>${opt.label}</span>
+            </div>
+        `;
     });
-}
-
-function closeMenu() {
-    document.getElementById('target-menu').classList.add('menu-hidden');
-    fetch(`https://${GetParentResourceName()}/close`, { method: 'POST' });
+    $('#options-container').html(html);
+    // Store options for click handler
+    window.currentOptions = options;
 }
 
 function selectOption(index) {
-    fetch(`https://${GetParentResourceName()}/select`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index: index })
-    });
-    closeMenu();
+    let opt = window.currentOptions[index];
+    if (opt) {
+        fetch(`https://${GetParentResourceName()}/select`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                event: opt.event,
+                serverEvent: opt.serverEvent,
+                entity: currentEntity
+            })
+        });
+    }
 }
 
 document.onkeyup = function(data) {
     if (data.which == 27) { // ESC
-        closeMenu();
+        fetch(`https://${GetParentResourceName()}/close`, { method: 'POST' });
+        $('#menu').addClass('hidden');
     }
 };

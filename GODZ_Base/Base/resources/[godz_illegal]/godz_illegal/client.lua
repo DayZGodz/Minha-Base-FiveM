@@ -59,30 +59,32 @@ local nearbyVehicle = nil
 local dismantledParts = {}
 
 Citizen.CreateThread(function()
-    while true do
-        local idle = 1000
-        local ped = PlayerPedId()
+    if exports["godz_target"] then
+        exports["godz_target"]:AddTargetCircle("chop_shop", Config.ChopShop.zone, Config.ChopShop.radius, {
+            options = {
+                {
+                    event = "godz_illegal:checkChopShop",
+                    icon = "fas fa-car-crash",
+                    label = "Desmanchar Veículo"
+                }
+            }
+        })
+    end
+end)
+
+RegisterNetEvent("godz_illegal:checkChopShop")
+AddEventHandler("godz_illegal:checkChopShop", function()
+    local ped = PlayerPedId()
+    local veh = GetVehiclePedIsIn(ped, false)
+    if veh == 0 then
         local pos = GetEntityCoords(ped)
-        local dist = #(pos - Config.ChopShop.zone)
-        
-        if dist < Config.ChopShop.radius then
-            idle = 5
-            -- Check for vehicle
-            local veh = GetVehiclePedIsIn(ped, false)
-            if veh == 0 then
-                veh = GetClosestVehicle(pos.x, pos.y, pos.z, 5.0, 0, 71)
-            end
-            
-            if veh ~= 0 and not dismantledParts[veh] then
-                -- Draw Text or 3D
-                DrawText3D(pos.x, pos.y, pos.z + 1.0, "[E] Desmanchar Veículo")
-                
-                if IsControlJustPressed(0, 38) then
-                    StartChopShop(veh)
-                end
-            end
-        end
-        Citizen.Wait(idle)
+        veh = GetClosestVehicle(pos.x, pos.y, pos.z, 5.0, 0, 71)
+    end
+    
+    if veh ~= 0 and not dismantledParts[veh] then
+        StartChopShop(veh)
+    else
+        TriggerEvent("godz_notify:notify", "negado", "Erro", "Nenhum veículo próximo para desmanchar.")
     end
 end)
 
