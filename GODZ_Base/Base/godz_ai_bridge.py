@@ -334,6 +334,62 @@ def ai_sentinel():
         "verdict": "BAN" if flags else "SAFE"
     })
 
+# ----------------------------------------------------------------------------------
+# 5. ENDPOINT ECONOMY SIMULATION (/ai_economy_simulation)
+# ----------------------------------------------------------------------------------
+@app.route('/ai_economy_simulation', methods=['POST'])
+def ai_economy_simulation():
+    """
+    Simula inflação e poder de compra.
+    Espera JSON: {"salaries": {}, "drugs": {}, "food": {}, "vehicles": {}}
+    """
+    data = request.json
+    salaries = data.get('salaries', {})
+    drugs = data.get('drugs', {})
+    vehicles = data.get('vehicles', {})
+    
+    # Cálculos
+    lixeiro_salary = salaries.get('lixeiro', 1)
+    car_popular_price = vehicles.get('popular_avg', 1)
+    
+    hours_to_buy_car = car_popular_price / lixeiro_salary
+    
+    cocaine_price = drugs.get('cocaine_sell', 0)
+    # Suposição: Facção vende 50 unidades por hora por membro
+    faction_profit_per_member_hr = cocaine_price * 50 
+    
+    # Relatório
+    report_lines = [
+        f"**🚗 Poder de Compra (Lixeiro)**",
+        f"- Salário Base: ${lixeiro_salary}",
+        f"- Carro Popular: ${car_popular_price}",
+        f"- Tempo para conquista: **{hours_to_buy_car:.1f} horas** de trabalho",
+        "",
+        f"**🏴 Lucro Estimado (Crime)**",
+        f"- Preço Cocaína: ${cocaine_price}",
+        f"- Lucro/Hora (Estimado): **${faction_profit_per_member_hr:,.2f}** (50 vendas)",
+        "",
+        f"**⚖️ Veredito IA**"
+    ]
+    
+    if hours_to_buy_car > 50:
+        report_lines.append("⚠️ **Economia Muito Difícil:** Iniciantes podem desistir.")
+    elif hours_to_buy_car < 10:
+        report_lines.append("⚠️ **Economia Muito Fácil:** Risco de inflação rápida.")
+    else:
+        report_lines.append("✅ **Economia Equilibrada:** Progressão saudável.")
+
+    embed = {
+        "title": "💰 GODZ Economy Report",
+        "description": "\n".join(report_lines),
+        "color": COLOR_NEON_GREEN,
+        "footer": {"text": "GODZ AI Economy Simulation"}
+    }
+    
+    send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
+    
+    return jsonify({"status": "success", "report": report_lines})
+
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor Bridge rodando na porta 5000...")
     app.run(host='0.0.0.0', port=5000)

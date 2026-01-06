@@ -7,6 +7,9 @@ vRPclient = Tunnel.getInterface("vRP")
 local src = {}
 Tunnel.bindInterface("godz_bank", src)
 
+-- Configurações Econômicas
+local TAX_RATE = 0.05 -- 5% de Imposto em transferências
+
 -- Helper: Add Log
 function AddBankLog(sender_id, receiver_id, type, value)
     MySQL.Async.execute("INSERT INTO godz_bank_logs (sender_id, receiver_id, type, value) VALUES (@sender_id, @receiver_id, @type, @value)", {
@@ -64,18 +67,31 @@ function src.transferMoney(target_id, amount)
     end
 
     if vRP.tryBankPayment(user_id, amount) then
-        vRP.giveBankMoney(target_id, amount)
+        local tax = math.floor(amount * TAX_RATE)
+        local final_amount = amount - tax
+        
+        vRP.giveBankMoney(target_id, final_amount)
         
         AddBankLog(user_id, target_id, "Transferência", amount)
         
-        TriggerClientEvent("godz:notify", source, "success", "Transferência de $"..vRP.format(parseInt(amount)).." realizada para ID: "..target_id, 5000)
-        TriggerClientEvent("godz:notify", nsource, "info", "Você recebeu um Pix de $"..vRP.format(parseInt(amount)).." do ID: "..user_id, 8000)
+        TriggerClientEvent("godz:notify", source, "success", "Transferência de $"..vRP.format(parseInt(final_amount)).." (Taxa: $"..vRP.format(tax)..") realizada para ID: "..target_id, 5000)
+        TriggerClientEvent("godz:notify", nsource, "info", "Você recebeu um Pix de $"..vRP.format(parseInt(final_amount)).." do ID: "..user_id, 8000)
         return true
     else
         TriggerClientEvent("godz:notify", source, "error", "Saldo insuficiente.", 5000)
         return false
     end
 end
+
+-- Auto Archive System (Logs Limpeza)
+Citizen.CreateThread(function()
+    Citizen.Wait(10000) -- Aguarda banco conectar
+    MySQL.Async.execute("DELETE FROM godz_bank_logs WHERE date < DATE_SUB(NOW(), INTERVAL 30 DAY)", {}, function(affected)
+        if affected and affected > 0 then
+            print("^3[GODZ BANK] ^7Auto-Archive: " .. affected .. " logs financeiros antigos removidos para otimização.")
+        end
+    end)
+end)
 
 -- Deposit
 function src.depositMoney(amount)

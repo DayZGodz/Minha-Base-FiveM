@@ -379,6 +379,35 @@ Organização profissional e intuitiva:
 
 ---
 
+## 💰 GODZ Economy (Balanceamento Inteligente)
+
+Sistema avançado de economia com monitoramento por Inteligência Artificial.
+
+### 📊 Master Config (godz_economy)
+- **Centralização:** Arquivo `config.lua` único define todos os preços vitais.
+- **Tabela de Preços:**
+  - Salários de Empregos (Lixeiro, Polícia, EMS).
+  - Valor de Drogas (Cocaína, Meta, Maconha).
+  - Preços de Veículos (Popular vs Luxo).
+- **Objetivo:** Facilitar o balanceamento sem precisar editar 50 scripts diferentes.
+
+### 🧠 Simulação de Inflação (IA)
+- **Análise em Tempo Real:** A IA monitora a Tabela de Preços.
+- **Relatórios no Discord:**
+  - "Quanto tempo um iniciante demora para comprar um carro popular?"
+  - "Qual o lucro real de uma facção por hora?"
+- **Veredito:** O sistema avisa se a economia está "Muito Fácil" (Inflação) ou "Muito Difícil" (Grind excessivo).
+
+### ⚖️ Impostos Dinâmicos
+- **Taxa de Transferência:** Imposto configurável (padrão 5%) em todas as transações PIX.
+- **Drenagem de Dinheiro:** Ajuda a controlar a inflação retirando dinheiro de circulação automaticamente.
+
+### 🧹 Auto-Archive (Logs)
+- **Limpeza Automática:** Logs bancários com mais de 30 dias são arquivados/removidos.
+- **Performance:** Mantém o banco de dados leve e rápido.
+
+---
+
 ## 🔔 GODZ Notify (Modern UI)
 
 - Sistema de notificações flutuantes com design Glassmorphism.
