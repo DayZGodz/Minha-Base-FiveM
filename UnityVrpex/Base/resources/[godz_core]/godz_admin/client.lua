@@ -1,0 +1,39 @@
+local Tunnel = module("vrp","lib/Tunnel")
+local Proxy = module("vrp","lib/Proxy")
+vRP = Proxy.getInterface("vRP")
+
+local isMenuOpen = false
+
+RegisterNetEvent("godz_admin:open")
+AddEventHandler("godz_admin:open", function(alerts)
+    isMenuOpen = true
+    SetNuiFocus(true, true)
+    SendNUIMessage({
+        type = "OPEN",
+        alerts = alerts
+    })
+end)
+
+RegisterNetEvent("godz_admin:newAlert")
+AddEventHandler("godz_admin:newAlert", function(alert)
+    if isMenuOpen then
+        SendNUIMessage({
+            type = "NEW_ALERT",
+            alert = alert
+        })
+    else
+        -- Optional: Notification if menu is closed
+        TriggerEvent("Notify", "aviso", "GODZ SHIELD: Alerta de " .. alert.type)
+    end
+end)
+
+RegisterNUICallback("close", function(data, cb)
+    isMenuOpen = false
+    SetNuiFocus(false, false)
+    cb("ok")
+end)
+
+RegisterNUICallback("action", function(data, cb)
+    TriggerServerEvent("godz_admin:action", data)
+    cb("ok")
+end)

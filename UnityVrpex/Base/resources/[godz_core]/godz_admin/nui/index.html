@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Unity Admin Tablet</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container" id="app" style="display: none;">
+        <!-- Modal -->
+        <div id="customModal" class="modal-overlay" style="display: none;">
+            <div class="modal-box">
+                <h3 id="modalTitle">Título</h3>
+                <div id="modalBody"></div>
+                <div class="modal-buttons">
+                    <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+                    <button class="btn btn-success" onclick="confirmModal()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i> UNITY ADMIN
+            </div>
+            <ul class="nav">
+                <li class="active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Dashboard</li>
+                <li onclick="switchTab('players')"><i class="fas fa-users"></i> Jogadores</li>
+                <li onclick="switchTab('shield')"><i class="fas fa-user-shield"></i> Unity Shield</li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <!-- DASHBOARD TAB -->
+            <div id="dashboard" class="tab-content active">
+                <h2>Ações Rápidas</h2>
+                <div class="grid-actions">
+                    <div class="card" onclick="promptSpawnVehicle()">
+                        <i class="fas fa-car"></i>
+                        <span>Spawnar Veículo</span>
+                    </div>
+                    <div class="card" onclick="promptRevive()">
+                        <i class="fas fa-heartbeat"></i>
+                        <span>Reviver ID</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLAYERS TAB -->
+            <div id="players" class="tab-content">
+                <h2>Gerenciamento de Jogadores</h2>
+                <div class="form-group">
+                    <input type="number" id="target_id" placeholder="ID do Jogador">
+                </div>
+                
+                <div class="actions-list">
+                    <button class="btn btn-danger" onclick="doAction('ban')"><i class="fas fa-ban"></i> Banir</button>
+                    <button class="btn btn-warning" onclick="doAction('unban')"><i class="fas fa-unlock"></i> Desbanir</button>
+                    <button class="btn btn-success" onclick="promptGiveItem()"><i class="fas fa-gift"></i> Dar Item</button>
+                </div>
+            </div>
+
+            <!-- SHIELD TAB -->
+            <div id="shield" class="tab-content">
+                <h2>Monitoramento Unity Shield</h2>
+                <div class="alert-list" id="alertList">
+                    <!-- Alerts will be injected here -->
+                    <div class="alert-item placeholder">
+                        <span>Aguardando alertas...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

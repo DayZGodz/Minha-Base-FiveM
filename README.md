@@ -1,6 +1,6 @@
-# ![Super Base Unity - DayZGodz Edition](https://via.placeholder.com/1000x250?text=Super+Base+Unity+-+DayZGodz+Edition)
+# GODZ DEV BASE VRPEX
 
-> **Uma fusão otimizada utilizando a leveza do Unity Clean como motor, a robustez dos sistemas Zirix v2 e uma camada de segurança proprietária.**
+> Base oficial GODZ, unificada e profissional, construída sobre VRPex com foco em Performance, Segurança e Escalabilidade.
 
 ---
 
@@ -13,31 +13,60 @@ Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **P
 ## 🛠️ Stack Tecnológico & Recursos
 
 ### 🛡️ Segurança & Core
-> O coração do servidor. Leve, rápido e protegido.
-- **Base Unity Clean VRPex:** Framework refatorado para máxima performance e baixo consumo de resmon.
-- **Unity Shield:** Sistema proprietário de Anticheat e proteção contra triggers maliciosos e injections.
-- **Banco de Dados Unificado:** Estrutura SQL otimizada (OxMySQL) garantindo transações rápidas e seguras.
+> Núcleo GODZ. Leve, rápido e protegido.
+- Banco de Dados Unificado (OxMySQL) com transações otimizadas.
+- Shield e Anticheat proprietários, integrados ao ecossistema GODZ.
 
-### 👤 Identidade & Inventário (Zirix Integration)
-> A melhor experiência de RPG do mercado, agora na Unity.
-- **Criação de Personagem:** Sistema completo de identidade (CNH, RG) com persistência visual.
-- **Inventário Zirix:** Sistema robusto base Zirix v2, livre de bugs de duplicação e com UI intuitiva.
+### 👤 Identidade & Inventário
+> Experiência de RPG moderna e estável.
+- Criação de Personagem completa (CNH, RG) com persistência visual.
+- Inventário GODZ e integração com inventário legado (quando habilitado).
 
 ### 📱 Comunicação & Tecnologia
 > Ferramentas essenciais para o roleplay moderno.
-- **GCPhone vRP:** Celular funcional com formato brasileiro (XXX-XXXX), Twitter, WhatsApp e Câmera.
-- **Logs Centralizados:** Integração direta com Discord Webhooks para monitoramento em tempo real (Admin, Chat, Kills, Inventário).
+- GODZ Phone: celular completo (Twitter, WhatsApp, Câmera).
+- Logs Centralizados com webhooks para auditoria e monitoramento.
 
 ### 💎 Experiência Visual e HUD
-> Identidade visual única e consistente.
-- **Unity Notify:** Sistema de notificações exclusivo (NUI) com design moderno (Glassmorphism/Azul), substituindo todas as mensagens padrão do vRP.
-- **Consistência Visual:** Padronização de cores e fontes entre Inventário, Celular e Notificações para uma experiência de usuário coesa.
+> Identidade visual GODZ, consistente e moderna.
+- GODZ Notify (NUI) em Glassmorphism.
+- Padronização visual entre Inventário, Celular e Notificações.
+
+### 🏴 Gestão de Facções Profissional
+> Controle total para líderes, integrado e automatizado.
+- Painel NUI para contratação e demissão em tempo real.
+- Controle de farm e monitoramento por baú/membro.
+
+### 👮 Policiamento Avançado
+> Evolução das interações policiais com foco em imersão.
+- Menu Tático GODZ (`/pmenu`) centraliza ações essenciais.
+- Verificar Ficha, Apreender Itens, Escoltar, Algemar e Gestão de Veículos.
+
+### 🎯 Interação Avançada (Third Eye)
+> Sistema de alvo moderno estilo ox_target/qtarget, integrado ao GODZ.
+- Recurso: `godz_target` com NUI leve (Glassmorphism).
+- Ativação: segure ALT, mire e clique direito para abrir opções.
+- Alvos de Jogador: Menu Policial, Verificar Ficha, Apreender, Algemar, Escoltar, CV/RV.
+- Garagens via Third Eye: selecione “Acessar Garagem” nas zonas.
+- Performance: substitui markers e reduz consumo de FPS.
+- Arquivos-Chave:
+  - [godz_target/client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/UnityVrpex/Base/resources/%5Bgodz_assets%5D/godz_target/client.lua)
+  - [policia/client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/UnityVrpex/Base/resources/%5Bgodz_core%5D/godz_modules/policia/client.lua)
+  - [policia/server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/UnityVrpex/Base/resources/%5Bgodz_core%5D/godz_modules/policia/server.lua)
+  - [godz_garages/client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/UnityVrpex/Base/resources/%5Bgodz_jobs%5D/godz_garages/client.lua)
+
+### 🛠️ Gestão Administrativa 2.0
+> Controle total do servidor na ponta dos dedos.
+- **GODZ Admin Tablet:** Interface NUI moderna (Glassmorphism) acessível via `/admin`.
+- **Ações Rápidas:** Banir, Desbanir, Reviver, Spawnar Veículos e Dar Itens com poucos cliques.
+- **Monitoramento Shield:** Integração nativa com o `godz_shield` para visualizar alertas de proteção em tempo real.
+- **UX Otimizada:** Design limpo e intuitivo para facilitar a moderação.
 
 ### 🏘️ Imersão & Mundo
-> Um ambiente vivo e detalhado sem pesar o FPS.
-- **Sistema de Shells:** Interiores otimizados via shells para propriedades e interações, reduzindo a necessidade de MLOs pesados.
-- **Pacote de Favelas:** YMAPs leves e bem renderizados para áreas de RP intenso.
-- **Elevadores Funcionais:** Script `angelicxs-elevators` configurado para navegação vertical realista.
+> Ambiente vivo e otimizado.
+- Shells otimizados para interiores.
+- Pacotes de favelas leves.
+- Elevadores funcionais (angelicxs-elevators).
 
 ### 🚗 Veículos & Mecânica
 > Para quem ama carros e customização.
@@ -46,14 +75,62 @@ Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **P
 
 ---
 
-## 📸 Galeria
+## 📦 Estrutura GODZ (Pastas e Recursos)
 
-| Inventário | Celular | Favela |
-|:---:|:---:|:---:|
-| ![Print do Inventário](https://via.placeholder.com/400x200?text=Preview+Inventario) | ![Print do Celular](https://via.placeholder.com/400x200?text=Preview+GCPhone) | ![Print da Favela](https://via.placeholder.com/400x200?text=Preview+Favela) |
+Organização profissional e intuitiva:
+
+### [godz_core]
+> Scripts vitais e fundamentais.
+- `godz_identity`: Identidade e criação de personagem.
+- `godz_inventory`: Inventário moderno e otimizado.
+- `godz_logs`: Sistema centralizado de logs via webhook.
+- `godz_admin`: Painel administrativo.
+- `godz_modules`: Módulos centrais (ferimentos, wall, etc).
+
+### [godz_illegal]
+> Crime e economia subterrânea.
+- `godz_factions`: Gestão avançada de facções (painel NUI).
+- `godz_drugs`: Sistema de drogas (se houver).
+- `godz_robbery`: Sistema de roubos.
+
+### [godz_jobs]
+> Empregos legais e serviços públicos.
+- `godz_dispatch`: Central de despacho policial.
+- `godz_garages`: Sistema de garagens e veículos.
+- `godz_police`: Scripts auxiliares de polícia.
+
+### [godz_assets]
+> Recursos visuais e interativos.
+- `godz_target`: Sistema de interação Third Eye.
+- `godz_phone`: Smartphone funcional.
+- `godz_vehicles`: Veículos customizados.
+- `godz_maps`: Mapeamentos exclusivos.
+
+### [godz_security]
+> Proteção e integridade.
+- `godz_shield`: Anticheat e proteção contra exploits.
 
 ---
 
-<div align="center">
-  <sub>Desenvolvido e Mantido por <b>DayZGodz Team</b>. Todos os direitos reservados.</sub>
-</div>
+## 🚀 Instalação e Inicialização
+
+1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
+2. Verifique a conexão no `server.cfg` (string de conexão oxmysql).
+3. A ordem de carregamento no `resources.cfg` é crítica:
+   ```cfg
+   ensure [godz_core]
+   ensure [godz_illegal]
+   ensure [godz_jobs]
+   ensure [godz_assets]
+   ensure [godz_security]
+   ```
+4. Inicie o servidor e verifique o console para garantir que todos os recursos `godz_` foram carregados corretamente.
+
+---
+
+## 🔄 Changelog Recente (Refatoração GODZ)
+
+- **Rebranding Total:** Padronização de nomes para `godz_*` (ex: `vrp_inventory` -> `godz_inventory`).
+- **Otimização:** Substituição de markers pesados por zonas Third Eye em garagens e interações.
+- **Code Cleanup:** Remoção de referências a bases antigas (Zirix/Unity) e código morto.
+- **Fixes:** Correção de conflitos de IDs e eventos legados (`unity_inventory` -> `godz_inventory`).
