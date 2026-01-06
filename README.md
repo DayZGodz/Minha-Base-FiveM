@@ -105,6 +105,7 @@ Organização profissional e intuitiva:
 - `godz_phone`: Smartphone funcional.
 - `godz_vehicles`: Veículos customizados.
 - `godz_maps`: Mapeamentos exclusivos.
+ - `godz_interface`: HUD moderna em Glassmorphism (Saúde, Colete, Fome, Sede, Oxigênio).
 
 ### [godz_security]
 > Proteção e integridade.
@@ -134,6 +135,19 @@ Organização profissional e intuitiva:
 - Use `/bugs` para reportar problemas diretamente do jogo.
 - Logs de bug são enviados aos administradores para correções rápidas.
 - As correções de estabilidade são publicadas via GitHub.
+
+## 💎 GODZ Interface Custom
+
+- Interface NUI otimizada com Glassmorphism.
+- Exibe Saúde, Colete, Fome, Sede e Oxigênio.
+- Atualização em tempo real com baixa utilização de ms.
+- Atalho: use o comando `/hud` para ocultar/exibir.
+- Arquivos:
+  - [fxmanifest.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_interface/fxmanifest.lua)
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_interface/client.lua)
+  - [index.html](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_interface/nui/index.html)
+  - [style.css](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_interface/nui/style.css)
+  - [script.js](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_interface/nui/script.js)
 
 ---
 

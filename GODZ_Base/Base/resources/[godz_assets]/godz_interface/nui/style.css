@@ -1,0 +1,8 @@
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; background: transparent; }
+.hud { position: absolute; bottom: 3vh; left: 3vh; display: flex; }
+.card { backdrop-filter: blur(10px); background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); border-radius: 14px; padding: 14px 18px; width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+.row { display: flex; align-items: center; gap: 10px; margin: 8px 0; color: #e6e6e6; font-family: Arial, Helvetica, sans-serif; font-weight: 600; }
+.bar { flex: 1; height: 12px; background: rgba(255,255,255,0.12); border-radius: 8px; overflow: hidden; }
+.fill { height: 100%; width: 0%; transition: width 0.25s ease; background: linear-gradient(90deg, #00ffc6, #00b3ff); }
+.hud.hidden { display: none; }
