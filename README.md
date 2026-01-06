@@ -6,7 +6,7 @@
 
 ## 📋 Sobre o Projeto
 
-Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **Performance**, **Segurança** e **Escalabilidade**. Removemos todo o "bloatware" desnecessário para entregar uma experiência fluida, mantendo os sistemas complexos que os jogadores amam (Inventário Zirix, Tuning Avançado, etc.) funcionando em harmonia com um Core otimizado.
+Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **Performance**, **Segurança** e **Escalabilidade**. Removemos todo o "bloatware" desnecessário para entregar uma experiência fluida, mantendo os sistemas complexos que os jogadores amam (Inventário GODZ, Tuning Avançado, etc.) funcionando em harmonia com um Core otimizado.
 
 ---
 
