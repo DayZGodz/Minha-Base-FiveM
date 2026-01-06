@@ -208,6 +208,24 @@ Organização profissional e intuitiva:
 
 ---
 
+## 💼 GODZ Jobs Pro (Progressão de Carreira)
+
+- Sistema de empregos com progressão de nível, XP e bônus salarial.
+- **Funcionalidades:**
+  - 🖥️ **Central de Carreiras (NUI):** Interface Glassmorphism para visualizar e iniciar trabalhos (Lixeiro, Entregador, Caminhoneiro).
+  - 📈 **Sistema de XP e Níveis:** Ganhe XP por rota concluída. Subir de nível aumenta o bônus de salário permanentemente.
+  - 🎯 **Integração Third Eye:** Início de expediente via interação com NPCs (sem markers).
+  - 📍 **Rotas Inteligentes:** Integração automática com GPS (Blips de rota).
+  - 📊 **Feedback Visual:** Barra de progresso de XP exibida na HUD (`godz_interface`) ao finalizar tarefas.
+- **Integrações:**
+  - `godz_bank`: Pagamentos diretos em conta.
+  - `godz_interface`: Visualização de ganho de XP.
+- **Arquivos:**
+  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_jobs%5D/godz_jobs/server.lua)
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_jobs%5D/godz_jobs/client.lua)
+
+---
+
 ## 🐞 Relatos de Bugs
 
 - Use `/bugs` para reportar problemas diretamente do jogo.

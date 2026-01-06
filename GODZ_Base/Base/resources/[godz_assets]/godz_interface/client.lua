@@ -42,3 +42,13 @@ RegisterCommand("hud", function()
     showing = not showing
     SendNUIMessage({ action = "toggle", show = showing })
 end)
+
+RegisterNetEvent("godz_interface:showXP")
+AddEventHandler("godz_interface:showXP", function(jobLabel, xpAmount, progressPct)
+    SendNUIMessage({
+        action = "showXP",
+        label = jobLabel,
+        xp = xpAmount,
+        progress = progressPct
+    })
+end)
