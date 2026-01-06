@@ -130,6 +130,19 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🏴 GODZ Illegal (Crime Organizado 2.0)
+
+- Sistema completo de ilegalidade com foco em interação e UX.
+- **Funcionalidades:**
+  - 🧪 **Laboratórios Interativos:** Processamento de drogas (Cocaína/Metanfetamina) usando props do mapa, animações e sistema de progresso.
+  - 🚗 **Desmanche Profissional:** Zona de desmanche onde o jogador deve desmontar fisicamente o veículo (Portas, Capô, Rodas) para ganhar peças.
+  - 📊 **Painel de Gestão (Glassmorphism):** Comando `/fmenu` exibe membros online, saldo da facção e status.
+  - 📝 **Logs Automáticos:** Integração total com `godz_logs` para monitoramento da Staff no Discord.
+- **Comandos:** `/fmenu` (Líderes/Membros).
+- **Dependências:** `godz_inventory`, `godz_logs`, `godz_target`.
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.
