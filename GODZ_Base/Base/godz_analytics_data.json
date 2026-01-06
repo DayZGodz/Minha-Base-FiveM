@@ -1,4 +1,10 @@
 {
+    "_metadata": {
+        "generated_by": "GODZ AI",
+        "last_updated": "Auto-Generated",
+        "warning": "NAO EDITE MANUALMENTE ESTE ARQUIVO. Dados gerados pela IA.",
+        "description": "Armazena historico de economia e atividade de jogadores para relatorios executivos."
+    },
     "history": [],
     "player_last_seen": {}
 }

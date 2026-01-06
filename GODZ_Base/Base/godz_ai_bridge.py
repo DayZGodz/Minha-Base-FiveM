@@ -36,9 +36,15 @@ def load_master_config():
         with open(MASTER_CONFIG_PATH, "r", encoding="utf-8") as f:
             MASTER_CONFIG = json.load(f)
         print(f"{Fore.GREEN}[GODZ CONFIG] {Fore.WHITE}Master Config carregada.")
+    except json.JSONDecodeError as e:
+        print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}ERRO CRÍTICO DE SINTAXE NO JSON!")
+        print(f"{Fore.RED}Detalhes: {e.msg}")
+        print(f"{Fore.RED}Linha: {e.lineno}, Coluna: {e.colno}")
+        print(f"{Fore.YELLOW}Verifique se não esqueceu uma vírgula ou aspas.")
+        MASTER_CONFIG = {"SERVER_SETTINGS": {}, "WEBHOOKS": {}, "STAFF_PERMISSIONS": {}, "SECURITY_CONFIG": {}}
     except Exception as e:
-        print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro ao carregar Master Config: {e}")
-        MASTER_CONFIG = {"webhooks": {}, "permissions": {}, "whitelists": {}}
+        print(f"{Fore.RED}[GODZ CONFIG] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
+        MASTER_CONFIG = {"SERVER_SETTINGS": {}, "WEBHOOKS": {}, "STAFF_PERMISSIONS": {}, "SECURITY_CONFIG": {}}
 
 def save_master_config():
     try:
@@ -78,10 +84,10 @@ load_analytics_data()
 # ==================================================================================
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
 # ==================================================================================
-DISCORD_TOKEN = MASTER_CONFIG.get("discord_token", "")
-DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("webhooks", {}).get("audit", "")
-DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("webhooks", {}).get("sentinel", "")
-DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("webhooks", {}).get("news", "")
+DISCORD_TOKEN = MASTER_CONFIG.get("SERVER_SETTINGS", {}).get("discord_token", "")
+DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
+DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
+DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")
 
 # Cores Neon
 COLOR_NEON_PURPLE = 0x9b59b6
@@ -260,7 +266,9 @@ def run_discord_bot():
                 await interaction.followup.send(f"🔗 Webhook para **{channel_name}** gerado.")
 
             # Atualizar JSON
-            MASTER_CONFIG["webhooks"][config_key] = webhook.url
+            if "WEBHOOKS" not in MASTER_CONFIG:
+                MASTER_CONFIG["WEBHOOKS"] = {}
+            MASTER_CONFIG["WEBHOOKS"][config_key] = webhook.url
             updated_count += 1
 
         # 3. Salvar Configuração
@@ -268,9 +276,9 @@ def run_discord_bot():
         
         # Recarregar variáveis globais
         global DISCORD_WEBHOOK_AUDIT, DISCORD_WEBHOOK_SENTINEL, DISCORD_WEBHOOK_NEWS
-        DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG["webhooks"].get("audit", "")
-        DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG["webhooks"].get("sentinel", "")
-        DISCORD_WEBHOOK_NEWS = MASTER_CONFIG["webhooks"].get("news", "")
+        DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
+        DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
+        DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")
 
         embed = discord.Embed(
             title="✅ Setup GODZ Concluído",
@@ -412,7 +420,8 @@ def ai_economy_simulation():
     
     # Whitelist check for Auditor
     user_id = data.get('user_id')
-    if user_id and user_id in MASTER_CONFIG.get("whitelists", {}).get("ignored_by_auditor", []):
+    ignored_auditor = MASTER_CONFIG.get("SECURITY_CONFIG", {}).get("ignored_by_auditor", [])
+    if user_id and user_id in ignored_auditor:
         logger.info(f"Auditor ignorando staff ID: {user_id}")
         return jsonify({"status": "ignored", "reason": "staff_whitelist"})
 
@@ -465,7 +474,8 @@ def sentinel_check():
     details = data.get('details')
     
     # Whitelist Check
-    if user_id and user_id in MASTER_CONFIG.get("whitelists", {}).get("ignored_by_sentinel", []):
+    ignored_sentinel = MASTER_CONFIG.get("SECURITY_CONFIG", {}).get("ignored_by_sentinel", [])
+    if user_id and user_id in ignored_sentinel:
         logger.info(f"Sentinel ignorando staff ID: {user_id}")
         return jsonify({"status": "ignored", "reason": "staff_whitelist"})
 

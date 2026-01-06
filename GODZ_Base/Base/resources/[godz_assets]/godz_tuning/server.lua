@@ -94,7 +94,10 @@ AddEventHandler("godz_tuning:applyMod", function(modType, modIndex, modLevel, ve
 
     -- Calcular Preço
     local price = 0
-    local prices = MasterConfig.tuning_prices or {}
+    local prices = {}
+    if MasterConfig.SERVER_SETTINGS and MasterConfig.SERVER_SETTINGS.tuning_prices then
+        prices = MasterConfig.SERVER_SETTINGS.tuning_prices
+    end
     
     if modType == "engine" then
         price = (prices.engine_base or 5000) * (modIndex + 1) -- Exemplo simples
