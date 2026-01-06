@@ -167,6 +167,29 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🔔 GODZ Notify (Modern UI)
+
+- Sistema de notificações flutuantes com design Glassmorphism.
+- **Tipos Suportados:**
+  - ✅ **Success** (Verde): Ações bem-sucedidas.
+  - ❌ **Error** (Vermelho): Falhas ou falta de permissão.
+  - ⚠️ **Warning** (Amarelo): Alertas do sistema.
+  - ℹ️ **Info** (Azul): Informações gerais.
+- **Como Usar (Developers):**
+  - **Export Client-Side:**
+    ```lua
+    exports["godz_notify"]:SendNotification("success", "Operação realizada!", 5000)
+    ```
+  - **Event Server/Client-Side:**
+    ```lua
+    TriggerClientEvent("godz:notify", source, "error", "Saldo insuficiente.", 5000)
+    ```
+- **Integração vRP:**
+  - O script sobrescreve automaticamente o evento `Notify` padrão do vRP.
+  - Notificações antigas (`vRP.notify`) são convertidas para o novo visual automaticamente.
+
+---
+
 ## ⚙️ GODZ Auto-Updater
 
 - Ferramenta de automação para manutenção de artefatos do servidor.
