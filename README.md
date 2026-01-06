@@ -192,6 +192,33 @@ Organização profissional e intuitiva:
 
 ---
 
+## 🏎️ GODZ Garages (Gestão de Veículos de Elite)
+
+- Sistema completo de gestão de veículos com interface Glassmorphism e integração total.
+- **Funcionalidades:**
+  - 🖥️ **Interface Moderna:** NUI em Glassmorphism exibindo status (Rua/Garagem/Apreendido), motor e combustível.
+  - 🏠 **Integração Housing:** Garagens de casas compradas aparecem automaticamente no menu (via `godz_housing`).
+  - 🎯 **Integração Target:** Acesso apenas via interação com NPCs ou painéis (sem markers no chão).
+  - 👮 **Bloqueio Policial:** Veículos apreendidos (`detido`) ficam bloqueados até liberação.
+  - 💸 **Economia:** Taxas de retirada e seguro descontadas do `godz_bank`.
+- **Dependências:** `godz_target`, `godz_bank`, `godz_housing`.
+- **Arquivos:**
+  - [client.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_garages/client.lua)
+  - [server.lua](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/resources/%5Bgodz_assets%5D/godz_garages/server.lua)
+
+---
+
+## 🧠 GODZ AI (Inteligência Artificial Local)
+
+- Módulo de inteligência artificial rodando localmente, integrado ao servidor via `start.bat`.
+- **Funcionalidades:**
+  - 🤖 **Auto-Start:** O `start.bat` gerencia o ciclo de vida da IA automaticamente (Inicia minimizado e encerra junto com o servidor).
+  - 📦 **Gestão de Dependências:** Verificação e instalação automática de bibliotecas Python (`flask`, `requests`, etc).
+  - 🌉 **Bridge Python-Lua:** API REST local (Porta 5000) pronta para expansão (NPCs inteligentes, chat dinâmico).
+- **Arquivo de Controle:** [godz_ai_bridge.py](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/godz_ai_bridge.py)
+
+---
+
 ## 🚀 Instalação e Inicialização
 
 1. Configure o banco de dados (MySQL/MariaDB) e importe o arquivo SQL.

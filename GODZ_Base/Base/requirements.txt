@@ -1,2 +1,7 @@
 flask
 requests
+torch
+transformers
+accelerate
+numpy
+colorama
