@@ -212,9 +212,14 @@ Organização profissional e intuitiva:
 
 - Módulo de inteligência artificial rodando localmente, integrado ao servidor via `start.bat`.
 - **Funcionalidades:**
-  - 🤖 **Auto-Start:** O `start.bat` gerencia o ciclo de vida da IA automaticamente (Inicia minimizado e encerra junto com o servidor).
-  - 📦 **Gestão de Dependências:** Verificação e instalação automática de bibliotecas Python (`flask`, `requests`, etc).
-  - 🌉 **Bridge Python-Lua:** API REST local (Porta 5000) pronta para expansão (NPCs inteligentes, chat dinâmico).
+  - 🤖 **Auto-Start:** O `start.bat` gerencia o ciclo de vida da IA automaticamente.
+  - 🧠 **Cérebro Neural:** Utiliza o modelo `Microsoft Phi-3 Mini` via `transformers` para processamento de linguagem natural.
+  - 🛡️ **Guardian Sentinel:** Análise vetorial de movimento para detectar SpeedHack e Teleporte.
+  - 🕵️ **Auditoria Financeira:** Análise heurística de transações bancárias para detectar lavagem de dinheiro e bugs.
+  - 💬 **Suporte Inteligente:** Responde dúvidas dos jogadores baseando-se no arquivo `REGRAS.txt`.
+- **Instalação do Modelo:**
+  - Na primeira execução, o script baixará automaticamente o modelo (~2.5GB). Certifique-se de ter espaço em disco.
+  - Requer Python 3.8+ e drivers NVIDIA (opcional, mas recomendado para GPU).
 - **Arquivo de Controle:** [godz_ai_bridge.py](file:///d:/servidor%20FIVEM/PROJETO_SUPER_BASE/01_BASE_PRINCIPAL/GODZ_Base/Base/godz_ai_bridge.py)
 
 ---
