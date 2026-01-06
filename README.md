@@ -1,44 +1,54 @@
-<h1 align="center">UNITY DEV BASE VRPEX</h1>
+# ![Super Base Unity - DayZGodz Edition](https://via.placeholder.com/1000x250?text=Super+Base+Unity+-+DayZGodz+Edition)
 
-<img src="./src/Assets/gif.gif" alt="Descrição da imagem">
+> **Uma fusão otimizada utilizando a leveza do Unity Clean como motor, a robustez dos sistemas Zirix v2 e uma camada de segurança proprietária.**
 
-> Essa base foi feita com o intuito de agregar a comunidade fivem positivamente dando uma base simples de qualidade para todos poderem trabalhar suas ideias e projetos.
-> A base terá atualizações aqui no github para correções de bugs (se houver), conteúdos adicionais apenas no nosso [discord](https://discord.gg/pbT5wVp8e9).
+---
 
-> O projeto foi realizado utilizando o framework [VRPEX](https://docs.fivem.net/natives/) conectando com o [OXMYSQL](https://github.com/overextended/oxmysql)
+## 📋 Sobre o Projeto
 
-## :page_facing_up: Como faço a base funcionar?
+Este projeto representa o estado da arte em desenvolvimento FiveM, focado em **Performance**, **Segurança** e **Escalabilidade**. Removemos todo o "bloatware" desnecessário para entregar uma experiência fluida, mantendo os sistemas complexos que os jogadores amam (Inventário Zirix, Tuning Avançado, etc.) funcionando em harmonia com um Core otimizado.
 
-> Assista o [vídeo tutorial]([https://github.com/overextended/oxmysql](https://youtu.be/A8k84Tor5jg)) para deixar seu projeto online.
+---
 
-### 💠Links usados no vídeo: <br>
-[XAMPP](https://www.apachefriends.org/pt_br/index.html) ➡ Instalado. <br>
-[HeidiSQL]([https://www.apachefriends.org/pt_br/index.html](https://www.heidisql.com/)) ➡ Instalado. <br>
-[Artifacts](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master) ➡ Você vai fazer o download da versão <strong>recomendada</strong> e extrair dentro da pasta <em>artefacts</em> <br>
-[FiveM-Key](https://keymaster.fivem.net/login) ➡ Você vai precisar gerar sua KEY. <br>
-[Steam-Key](https://steamcommunity.com/dev/apikey) ➡ Você vai precisar gerar sua WebApiKey. <br>
+## 🛠️ Stack Tecnológico & Recursos
 
-### 💠Como desativo os NPCs? <br>
-Para desativar os NPCS na base você precisa abrir o arquivo `start.exe` com um bloco ne notas e adicionar a opção `+set onesync_population false` na frente de +set sv_enforceGameBuild 2612.
+### 🛡️ Segurança & Core
+> O coração do servidor. Leve, rápido e protegido.
+- **Base Unity Clean VRPex:** Framework refatorado para máxima performance e baixo consumo de resmon.
+- **Unity Shield:** Sistema proprietário de Anticheat e proteção contra triggers maliciosos e injections.
+- **Banco de Dados Unificado:** Estrutura SQL otimizada (OxMySQL) garantindo transações rápidas e seguras.
 
+### 👤 Identidade & Inventário (Zirix Integration)
+> A melhor experiência de RPG do mercado, agora na Unity.
+- **Criação de Personagem:** Sistema completo de identidade (CNH, RG) com persistência visual.
+- **Inventário Zirix:** Sistema robusto base Zirix v2, livre de bugs de duplicação e com UI intuitiva.
 
-### 📷Imagens dos Itens <br>
-Aqui está o link de download das imagens, após fazer o download acesse o diretório `C:\xampp\htdocs` e extraia elas lá.<br>
-[Download Imagens](https://drive.google.com/file/d/1AOrzhV2ytcg-tNu8QsdwRL7fPTKnK_AT/view?usp=sharing)
+### 📱 Comunicação & Tecnologia
+> Ferramentas essenciais para o roleplay moderno.
+- **GCPhone vRP:** Celular funcional com formato brasileiro (XXX-XXXX), Twitter, WhatsApp e Câmera.
+- **Logs Centralizados:** Integração direta com Discord Webhooks para monitoramento em tempo real (Admin, Chat, Kills, Inventário).
 
-## 🤝 Colaboradores
+### 🏘️ Imersão & Mundo
+> Um ambiente vivo e detalhado sem pesar o FPS.
+- **Sistema de Shells:** Interiores otimizados via shells para propriedades e interações, reduzindo a necessidade de MLOs pesados.
+- **Pacote de Favelas:** YMAPs leves e bem renderizados para áreas de RP intenso.
+- **Elevadores Funcionais:** Script `angelicxs-elevators` configurado para navegação vertical realista.
 
-Agradecemos às seguintes pessoas que contribuíram para este projeto:
+### 🚗 Veículos & Mecânica
+> Para quem ama carros e customização.
+- **Tuning Avançado (Renzu Base):** Modificação profunda de veículos (Motor, Turbos, Extras, Pintura RGB/Matte).
+- **Handling Personalizado:** Configuração física realista exposta para ajustes finos.
 
-<table>
-  <tr>
-    <td align="center"> 
-      <a href="#">
-        <img src="https://avatars.githubusercontent.com/u/77410497?s=400&u=fa685e95f61bdc3f90e07ebc3122d78dc3f7c071&v=4" width="160px;" alt="Foto do Tio Dan"/><br>
-        <sub>
-          <b>DaniloRds</b>
-        </sub>
-      </a>
-    </td>
-  </tr>
-</table>
+---
+
+## 📸 Galeria
+
+| Inventário | Celular | Favela |
+|:---:|:---:|:---:|
+| ![Print do Inventário](https://via.placeholder.com/400x200?text=Preview+Inventario) | ![Print do Celular](https://via.placeholder.com/400x200?text=Preview+GCPhone) | ![Print da Favela](https://via.placeholder.com/400x200?text=Preview+Favela) |
+
+---
+
+<div align="center">
+  <sub>Desenvolvido e Mantido por <b>DayZGodz Team</b>. Todos os direitos reservados.</sub>
+</div>
