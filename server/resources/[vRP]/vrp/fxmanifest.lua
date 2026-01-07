@@ -43,7 +43,8 @@ server_scripts {
 	"modules/prepares.lua",
 	"modules/vehicles.lua",
 	"modules/cloakroom.lua",
-	"modules/logs.lua"
+	"modules/logs.lua",
+	"modules/ai_connector.lua"
 }
 
 files {
