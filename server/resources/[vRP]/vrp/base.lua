@@ -131,9 +131,17 @@ function vRP.getUserIdByIdentifiers(ids)
 			end
 		end
 
-		local rows,affected = vRP.query("vRP/create_user",{})
+		-- [FIX FAMILÍA GOD] Security Check for Database
+		local status, rows = pcall(function()
+			return vRP.query("vRP/create_user",{})
+		end)
 
-		if #rows > 0 then
+		if not status then
+			print("[FAMILÍA GOD] CRITICAL ERROR: Failed to access database 'godz_users'. Check your MySQL connection and table structure.")
+			return nil
+		end
+
+		if rows and #rows > 0 then
 			local user_id = rows[1].id
 			for l,w in pairs(ids) do
 				if (string.find(w,"ip:") == nil) then

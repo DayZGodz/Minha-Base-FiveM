@@ -1,127 +1,82 @@
-# Familía God - Base FiveM Premium
+# 🌟 Familía God Base - VRPEX Premium
 
-![Familía God Banner](https://via.placeholder.com/800x200.png?text=Familia+God+Base+Premium)
+Bem-vindo ao repositório oficial da **Base Familía God**. Este projeto representa o estado da arte em servidores FiveM, resultado de uma fusão meticulosa entre as melhores características das bases Unity, Zirix e Bahamas, estabilizada com correções críticas no núcleo do vRP e potencializada por uma Inteligência Artificial proprietária.
 
-## � Identidade e História
-A **Familía God** representa a culminação de anos de desenvolvimento e otimização no cenário FiveM. Esta base é o resultado de uma fusão estratégica e técnica entre três das mais respeitadas bases do mercado:
+![Banner](logo.png)
 
-*   **Unity Clean**: A fundação leve e otimizada, garantindo performance superior e zero lag.
-*   **Zirix v2**: A robustez e as funcionalidades clássicas que definiram uma era de RP.
-*   **Bahamas**: Sistemas exclusivos e inovações de jogabilidade que trazem modernidade.
+## 🚀 Sobre o Projeto (Fusão de Bases)
 
-O resultado é uma infraestrutura **híbrida e poderosa**, projetada para estabilidade, escalabilidade e uma experiência de jogador imersiva.
+A "Super Base" não é apenas um compilado de scripts; é uma arquitetura unificada.
 
----
-
-## 🏗️ Arquitetura Técnica
-A estrutura do projeto foi reorganizada para separar claramente o ambiente de execução dos dados do servidor, facilitando atualizações e manutenção.
-
-### Estrutura de Diretórios
-*   **`artifacts/`**: Contém os binários do servidor FiveM (fxserver.exe e dependências). Mantemos esta pasta separada para facilitar a atualização da build do servidor sem afetar os scripts.
-*   **`server/`**: O coração da base.
-    *   `resources/`: Todos os scripts e recursos.
-    *   `server.cfg`: Configurações principais.
-    *   `start.bat`: Script de inicialização automatizado e estilizado.
-
-Esta separação garante que a lógica de negócio (`server/`) esteja desacoplada da runtime (`artifacts/`), seguindo as melhores práticas de DevOps para FiveM.
+*   **Legado Unity:** Herdamos o sistema de otimização de threads e o gerenciamento de inventário robusto, garantindo que o servidor suporte alta carga sem "crashar".
+*   **Core Zirix:** Utilizamos a estrutura modular de empregos e facções da Zirix, conhecida pela facilidade de configuração e estabilidade em roleplay sério.
+*   **UI Bahamas:** Integramos a interface visual moderna (HUD, Inventário, Notify) inspirada na base Bahamas, proporcionando uma experiência visual limpa e responsiva (NUI otimizada).
 
 ---
 
-## 🔧 Core vRP Fixes
-Para garantir a estabilidade absoluta, realizamos correções profundas no núcleo do vRP.
-
-### 1. Inicialização de Itens (`vRP.items = {}`)
-Um erro comum em bases vRP é a tentativa de indexar `vRP.items` antes de sua definição.
-**Correção:** Em `vrp/modules/inventory.lua`, garantimos a inicialização explícita no topo do arquivo:
-```lua
-vRP.items = {} -- Inicialização preventiva
--- ... restante do código
-```
-Isso previne erros de "attempt to index a nil value" durante o carregamento de módulos dependentes.
-
-### 2. Lógica de Wait (Prevenção de Nil Value)
-Implementamos loops de verificação (`Wait`) em scripts críticos (como inventário e identidade) para aguardar o carregamento completo das tabelas do banco de dados e do objeto vRP antes de prosseguir.
-**Exemplo de Lógica:**
-```lua
-Citizen.CreateThread(function()
-    while not vRP or not vRP.getUserId do
-        Wait(100)
-    end
-    -- Execução segura após carregamento
-end)
-```
-Essa abordagem elimina condições de corrida (race conditions) na inicialização do servidor.
-
----
-
-## � Módulos God (Godz Scripts)
-A base conta com uma suite exclusiva de scripts desenvolvidos ou refatorados pela equipe Familía God, prefixados com `godz_` para fácil identificação e padronização.
-
-### Lista de Módulos Principais
-*   **`godz_core`**: Núcleo de funções compartilhadas.
-*   **`godz_admin`**: Ferramentas administrativas avançadas.
-*   **`godz_bank`**: Sistema bancário com UI moderna.
-*   **`godz_chest`**: Baús de facções e casas otimizados.
-*   **`godz_clothing`**: Loja de roupas com persistência robusta.
-*   **`godz_factions`**: Gerenciamento completo de facções ilegais.
-*   **`godz_garages`**: Sistema de garagens com salvamento de estado.
-*   **`godz_housing`**: Sistema imobiliário dinâmico.
-*   **`godz_identity`**: Criação e gestão de identidade (RG).
-*   **`godz_inventory`**: Inventário com peso, slots e hotbar, altamente responsivo.
-*   **`godz_missions`**: Missões interativas para empregos.
-*   **`godz_phone`**: Smartphone funcional integrado (banco, twitter, fotos).
-*   **`godz_tuning`**: Oficina de tunagem completa.
-
-### Destaque Técnico: Tuning Otimizado
-No módulo `godz_tuning`, substituímos chamadas pesadas de banco de dados por arquivos de configuração JSON carregados via `LoadResourceFile`.
-**Benefício:** Carregamento instantâneo de preços e configurações de peças, sem latência de SQL.
-```lua
--- Exemplo em godz_tuning/server.lua
-local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
-MasterConfig = json.decode(config)
-```
-
----
-
-## 🤖 Familía God AI: Infraestrutura de Próxima Geração
-A inovação central desta base é a integração com Inteligência Artificial para monitoramento, gestão e suporte, agora operando em nível de produção.
-
-### Infraestrutura de Produção (WSGI)
-Abandonamos o servidor de desenvolvimento do Flask em favor do **Waitress**, um servidor WSGI robusto e escalável.
-*   **Concorrência:** Suporte real a múltiplos jogadores e requisições simultâneas sem bloqueios.
-*   **Estabilidade:** Eliminação de avisos de "Development Server" e maior resiliência a falhas.
-*   **Performance:** Otimização no handling de threads para inferência de IA.
-
-### Modelo de IA & Otimização
-Utilizamos o modelo **`microsoft/Phi-3-mini-4k-instruct`**, um LLM (Large Language Model) leve e poderoso, capaz de rodar localmente com alta eficiência.
-*   **Aceleração:** Uso de `flash-attn` e `hf_xet` para inferência ultra-rápida em GPUs NVIDIA.
-*   **Segurança:** O bridge Python (`godz_ai_bridge.py`) implementa sanitização rigorosa de tokens (`.strip()`) para prevenir erros de autenticação ("Improper token") e vazamento de credenciais.
-*   **Log Padronizado:** Todo o sistema de logs foi unificado sob a tag `[FAMILÍA GOD AI]` para fácil rastreabilidade.
-
-### Monitoramento de Facções
-A IA analisa logs em tempo real para calcular o lucro das facções:
-1.  Coleta dados de transações (vendas de drogas, lavagem de dinheiro).
-2.  Processa os valores via Python.
-3.  Gera relatórios de eficiência e alerta sobre anomalias econômicas.
-
----
-
-## 🚀 Como Iniciar
+## 🛠️ Instalação e Configuração
 
 ### Pré-requisitos
-*   **Game Build:** A base requer a build `3095` (ou superior) para carregar corretamente os assets de roupas e veículos. Isso já está configurado no `server.cfg`, mas certifique-se de não remover a linha `set sv_enforceGameBuild 3095`. Sem isso, texturas e DLCs podem bugar.
-*   Python 3.10+
-*   Dependências Python:
-    ```bash
-    pip install -r server/requirements.txt
-    ```
-    *(Nota: `flash-attn` é recomendado para GPUs NVIDIA, mas opcional em Windows se houver problemas de compilação)*
+*   **Game Build:** A base requer a build `3095` (ou superior) para carregar corretamente os assets de roupas e veículos. Isso já está configurado no `server.cfg` (`set sv_enforceGameBuild 3095`), mas certifique-se de mantê-la.
+*   Python 3.10+ (Para a ponte de IA).
+*   MySQL Server (XAMPP ou MariaDB).
 
-### Start
-Execute o arquivo `server/start.bat`. O script irá:
-1.  Limpar o cache automaticamente.
-2.  Iniciar a bridge de IA.
-3.  Subir o servidor FiveM.
+### 1. Configuração do Banco de Dados
+A base utiliza uma estrutura SQL otimizada. O arquivo `GODZ_INSTALL_DB.sql` na raiz contém todas as tabelas necessárias.
+
+1.  Crie um banco de dados chamado `godz_database` (ou `familia_god_db` se preferir renomear).
+2.  Importe o arquivo `GODZ_INSTALL_DB.sql`.
+3.  Verifique o `server.cfg` e garanta que a string de conexão corresponda:
+    ```cfg
+    set mysql_connection_string "user=root;database=godz_database;password=;host=127.0.0.1"
+    ```
+    > **Nota:** Se o nome do banco no `server.cfg` não bater com o banco criado, o script `base.lua` agora emitirá um alerta crítico no console ao invés de travar o servidor silenciosamente.
+
+### 2. Dependências Python (IA)
+Para ativar a Inteligência Artificial, instale as dependências:
+```bash
+cd server
+pip install -r requirements.txt
+```
 
 ---
-*Desenvolvido por Familía God Dev Team - 2025*
+
+## 🔧 Correções Críticas Realizadas
+
+### ✅ Fix do Core vRP (`base.lua`)
+Identificamos um erro fatal na função `getUserIdByIdentifiers` onde uma falha na conexão SQL ou ausência de tabela causava um crash silencioso no scheduler do FiveM.
+**Solução:** Implementamos um `pcall` (Protected Call) na linha 134 do `base.lua`. Agora, se o `oxmysql` falhar, o erro é capturado e uma mensagem amigável `[FAMILÍA GOD] CRITICAL ERROR` é exibida, prevenindo o colapso do servidor.
+
+### ✅ Correção de Inventário (`vRP.items`)
+Bases fundidas frequentemente sofrem com IDs de itens duplicados. Padronizamos o `items.lua` para garantir que não haja conflitos entre itens da Unity e da Zirix, utilizando o sistema de peso e stack da Unity como padrão mestre.
+
+---
+
+## 🤖 Sistema de Inteligência Artificial (Familía God AI)
+
+A base conta com um sistema de IA exclusivo rodando localmente, projetado para monitorar a economia e auxiliar a administração.
+
+### Arquitetura
+*   **Modelo:** Microsoft Phi-3 Mini (4k Instruct) - Leve e eficiente para respostas rápidas.
+*   **Servidor:** Utilizamos `Waitress` como servidor WSGI de produção, substituindo o servidor de desenvolvimento do Flask. Isso garante suporte a múltiplas requisições simultâneas sem engasgos.
+*   **Ponte:** O script `godz_ai_bridge.py` conecta o servidor FiveM (via HTTP) ao modelo Python.
+
+### Funcionalidades
+1.  **Sentinela:** Monitora logs em busca de anomalias (ex: retiradas massivas de baús).
+2.  **Economista:** Analisa salários vs. preços de veículos para sugerir balanceamento.
+3.  **Suporte:** Um bot de Discord integrado responde dúvidas de jogadores baseando-se no arquivo `REGRAS.txt`.
+
+Para iniciar a IA:
+```bash
+python server/godz_ai_bridge.py
+```
+*(Certifique-se de configurar o Token do Discord no `GODZ_MASTER_CONFIG.json`)*
+
+---
+
+## 🔗 Links Úteis
+*   **Repositório Oficial:** [https://github.com/DayZGodz/Minha-Base-FiveM](https://github.com/DayZGodz/Minha-Base-FiveM)
+*   **Discord de Suporte:** [Link do Discord]
+
+---
+*Desenvolvido com ❤️ pela equipe Familía God.*
