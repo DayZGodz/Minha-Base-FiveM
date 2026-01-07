@@ -138,7 +138,8 @@ function vRP.getUserIdByIdentifiers(ids)
 		end)
 
 		if not status then
-			print("[GODZ] CRITICAL ERROR: Failed to access database 'godz_users'. Check your MySQL connection and table structure.")
+			print("[GODZ] CRITICAL ERROR: Failed to access database 'godz_users'.")
+			print("ERRO MYSQL REAL: " .. tostring(rows))
 			return nil
 		end
 

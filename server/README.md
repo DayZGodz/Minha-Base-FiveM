@@ -51,6 +51,25 @@ Todas as tabelas do ecossistema GODZ possuem o prefixo `godz_` para organizaçã
 
 ---
 
+## 💎 Superioridade Estrutural (GODZ vs Legacy)
+
+### Por que `godz_`?
+Bases legadas (vrpex, creative) sofrem com "Colisão de Tabelas" ao instalar scripts de terceiros. A estrutura GODZ resolve isso:
+1.  **Isolamento**: Prefixos `godz_` garantem que nossos scripts nunca conflitem com mods baixados da internet.
+2.  **Integridade Referencial (FKs)**: Ao deletar um usuário em `godz_users`, o banco limpa automaticamente:
+    *   Contatos do celular.
+    *   Contas bancárias.
+    *   Chaves de casas.
+    *   Dados de inventário.
+    *   *Isso elimina o "lixo" acumulado no banco de dados, comum em servidores antigos.*
+
+### Interação com Build 3407
+O Build 3407 traz nativos modernos de persistência.
+*   O servidor utiliza `LoadResourceFile` para carregar configurações JSON dinâmicas, reduzindo chamadas SQL desnecessárias.
+*   A estrutura de banco foi desenhada para suportar os novos tipos de dados de veículos e roupas estendidas da DLC Bottom Dollar Bounties.
+
+---
+
 ## 🔧 Configurações do Servidor
 
 ### Build 3407
@@ -68,5 +87,6 @@ A ponte de IA (`godz_ai_bridge.py`) utiliza o servidor WSGI `Waitress` para prod
 ---
 
 ## 🛠️ Manutenção e Soluções
-*   **Fix de Login**: `godz_users` aceita `NULL` em `last_login` e `ip`.
+*   **Debug SQL**: `vrp/base.lua` agora exibe o erro RAW do MySQL no console se a conexão falhar.
+*   **Fix de Login**: `godz_users` aceita `NULL` em `last_login` e `ip` para garantir cadastro inicial.
 *   **Dynamic Loading**: Recursos utilizam `LoadResourceFile` e `SaveResourceFile` para persistência local quando apropriado.
