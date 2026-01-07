@@ -109,6 +109,7 @@ A IA analisa logs em tempo real para calcular o lucro das facções:
 ## 🚀 Como Iniciar
 
 ### Pré-requisitos
+*   **Game Build:** A base requer a build `3095` (ou superior) para carregar corretamente os assets de roupas e veículos. Isso já está configurado no `server.cfg`, mas certifique-se de não remover a linha `set sv_enforceGameBuild 3095`. Sem isso, texturas e DLCs podem bugar.
 *   Python 3.10+
 *   Dependências Python:
     ```bash
