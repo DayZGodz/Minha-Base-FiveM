@@ -1,6 +1,6 @@
 
 local lang = vRP.lang
-local Luang = module("vrp", "lib/Luang")
+-- local Luang = module("vrp", "lib/Luang") -- Disabled: Dependency missing
 
 -- Configuração dos Webhooks (Preencha com URLs reais)
 local webhooks = {

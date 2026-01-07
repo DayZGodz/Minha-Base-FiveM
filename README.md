@@ -1,101 +1,99 @@
 # 👑 GODZ ENGINE - THE PINNACLE OF PERFORMANCE
 
-> *A revolução em inteligência artificial e estabilidade para ecossistemas de alta performance.*
+> *O ecossistema definitivo para FiveM, unindo Inteligência Artificial, Segurança de Elite e UX Premium.*
 
 ---
 
-### 🤖 GODZ AI NEXUS (O CÉREBRO)
+### � O CÉREBRO: INTELIGÊNCIA ARTIFICIAL & BOT
 
-A inteligência é o alicerce da nossa infraestrutura. O **GODZ AI Nexus**, integrado nativamente com o modelo **Phi-3 Mini**, opera como o sistema nervoso central da cidade, processando linguagem natural em tempo real.
+A coordenação central da cidade é realizada por uma simbiose entre processamento local e automação remota.
 
-*   **Suporte Inteligente (`/ajuda`):** Um assistente que entende o contexto da dúvida do jogador e responde instantaneamente, eliminando a necessidade de tickets triviais.
-*   **Laudos Técnicos:** Geração de relatórios detalhados de performance veicular após tunagens, assinados digitalmente pela IA.
-*   **Despacho Imersivo (`/911`):** Triagem automática de chamados de emergência, coordenando unidades policiais com relatórios de situação precisos e priorização de ocorrências.
-*   **Lore Generator (`/rg`):** Criação de biografias profundas e únicas para cada personagem no momento do registro, baseadas nas características escolhidas pelo jogador.
+*   **GODZ AI Nexus (Phi-3 Mini)**
+    *   **Suporte Contextual:** Responde dúvidas dos jogadores (`/ajuda`) entendendo o contexto da pergunta e eliminando a necessidade de tickets triviais.
+    *   **Despacho Tático:** Analisa chamados de emergência (`/911`) e coordena unidades policiais com precisão, gerando relatórios de situação e prioridade.
+    *   **Consultor Técnico:** Gera análises detalhadas sobre modificações de veículos (Tuning) e economia, atuando como um especialista virtual.
 
----
-
-### 🛠️ GODZ ADMIN
-
-Gestão administrativa de elite desenhada para controle total e transparência.
-
-*   **Auditoria Real-Time:** Ferramentas de espectador invisível e logs detalhados de cada ação sensível.
-*   **Monitoramento de Jogadores:** Dashboard avançado para visualização de saúde, inventário e conexões suspeitas.
-*   **Gestão de Comunidade:** Painel de controle unificado para aplicação de punições, whitelist e gerenciamento de grupos.
+*   **GODZ Discord Bot (Python)**
+    *   **Sincronia Real-Time:** Atualiza cargos e permissões no jogo instantaneamente via Discord, sem necessidade de relogue.
+    *   **Logs de Auditoria:** Espelha ações administrativas sensíveis em canais privados para segurança máxima e rastreabilidade forense.
+    *   **Gestão Remota:** Permite aplicar punições, verificar status do servidor e gerenciar whitelist sem entrar no jogo.
 
 ---
 
 ### 🛡️ GODZ SENTINEL (PROTEÇÃO ATIVA)
 
-Nossa barreira impenetrável. Operando com lógica de nível de kernel (Kernel Level Logic), o Sentinel blinda o servidor contra ameaças externas.
+Nosso sistema de segurança proprietário que atua em nível de lógica de kernel para blindar o servidor.
 
-*   **Anti-Injection:** Bloqueio proativo de triggers maliciosos e tentativas de injeção de código.
-*   **Honeypots Ativos:** Armadilhas lógicas espalhadas pelo código para capturar e banir automaticamente usuários mal-intencionados.
-*   **Mitigação de Flood:** Firewall interno de eventos para impedir ataques de negação de serviço lógicos.
+*   **Anti-Injection System**
+    *   **Monitoramento Constante:** Vigilância em tempo real de triggers sensíveis (dinheiro, itens, grupos e permissões).
+    *   **Bloqueio Instantâneo:** Interceptação imediata de execuções de código externo e detecção de injetores conhecidos.
+*   **Sentinel Honeypots**
+    *   **Armadilhas Lógicas:** Eventos falsos ocultos estrategicamente no código para capturar e banir automaticamente cheaters que tentam abusar de triggers.
+*   **Entity Control**
+    *   **Anti-Crash:** Proteção rigorosa contra spawn massivo de objetos, veículos ou peds, garantindo a estabilidade da thread principal.
 
 ---
 
-### � GODZ BANK & ECONOMY
+### 💰 GODZ BANK & ECONOMY
 
-Um ecossistema financeiro completo, desenhado para simular uma economia real e saudável.
+Um ecossistema financeiro completo e inteligente que regula a vida financeira da cidade.
 
-*   **Interface Premium:** Sistema bancário digital com design moderno, suporte a PIX e histórico de transações à prova de fraudes.
-*   **Regulador Econômico:** Um algoritmo inteligente que monitora o fluxo de caixa do servidor, ajustando dinamicamente preços em lojas e salários de empregos para combater a inflação antes que ela aconteça.
+*   **Financial Interface**
+    *   **UX Premium:** Design Glassmorphism moderno com sistema de PIX, histórico detalhado de transações e gestão de cartões de crédito/débito.
+*   **IA Economy Regulator**
+    *   **Controle de Inflação:** Algoritmo que analisa a circulação de capital global e ajusta preços de lojas e salários automaticamente para manter o poder de compra equilibrado.
 
 ---
 
 ### 👥 GODZ IDENTITY (MULTICHARACTER)
 
-O primeiro passo da imersão. Um sistema de criação de personagens reinventado.
+A porta de entrada para a imersão total no Roleplay.
 
-*   **Estética Glassmorphism:** Interface de seleção fluida com desfoque de fundo e transições suaves.
-*   **Múltiplos Slots:** Suporte nativo para múltiplos personagens por conta, com isolamento total de dados.
-*   **Integração de Lore:** Cada novo cidadão recebe uma história de fundo gerada por IA, conectando-o imediatamente ao mundo da GODZ.
-
----
-
-### 🎨 GODZ INTERFACE & UX
-
-A assinatura visual da GODZ. Um framework UI/UX proprietário construído sobre os pilares do luxo e da modernidade.
-
-*   **Design System "Dark Gold":** A cor primária (#D4AF37) é utilizada estrategicamente para transmitir exclusividade.
-*   **Notificações Inteligentes (`ia_tip`):** Alertas visuais com animação de **pulsação dourada**, indicando interações diretas com a Inteligência Artificial.
-*   **Consistência Visual:** De menus de loja a inventários, toda a interface segue uma linguagem visual coesa e polida.
+*   **Geração de Lore assistida por IA**
+    *   **Biografias Únicas:** Cada personagem recebe uma história de fundo exclusiva no momento da criação, baseada em seus dados iniciais, salvando a narrativa no banco de dados.
+*   **Visual Premium**
+    *   **Interface Fluida:** Seleção de personagens com efeitos de vidro fosco (Glassmorphism) e transições cinematográficas.
 
 ---
 
 ### 🔧 GODZ TUNING & GARAGE
 
-Para os amantes de automotores, a experiência definitiva.
+A engenharia automotiva levada ao próximo nível.
 
-*   **Diagnóstico via IA:** A oficina mecânica não apenas modifica peças, mas gera laudos técnicos sobre o impacto real de cada alteração na performance.
-*   **Persistência Total:** O sistema de garagens salva o estado exato do veículo: danos na lataria, nível de combustível, sujeira e até a posição exata de estacionamento.
+*   **Diagnóstico IA**
+    *   **Laudos Técnicos:** O mecânico virtual gera um relatório real sobre o impacto das modificações na potência e torque, influenciando no valor de revenda do veículo.
+*   **Persistent Fleet Management**
+    *   **Salvamento Total:** Persistência absoluta de danos na lataria, nível de combustível, sujeira, localização exata e modificações estéticas e de performance.
 
 ---
 
-### 📦 GODZ INVENTORY
+### 📦 GODZ INVENTORY & ITEMS
 
-Um sistema de gestão de ativos robusto e intuitivo.
+Sistema de gestão de itens focado em praticidade e realismo.
 
-*   **Metadados Avançados:** Suporte para itens únicos com propriedades específicas (ex: armas com número de série, documentos assinados).
-*   **Peso Dinâmico:** Cálculo de encargo em tempo real que afeta a movimentação do personagem.
-*   **Hotbar Responsiva:** Acesso rápido a itens essenciais com resposta imediata em situações de combate.
+*   **Metadata & Durabilidade**
+    *   **Identidade Única:** Itens com metadados específicos (ex: armas com número de série, documentos assinados) e sistema de desgaste por uso.
+*   **Dynamic Weight**
+    *   **Física de Inventário:** Influência real do peso carregado sobre a movimentação, stamina e fôlego do jogador.
 
 ---
 
 ### 🔌 GODZ FACTIONS & ILLEGAL
 
-O submundo e as corporações, gerenciados com profundidade.
+O equilíbrio perfeito entre a lei e o crime.
 
-*   **Hierarquias Customizáveis:** Líderes têm controle total para criar cargos, definir salários e gerenciar permissões.
-*   **Ecossistema Ilegal:** Rotas de drogas complexas, desmanches de veículos e um sistema de lavagem de dinheiro onde o lucro é proporcional ao risco calculado pelo nível de policiamento.
+*   **Faction Management**
+    *   **Gestão Corporativa:** Painéis de liderança completos para gestão de membros, definição de salários e criação de hierarquias customizadas.
+*   **Illegal Ecosystem**
+    *   **Economia de Risco:** Rotas de drogas dinâmicas, desmanches de veículos e sistemas de lavagem de dinheiro onde o lucro é proporcional ao risco calculado pelo policiamento online.
 
 ---
 
 ### 🗄️ GODZ DATA ARCHITECTURE
 
-Nossa estrutura de dados é desenhada para segurança máxima e rastreabilidade total. A tabela mestra `godz_users` é o coração da persistência.
+Estrutura de dados robusta e segura baseada na tabela `godz_users`.
 
-*   **Rastreabilidade Forense (`ip`):** Armazena o endereço IP da última conexão para cruzamento de dados e prevenção de evasão.
-*   **Auditoria de Acesso (`last_login`):** Timestamp preciso para controle de inatividade e purga automática de contas ociosas.
-*   **Ativos Complexos (`moedas`, `pet`, `garagem`):** Colunas dedicadas que armazenam estruturas JSON complexas, garantindo que o patrimônio do jogador (saldo premium, animais de estimação e frota de veículos) esteja sempre seguro e acessível.
+*   **Security Tracking**
+    *   **Rastreio Forense:** Monitoramento de IP e Last Login para auditoria de segurança e prevenção de evasão de banimentos.
+*   **Integrated Assets**
+    *   **Centralização:** Gestão unificada de Moedas Premium, Pets e Slots de Garagem armazenados em estruturas JSON diretamente no banco de dados centralizado.

@@ -6,6 +6,7 @@ description 'Godz Economy System with AI Integration'
 version '1.0.0'
 
 server_scripts {
+    '@vrp/lib/utils.lua',
     '@oxmysql/lib/MySQL.lua',
     'server.lua'
 }

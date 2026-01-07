@@ -14,6 +14,5 @@ client_scripts {
 files {
     'nui/index.html',
     'nui/style.css',
-    'nui/script.js',
-    'nui/img/*.png'
+    'nui/script.js'
 }

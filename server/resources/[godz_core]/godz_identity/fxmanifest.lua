@@ -10,8 +10,7 @@ ui_page 'nui/index.html'
 files {
     'nui/index.html',
     'nui/style.css',
-    'nui/script.js',
-    'nui/img/*.png'
+    'nui/script.js'
 }
 
 client_scripts {

@@ -8,6 +8,7 @@ vRPclient = Tunnel.getInterface("vRP")
 -- MASTER CONFIG SYNC
 -----------------------------------------------------------------------------------------------------------------------------------------
 local MasterConfig = { whitelists = { ignored_by_sentinel = {} } }
+local API_KEY = "godz_secret_key_123"
 
 Citizen.CreateThread(function()
     Wait(2000) -- Aguarda API subir

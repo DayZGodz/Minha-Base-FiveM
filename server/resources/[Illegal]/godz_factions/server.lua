@@ -4,6 +4,7 @@ vRP = Proxy.getInterface("vRP")
 vRPclient = Tunnel.getInterface("vRP")
 
 local MasterConfig = { groups = {} }
+local API_KEY = "godz_secret_key_123"
 
 -- 1. Sincronização Master Config
 Citizen.CreateThread(function()

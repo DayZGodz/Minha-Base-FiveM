@@ -8,7 +8,12 @@ Tunnel.bindInterface("godz_identity",vRPN)
 Proxy.addInterface("godz_identity",vRPN)
 
 local cfg = module("vrp","cfg/groups")
-local groups = cfg.groups
+local groups = {}
+if cfg then
+    groups = cfg.groups
+else
+    print("[GODZ IDENTITY] AVISO: Configuração de grupos (cfg/groups) não encontrada ou vazia.")
+end
 
 -- Verificação da coluna 'biography' na tabela 'godz_user_identities'
 Citizen.CreateThread(function()
