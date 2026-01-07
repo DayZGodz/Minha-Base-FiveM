@@ -477,54 +477,53 @@ def dispatch_ticket():
 @require_api_key
 def ai_economy_simulation():
     data = request.json
-    
-    # Whitelist check for Auditor
-    user_id = data.get('user_id')
-    ignored_auditor = MASTER_CONFIG.get("SECURITY", {}).get("ignored_by_auditor", [])
-    if user_id and user_id in ignored_auditor:
-        logger.info(f"Auditor ignorando staff ID: {user_id}")
-        return jsonify({"status": "ignored", "reason": "staff_whitelist"})
+    item = data.get('item', 'General')
+    total_circulating = data.get('total_circulating', 0)
+    average_balance = data.get('average_balance', 0)
 
-    salaries = data.get('salaries', {})
-    drugs = data.get('drugs', {})
-    vehicles = data.get('vehicles', {})
+    # Prompt para o Phi-3
+    prompt = f"""
+    You are an advanced Economy Manager AI for a FiveM roleplay server.
+    Current Economic Data:
+    - Item/Category: {item}
+    - Total Circulating Money: ${total_circulating}
+    - Average Player Balance: ${average_balance}
     
-    lixeiro_salary = salaries.get('lixeiro', 1) or 1
-    car_popular_price = vehicles.get('popular_avg', 1) or 1
+    Your goal is to prevent inflation. If money is abundant, slightly increase prices. If money is scarce, lower prices.
+    Base price multiplier is 1.0.
     
-    hours_to_buy_car = car_popular_price / lixeiro_salary
-    
-    cocaine_price = drugs.get('cocaine_sell', 0) or 0
-    faction_profit = cocaine_price * 50
-    
-    report_lines = [
-        f"**🚗 Poder de Compra**",
-        f"- Tempo para Carro Popular: **{hours_to_buy_car:.1f} horas**",
-        "",
-        f"**🏴 Crime**",
-        f"- Lucro/Hora Facção: **${faction_profit:,.2f}**",
-        "",
-        f"**⚖️ Veredito IA**"
-    ]
-    
-    if hours_to_buy_car > 50:
-        report_lines.append("⚠️ **Muito Difícil**")
-    elif hours_to_buy_car < 10:
-        report_lines.append("⚠️ **Muito Fácil**")
-    else:
-        report_lines.append("✅ **Equilibrado**")
+    Analyze the data and return a JSON object with a single key 'multiplier' (float between 0.8 and 2.0).
+    Example: {{"multiplier": 1.2}}
+    Do not explain. Return only the JSON.
+    """
 
-    embed = {
-        "title": "💰 Familía God Economy Report",
-        "description": "\n".join(report_lines),
-        "color": COLOR_NEON_GREEN,
-        "footer": {"text": "Familía God AI Economy Simulation"}
-    }
-    
-    if DISCORD_WEBHOOK_AUDIT:
-        send_discord_webhook(DISCORD_WEBHOOK_AUDIT, embed)
-    
-    return jsonify({"status": "success", "report": report_lines})
+    try:
+        # Se o modelo estiver carregado
+        if pipeline:
+            output = pipeline(prompt, max_new_tokens=50, return_full_text=False)
+            response_text = output[0]['generated_text'].strip()
+            
+            # Tentar extrair o JSON da resposta
+            import re
+            match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if match:
+                json_str = match.group(0)
+                result = json.loads(json_str)
+                multiplier = float(result.get('multiplier', 1.0))
+                
+                # Safety Clamp
+                multiplier = max(0.8, min(multiplier, 2.0))
+                
+                return jsonify({"multiplier": multiplier})
+            else:
+                print(f"{Fore.YELLOW}[GODZ AI] Falha ao parsear JSON da IA. Usando default.")
+                return jsonify({"multiplier": 1.0})
+        else:
+             return jsonify({"multiplier": 1.0}) # Fallback se IA offline
+
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ AI] Erro na simulação de economia: {e}")
+        return jsonify({"multiplier": 1.0})
 
 @app.route('/sentinel_check', methods=['POST'])
 @require_api_key
