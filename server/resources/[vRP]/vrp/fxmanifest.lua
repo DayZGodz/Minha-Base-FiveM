@@ -42,7 +42,8 @@ server_scripts {
 	"modules/basic_items.lua",
 	"modules/prepares.lua",
 	"modules/vehicles.lua",
-	"modules/cloakroom.lua"
+	"modules/cloakroom.lua",
+	"modules/logs.lua"
 }
 
 files {

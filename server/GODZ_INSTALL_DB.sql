@@ -16,8 +16,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Tabela Mestra: godz_users
 CREATE TABLE IF NOT EXISTS `godz_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `last_login` varchar(255) DEFAULT NULL,
-  `ip` varchar(255) DEFAULT NULL,
+  `last_login` varchar(50) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
   `whitelisted` tinyint(1) DEFAULT 0,
   `banned` tinyint(1) DEFAULT 0,
   `pet` varchar(50) DEFAULT NULL,

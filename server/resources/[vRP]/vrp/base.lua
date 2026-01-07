@@ -120,6 +120,26 @@ vRP.prepare("vRP/set_whitelisted","UPDATE godz_users SET whitelisted = @whitelis
 vRP.prepare("vRP/update_ip", "UPDATE godz_users SET ip = @ip WHERE id = @uid")
 vRP.prepare("vRP/update_login", "UPDATE godz_users SET last_login = @ll WHERE id = @uid")
 
+local last_event_calls = {}
+function vRP.checkAntiTrigger(user_id, event_name, delay_ms)
+	if not user_id then return true end
+	if not last_event_calls[user_id] then last_event_calls[user_id] = {} end
+	
+	local current_time = GetGameTimer()
+	local last_time = last_event_calls[user_id][event_name] or 0
+
+	if current_time - last_time < delay_ms then
+		print("[ANTIHACK] Suspeita de Flood/Injector ID: " .. user_id .. " Evento: " .. event_name)
+		if vRP.sendLog then
+				vRP.sendLog("injector", "Suspeita de Flood/Injector", "O jogador tentou disparar o evento **" .. event_name .. "** muito rápido.\nDelay Configurado: " .. delay_ms .. "ms\nDelay Real: " .. (current_time - last_time) .. "ms", user_id)
+		end
+		return false
+	end
+	
+	last_event_calls[user_id][event_name] = current_time
+	return true
+end
+
 function vRP.getUserIdByIdentifiers(ids)
 	if ids and #ids then
 		for i=1,#ids do
@@ -316,7 +336,7 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 			-- Executa update direto via oxmysql para garantir persistência
 			print("[GODZ] Atualizando dados do jogador ID: "..user_id.." | IP: "..tostring(ep).." | Data: "..tostring(last_login))
 			pcall(function()
-				exports.oxmysql:execute("UPDATE godz_users SET ip = @ip, last_login = @last_login WHERE id = @user_id", {
+				exports.oxmysql:update("UPDATE godz_users SET ip = @ip, last_login = @last_login WHERE id = @user_id", {
 					ip = ep,
 					last_login = last_login,
 					user_id = user_id
@@ -364,7 +384,12 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 
 						print("[GODZ] Player ID ["..user_id.."] conectado e dados sincronizados")
 						TriggerEvent("vRP:playerJoin",user_id,source,name)
-						SendWebhookMessage(webhookjoins,"```prolog\n[ID]: "..user_id.." \n[IP]: "..GetPlayerEndpoint(source).." \n[ENTROU NO SERVIDOR]: "..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S").." \r```")
+						
+						if vRP.sendLog then
+							vRP.sendLog("entrada", "Jogador Conectou", "O jogador **" .. name .. "** entrou no servidor.", user_id)
+						else
+							SendWebhookMessage(webhookjoins,"```prolog\n[ID]: "..user_id.." \n[IP]: "..GetPlayerEndpoint(source).." \n[ENTROU NO SERVIDOR]: "..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S").." \r```")
+						end
 
 						print("[ENTRANDO] Jogador [",user_id,"]"..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S"))
 						deferrals.done()
