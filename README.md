@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 👑 Família God - Super Base Unified (2026)
 
 ## Sobre
@@ -21,3 +22,6 @@ Integração com sistema de auditoria econômica e suporte via Discord, permitin
 Separação profissional para facilitar a manutenção e CI/CD:
 - **artifacts/** (Engine): Contém os binários do servidor.
 - **server/** (Data): Contém recursos, configurações e banco de dados.
+=======
+
+>>>>>>> 22f2eddc11d0c6c8a55d81f4c64a60ebdc8df677
