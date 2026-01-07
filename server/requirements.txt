@@ -9,3 +9,4 @@ accelerate
 huggingface-hub[hf_xet]
 flash-attn
 hf_xet
+waitress

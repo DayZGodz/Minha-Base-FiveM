@@ -9,6 +9,7 @@ import asyncio
 import discord
 from discord.ext import commands
 from flask import Flask, request, jsonify
+from waitress import serve
 import numpy as np
 from datetime import datetime, timedelta
 
@@ -35,9 +36,9 @@ def load_master_config():
     try:
         with open(MASTER_CONFIG_PATH, "r", encoding="utf-8") as f:
             MASTER_CONFIG = json.load(f)
-        print(f"{Fore.GREEN}[FAMILÍA GOD CONFIG] {Fore.WHITE}Master Config carregada.")
+        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Master Config carregada.")
     except json.JSONDecodeError as e:
-        print(f"{Fore.RED}[FAMILÍA GOD CONFIG] {Fore.WHITE}ERRO CRÍTICO DE SINTAXE NO JSON!")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}ERRO CRÍTICO DE SINTAXE NO JSON!")
         print(f"{Fore.RED}Detalhes: {e.msg}")
         print(f"{Fore.RED}Linha: {e.lineno}, Coluna: {e.colno}")
         print(f"{Fore.YELLOW}Verifique se não esqueceu uma vírgula ou aspas.")
@@ -58,16 +59,16 @@ def load_master_config():
             pass
         MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD CONFIG] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
         MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
 
 def save_master_config():
     try:
         with open(MASTER_CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(MASTER_CONFIG, f, indent=4)
-        print(f"{Fore.GREEN}[FAMILÍA GOD CONFIG] {Fore.WHITE}Master Config salva com sucesso.")
+        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Master Config salva com sucesso.")
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD CONFIG] {Fore.WHITE}Erro ao salvar Master Config: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro ao salvar Master Config: {e}")
 
 load_master_config()
 
@@ -83,9 +84,9 @@ def load_analytics_data():
         if os.path.exists(ANALYTICS_DATA_PATH):
             with open(ANALYTICS_DATA_PATH, "r", encoding="utf-8") as f:
                 ANALYTICS_DATA = json.load(f)
-            print(f"{Fore.GREEN}[FAMILÍA GOD ANALYTICS] {Fore.WHITE}Dados históricos carregados.")
+            print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Dados históricos carregados.")
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD ANALYTICS] {Fore.WHITE}Erro ao carregar dados: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro ao carregar dados: {e}")
 
 def save_analytics_data():
     try:
@@ -195,12 +196,12 @@ class GodzDiscordBot(commands.Bot):
         self.economy_health = 100
 
     async def on_ready(self):
-        print(f"{Fore.MAGENTA}[FAMILÍA GOD BOT] {Fore.WHITE}Conectado como {self.user}")
+        print(f"{Fore.MAGENTA}[FAMILÍA GOD AI] {Fore.WHITE}Conectado como {self.user}")
         try:
             synced = await self.tree.sync()
-            print(f"{Fore.MAGENTA}[FAMILÍA GOD BOT] {Fore.WHITE}Comandos Slash sincronizados: {len(synced)}")
+            print(f"{Fore.MAGENTA}[FAMILÍA GOD AI] {Fore.WHITE}Comandos Slash sincronizados: {len(synced)}")
         except Exception as e:
-            print(f"{Fore.RED}[FAMILÍA GOD BOT] Erro ao sincronizar comandos: {e}")
+            print(f"{Fore.RED}[FAMILÍA GOD AI] Erro ao sincronizar comandos: {e}")
         self.loop.create_task(self.update_status_loop())
 
     async def update_status_loop(self):
@@ -217,13 +218,13 @@ class GodzDiscordBot(commands.Bot):
                 status_text = f"Família God RP | {player_count} Players | Econ: {self.economy_health}%"
                 await self.change_presence(activity=discord.Game(name=status_text))
             except Exception as e:
-                print(f"{Fore.RED}[FAMILÍA GOD BOT] Erro no loop de status: {e}")
+                print(f"{Fore.RED}[FAMILÍA GOD AI] Erro no loop de status: {e}")
             
             await asyncio.sleep(60)
 
 def run_discord_bot():
     if not DISCORD_TOKEN or "SEU_TOKEN" in DISCORD_TOKEN:
-        print(f"{Fore.YELLOW}[FAMILÍA GOD BOT] {Fore.WHITE}Token não configurado. Bot de Status desativado.")
+        print(f"{Fore.YELLOW}[FAMILÍA GOD AI] {Fore.WHITE}Token não configurado. Bot de Status desativado.")
         return
 
     bot = GodzDiscordBot()
@@ -355,7 +356,7 @@ def run_discord_bot():
     try:
         bot.run(DISCORD_TOKEN)
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD BOT] Erro ao iniciar Bot: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] Erro ao iniciar Bot: {e}")
 
 threading.Thread(target=run_discord_bot, daemon=True).start()
 
@@ -611,5 +612,5 @@ def analytics_ingest():
     return jsonify({"status": "received"})
 
 if __name__ == '__main__':
-    print(f"{Fore.CYAN}[FAMILÍA GOD AI] {Fore.WHITE}Servidor rodando na porta 5000...")
-    app.run(host='0.0.0.0', port=5000)
+    print(f"{Fore.CYAN}[FAMILÍA GOD AI] {Fore.WHITE}Servidor de Produção rodando na porta 5000...")
+    serve(app, host='0.0.0.0', port=5000)

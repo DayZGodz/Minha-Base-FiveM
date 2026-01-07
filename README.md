@@ -83,13 +83,20 @@ MasterConfig = json.decode(config)
 
 ---
 
-## 🤖 Familía God AI
-A inovação central desta base é a integração com Inteligência Artificial para monitoramento e gestão.
+## 🤖 Familía God AI: Infraestrutura de Próxima Geração
+A inovação central desta base é a integração com Inteligência Artificial para monitoramento, gestão e suporte, agora operando em nível de produção.
 
-### Modelo de IA
+### Infraestrutura de Produção (WSGI)
+Abandonamos o servidor de desenvolvimento do Flask em favor do **Waitress**, um servidor WSGI robusto e escalável.
+*   **Concorrência:** Suporte real a múltiplos jogadores e requisições simultâneas sem bloqueios.
+*   **Estabilidade:** Eliminação de avisos de "Development Server" e maior resiliência a falhas.
+*   **Performance:** Otimização no handling de threads para inferência de IA.
+
+### Modelo de IA & Otimização
 Utilizamos o modelo **`microsoft/Phi-3-mini-4k-instruct`**, um LLM (Large Language Model) leve e poderoso, capaz de rodar localmente com alta eficiência.
-*   **Otimização:** Uso de `flash-attn` e `hf_xet` para aceleração de inferência.
-*   **Sanitização:** O bridge Python (`godz_ai_bridge.py`) implementa limpeza automática de tokens (`.strip()`) para evitar erros de autenticação no Discord.
+*   **Aceleração:** Uso de `flash-attn` e `hf_xet` para inferência ultra-rápida em GPUs NVIDIA.
+*   **Segurança:** O bridge Python (`godz_ai_bridge.py`) implementa sanitização rigorosa de tokens (`.strip()`) para prevenir erros de autenticação ("Improper token") e vazamento de credenciais.
+*   **Log Padronizado:** Todo o sistema de logs foi unificado sob a tag `[FAMILÍA GOD AI]` para fácil rastreabilidade.
 
 ### Monitoramento de Facções
 A IA analisa logs em tempo real para calcular o lucro das facções:
