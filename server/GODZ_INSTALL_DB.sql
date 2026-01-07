@@ -94,6 +94,14 @@ CREATE TABLE IF NOT EXISTS `godz_priority` (
   `priority` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- godz_benefits
+CREATE TABLE IF NOT EXISTS `godz_benefits` (
+  `user_id` int(11) NOT NULL,
+  `steam` varchar(100) DEFAULT NULL,
+  `global_ban` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 -- VEHICLE & GARAGE TABLES
 -- --------------------------------------------------------
@@ -198,16 +206,28 @@ CREATE TABLE IF NOT EXISTS `godz_bank_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
--- SUPPORT TABLES
+-- MOBILE & AI TABLES
 -- --------------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `godz_support_tickets` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` INT,
-    `category` VARCHAR(50),
-    `description` TEXT,
-    `status` VARCHAR(20) DEFAULT 'open',
-    `staff_id` INT DEFAULT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `closed_at` TIMESTAMP NULL
+CREATE TABLE IF NOT EXISTS `godz_phone_contacts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `number` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_phone_contacts_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `godz_phone_messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `sender_id` (`sender_id`),
+  KEY `receiver_id` (`receiver_id`),
+  CONSTRAINT `fk_phone_messages_sender` FOREIGN KEY (`sender_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_phone_messages_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

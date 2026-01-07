@@ -19,6 +19,21 @@ A base força o uso do Build 3407 (`sv_enforceGameBuild 3407`), garantindo:
 
 ---
 
+## 🗄️ Gerenciamento de Dados
+
+O arquivo **`GODZ_INSTALL_DB.sql`** é a **única fonte de verdade** para a estrutura do banco de dados.
+
+*   **Regra de Ouro**: Nunca crie arquivos SQL separados para novos recursos. Todas as tabelas devem ser consolidadas no Master SQL.
+*   **Padronização**: Todas as tabelas utilizam o prefixo `godz_` para evitar conflitos com recursos legados.
+*   **Engine**: InnoDB (utf8mb4).
+
+### Tabelas Principais
+*   `godz_users`: Tabela mestre.
+*   `godz_phone_contacts/messages`: Dados do ecossistema mobile.
+*   `godz_user_moneys`: Economia bancária.
+
+---
+
 ## 🔧 Fixes Críticos Aplicados
 
 ### 1. Inicialização de Inventário (`vrp/base.lua` e `inventory.lua`)
@@ -35,10 +50,7 @@ set mysql_connection_string "mysql://root@localhost/godz_database?charset=utf8mb
 ```
 
 ### 3. Identidade e Tabelas `godz_`
-Migração completa de `vrp_` para `godz_`:
-*   `godz_users`: Tabela mestre.
-*   `godz_user_ids`: Identificadores.
-*   `godz_user_moneys`: Economia bancária.
+Migração completa de `vrp_` para `godz_`.
 
 ---
 
