@@ -4,7 +4,7 @@
 
 ---
 
-## 🧠 O CÉREBRO: GODZ AI NEXUS & DISCORD BOT
+## 🧠 O CÉREBRO: GODZ AI NEXUS & BOT
 
 ### 🤖 GODZ AI NEXUS (Phi-3 Mini)
 **A Mente da Cidade**
@@ -33,82 +33,107 @@ O sistema de emergência não envia apenas um blip. Ele cria uma narrativa.
 
 ---
 
-## 🛠️ NÚCLEO GODZ ([godz_core])
+## 📦 NÚCLEO GODZ ([godz_core])
 
-### 👥 GODZ IDENTITY (MULTICHARACTER)
-**Sua História Começa Aqui**
-O sistema de identidade mais avançado já criado.
-*   **AI Lore Generation:** Ao criar um personagem, a IA gera automaticamente uma biografia rica e única baseada no nome e idade escolhidos.
-*   **Visual UI Premium:** Interface Glassmorphism com pré-visualização 3D do personagem em tempo real.
-*   **Proteção de Integridade:** Verificações robustas (Anti-Null) garantem que nenhum personagem seja corrompido ou perdido.
+### 🛡️ GODZ ADMIN
+**Gestão Administrativa & Auditoria**
+Painel administrativo completo com ferramentas de monitoramento em tempo real e logs de auditoria detalhados para garantir a integridade do servidor.
 
 ---
 
-### 💰 GODZ BANK & ECONOMY
-**Economia Viva e Dinâmica**
-Um sistema financeiro que simula a realidade.
-*   **Interface Bancária:** Design moderno, suporte a PIX, Extratos detalhados e Cartões de Crédito.
-*   **Inflação Controlada:** A IA monitora o fluxo de caixa do servidor e ajusta preços de itens essenciais para evitar hiperinflação.
-*   **Segurança Transacional:** Logs imutáveis de todas as transações para auditoria completa.
+### 💰 GODZ BANK
+**Finanças, PIX e Histórico Digital**
+Sistema bancário moderno com interface Glassmorphism, suporte a transferências instantâneas (PIX), extratos detalhados e gestão de cartões de crédito.
 
 ---
 
-### 🛡️ GODZ ADMIN (GOD MODE)
-**Administração Onipresente**
-Ferramentas poderosas para a gestão do servidor.
-*   **Painel Administrativo:** Controle total sobre jogadores, veículos e economia em uma UI unificada.
-*   **Wallhack & ESP:** Visualização de informações vitais de jogadores e entidades através de paredes para detecção de irregularidades.
-*   **Banimento HWID:** Sistema de banimento global que impede o retorno de infratores.
+### 📉 GODZ ECONOMY
+**Inteligência Econômica**
+Algoritmo avançado que regula a inflação e os preços de mercado dinamicamente, mantendo o equilíbrio financeiro do servidor.
+
+---
+
+### ⚔️ GODZ SENTINEL
+**Proteção Ativa**
+Sistema de segurança robusto que atua como um escudo contra injetores e tentativas de exploração, garantindo um ambiente justo para todos.
+
+---
+
+### 👥 GODZ IDENTITY
+**Multicharacter com Lore IA**
+Criação de personagens imersiva onde a IA gera biografias únicas baseadas nas escolhas do jogador. Interface visual premium para seleção de personagens.
+
+---
+
+### 🏠 GODZ HOUSING
+**Sistema Imobiliário & Decoração**
+Compra, venda e aluguel de propriedades com sistema de decoração livre, permitindo que os jogadores personalizem seus espaços.
+
+---
+
+### 🎒 GODZ INVENTORY
+**Gestão de Itens com Metadados**
+Inventário inteligente que suporta metadados (durabilidade, número de série, etc.) e drag-and-drop fluido.
+
+---
+
+### 📋 OUTROS MÓDULOS CORE
+*   **godz_chest:** Sistema de baús seguros e compartilhados.
+*   **godz_connect:** Gerenciamento de filas e conexões otimizado.
+*   **godz_dispatch:** Central de despachos unificada.
+*   **godz_events:** Sistema de eventos dinâmicos pelo mapa.
+*   **godz_garage:** Garagem pessoal com persistência de veículos.
+*   **godz_jobs:** Empregos interativos e diversificados.
+*   **godz_missions:** Missões diárias e semanais geradas proceduralmente.
+*   **godz_phone:** Smartphone funcional com apps reais (Twitter, Instagram, Banco).
+*   **godz_target:** Sistema de interação "olho" otimizado (ox_target).
+*   **godz_tuning:** Oficina mecânica com diagnóstico via IA.
 
 ---
 
 ## 🛡️ ESPECIALIZAÇÕES ([godz_modules])
 
-### 🔧 GODZ TUNING & GARAGE
-**Engenharia Automotiva**
-Não é apenas uma garagem, é uma oficina completa.
-*   **Diagnóstico Técnico:** A IA gera laudos mecânicos detalhando o estado do motor, suspensão e freios.
-*   **Persistência Total:** Veículos mantêm danos, sujeira, combustível e modificações permanentemente.
-*   **Valorização:** Carros bem cuidados e tunados valem mais no mercado de usados.
+### ⚔️ GODZ FACTIONS
+**Gestão de Organizações**
+Painel completo para líderes de facções gerenciarem membros, cargos, salários e o cofre da organização, seja ela criminosa ou legal.
 
 ---
 
-### ⚔️ GODZ FACTIONS (GANGS & ORGS)
-**Domínio Territorial**
-Sistema completo para gestão de organizações criminosas e legais.
-*   **Gestão de Membros:** Promoção, rebaixamento e expulsão via interface in-game.
-*   **Cofre da Facção:** Gestão financeira compartilhada com logs de depósitos e saques.
-*   **Territórios Dinâmicos:** Áreas de controle que geram renda passiva para a organização dominante.
+### 💊 GODZ ILLEGAL
+**Rotas de Drogas & Lavagem**
+Ecossistema criminal profundo com rotas de produção de drogas, riscos calculados e sistemas de lavagem de dinheiro através de empresas de fachada.
 
 ---
 
-### 💊 GODZ ILLEGAL (DRUGS & HEISTS)
-**O Submundo do Crime**
-Sistemas complexos para o roleplay ilegal.
-*   **Rotas de Drogas:** Produção, processamento e venda com riscos calculados e intervenção policial.
-*   **Desmanche:** Sistema de desmanche de veículos roubados com peças que podem ser vendidas ou usadas.
-*   **Lavagem de Dinheiro:** Mecânicas para transformar dinheiro sujo em limpo através de empresas de fachada.
+### 🔥 GODZ SHIELD
+**Firewall Anti-DDoS**
+Camada extra de proteção de rede para mitigar ataques de negação de serviço e manter o servidor online e estável.
 
 ---
 
-## 🗄️ DATA ARCHITECTURE
+### 🎫 GODZ SUPPORT
+**Sistema de Tickets In-Game**
+Ferramenta integrada para jogadores reportarem bugs ou denúncias diretamente para a staff sem sair do jogo.
+
+---
+
+### 🚗 GODZ GARAGES
+**Expansão Empresarial**
+Módulo estendido de garagens focado em empresas, permitindo frotas corporativas e compartilhamento de veículos entre funcionários.
+
+---
+
+## 🗄️ ARQUITETURA DE DADOS (DB)
 
 ### 📊 GODZ USERS (TABELA MESTRA)
 **A Espinha Dorsal do Servidor**
-A estrutura de dados foi desenhada para performance e integridade.
-*   **`id`**: Identificador único e imutável do cidadão.
-*   **`whitelisted`**: Status de aprovação na cidade (Boolean).
-*   **`banned`**: Status de banimento global (Boolean).
-*   **`ip`**: Último endereço IP de conexão (Rastreio de Segurança).
-*   **`last_login`**: Data e hora exata da última conexão (Formato: `%d/%m/%Y %H:%M:%S`).
-
-### 🆔 GODZ USER IDENTITIES
-**Perfil do Cidadão**
-*   **`user_id`**: Chave estrangeira ligada à tabela mestra.
-*   **`registration`**: Número de registro civil único (RG).
-*   **`phone`**: Número de telefone persistente.
-*   **`biography`**: História do personagem gerada pela IA ou escrita pelo jogador.
-*   **`driverlicense`**: Status da carteira de motorista (0: Não, 1: Sim, 3: Cassada).
+Estrutura otimizada para segurança e performance.
+*   **`id`**: Identificador único do cidadão.
+*   **`whitelisted`**: Status de aprovação.
+*   **`banned`**: Status de banimento global.
+*   **`ip`**: Rastreio de IP para segurança e auditoria.
+*   **`last_login`**: Data/Hora da última conexão (`%d/%m/%Y %H:%M:%S`).
+*   **Controle Integrado:** Moedas Premium, Pets e Slots de Garagem vinculados diretamente ao ID.
 
 ---
 
