@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ Garage</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app" style="display: none;">
+        <div class="glass-background"></div>
+        
+        <div class="garage-container">
+            <header>
+                <div class="brand">
+                    <i class="fas fa-warehouse brand-icon"></i>
+                    <div class="brand-text">
+                        <h1>GODZ</h1>
+                        <span>GARAGE CLUB</span>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeMenu()"><i class="fas fa-times"></i></button>
+            </header>
+
+            <div class="content-wrapper">
+                <aside class="vehicle-list-panel">
+                    <h3>MEUS VEÍCULOS</h3>
+                    <ul id="vehicle-list">
+                        <!-- Items injected by JS -->
+                    </ul>
+                </aside>
+
+                <main class="vehicle-details-panel">
+                    <div id="empty-state">
+                        <i class="fas fa-car-side"></i>
+                        <p>Selecione um veículo para visualizar detalhes</p>
+                    </div>
+
+                    <div id="details-content" style="display: none;">
+                        <div class="vehicle-header">
+                            <h2 id="veh-name">MODELO DO VEÍCULO</h2>
+                            <span class="plate-badge" id="veh-plate">ABC-1234</span>
+                        </div>
+
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <i class="fas fa-gas-pump"></i>
+                                <div class="status-info">
+                                    <span>Combustível</span>
+                                    <div class="progress-bar"><div id="bar-fuel" class="fill"></div></div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <i class="fas fa-cogs"></i>
+                                <div class="status-info">
+                                    <span>Motor</span>
+                                    <div class="progress-bar"><div id="bar-engine" class="fill"></div></div>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <i class="fas fa-car-crash"></i>
+                                <div class="status-info">
+                                    <span>Lataria</span>
+                                    <div class="progress-bar"><div id="bar-body" class="fill"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mechanic-report-card">
+                            <div class="card-header">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>LAUDO DO MECÂNICO (IA)</span>
+                            </div>
+                            <div class="card-body">
+                                <p id="mechanic-report-text">Nenhum laudo disponível para este veículo.</p>
+                            </div>
+                        </div>
+
+                        <div class="action-area">
+                            <button class="spawn-btn" onclick="spawnVehicle()">
+                                <i class="fas fa-key"></i> RETIRAR VEÍCULO
+                            </button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

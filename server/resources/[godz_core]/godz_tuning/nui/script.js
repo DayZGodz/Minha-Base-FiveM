@@ -2,6 +2,18 @@ let currentMods = {};
 let currentPrices = {};
 let configCategories = [];
 
+// Sound Helper
+function playSound(name) {
+    // Optional: Trigger client sound if needed via NUI callback, 
+    // or just rely on CSS hover sounds if implemented.
+    // Here we will use NUI callback for premium sounds
+    fetch(`https://${GetParentResourceName()}/playSound`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({ sound: name })
+    });
+}
+
 window.addEventListener('message', function(event) {
     const data = event.data;
     if (data.action === "open") {
@@ -10,17 +22,52 @@ window.addEventListener('message', function(event) {
         currentPrices = data.prices;
         configCategories = data.categories;
         loadCategories();
+        
+        // Initial Stats Update
+        if (data.stats) {
+            updateStatsDisplay(data.stats);
+        }
+    } else if (data.action === "updateStats") {
+        updateStatsDisplay(data.stats);
     } else if (data.action === "close") {
         document.getElementById("app").style.display = "none";
     }
 });
 
+function updateStatsDisplay(stats) {
+    // stats: { speed: 0-100, accel: 0-100, brakes: 0-100, traction: 0-100 } (normalized)
+    // or raw values. Let's assume client sends normalized 0-100 values for bars, and raw for text.
+    
+    // Speed
+    updateStat('stat-speed', stats.speedPercent, Math.round(stats.speedVal) + " km/h");
+    // Accel
+    updateStat('stat-accel', stats.accelPercent, stats.accelVal.toFixed(2));
+    // Brakes
+    updateStat('stat-brakes', stats.brakesPercent, stats.brakesVal.toFixed(2));
+    // Traction
+    updateStat('stat-traction', stats.tractionPercent, stats.tractionVal.toFixed(2));
+}
+
+function updateStat(idPrefix, percent, textVal) {
+    const bar = document.getElementById(`${idPrefix}-bar`);
+    const val = document.getElementById(`${idPrefix}-val`);
+    if (bar) bar.style.width = `${percent}%`;
+    if (val) val.innerText = textVal;
+}
+
 function closeMenu() {
     fetch(`https://${GetParentResourceName()}/close`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-        },
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({})
+    });
+    document.getElementById("app").style.display = "none";
+}
+
+function finishTuning() {
+    fetch(`https://${GetParentResourceName()}/finish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
         body: JSON.stringify({})
     });
     document.getElementById("app").style.display = "none";
@@ -40,7 +87,9 @@ function loadCategories() {
         const li = document.createElement("li");
         li.className = "category-item";
         li.innerHTML = `<i class="${cat.icon}"></i> ${cat.label}`;
+        li.onmouseenter = () => playSound("hover");
         li.onclick = () => {
+            playSound("select");
             document.querySelectorAll(".category-item").forEach(el => el.classList.remove("active"));
             li.classList.add("active");
             loadOptions(cat);
@@ -54,7 +103,6 @@ function loadOptions(category) {
     const grid = document.getElementById("options-grid");
     grid.innerHTML = "";
     
-    // Dados Dinâmicos baseados no Config
     let options = [];
     
     // Fallbacks
@@ -98,7 +146,7 @@ function loadOptions(category) {
             { label: "Suspensão Rebaixada", index: 0, price: p_susp, level: 2 },
             { label: "Suspensão Street", index: 1, price: p_susp * 2, level: 5 },
             { label: "Suspensão Sport", index: 2, price: p_susp * 3, level: 10 },
-            { label: "Suspensão Corrida", index: 3, price: p_susp * 4, level: 15 }
+            { label: "Suspensão Competição", index: 3, price: p_susp * 4, level: 15 }
         ];
     } else if (category.name === "armor") {
         options = [
@@ -111,39 +159,51 @@ function loadOptions(category) {
         ];
     }
     
-    // Render
     options.forEach(opt => {
-        const div = document.createElement("div");
-        div.className = "option-card";
+        const card = document.createElement("div");
+        card.className = "option-card";
         
-        // Verificar se está instalado
+        // Check if installed
         let isInstalled = false;
         if (category.name === "turbo") {
-            if (currentMods.turbo === opt.index) isInstalled = true;
+            // boolean check
+            isInstalled = (currentMods[category.name] == opt.index); 
+            // Note: == allows true == 1 comparison if needed, but safe to be explicit
+            if (typeof currentMods[category.name] === 'boolean' && typeof opt.index === 'boolean') {
+                isInstalled = (currentMods[category.name] === opt.index);
+            }
         } else {
-            if (currentMods[category.name] === opt.index) isInstalled = true;
+            // int check
+            isInstalled = (currentMods[category.name] == opt.index);
         }
         
-        if (isInstalled) div.classList.add("installed");
+        if (isInstalled) card.classList.add("installed");
         
-        div.innerHTML = `
-            <h3>${opt.label}</h3>
-            <div class="price">$${opt.price}</div>
-            <div class="level-req">Nível Mecânico: ${opt.level}</div>
+        card.innerHTML = `
+            <div class="option-name">${opt.label}</div>
+            <div class="option-price">$${opt.price}</div>
         `;
         
-        div.onclick = () => {
+        card.onmouseenter = () => playSound("hover");
+        
+        card.onclick = () => {
+            playSound("select");
             fetch(`https://${GetParentResourceName()}/applyMod`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=UTF-8' },
                 body: JSON.stringify({
                     category: category.name,
                     index: opt.index,
-                    level: opt.level
+                    level: opt.level,
+                    price: opt.price
                 })
             });
+            
+            // Optimistic update
+            currentMods[category.name] = opt.index;
+            loadOptions(category); // Reload to update "installed" class
         };
         
-        grid.appendChild(div);
+        grid.appendChild(card);
     });
 }

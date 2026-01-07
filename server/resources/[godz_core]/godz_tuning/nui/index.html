@@ -3,34 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GODZ Tuning</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>GODZ Tuning Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app" class="container" style="display: none;">
+        <div class="glass-background"></div>
+        
         <header>
-            <div class="logo">
-                <i class="fas fa-wrench"></i> FAMÍLIA GOD TUNING
+            <div class="brand">
+                <i class="fas fa-gem brand-icon"></i>
+                <div class="brand-text">
+                    <h1>GODZ</h1>
+                    <span>TUNING CLUB</span>
+                </div>
             </div>
-            <div class="close-btn" onclick="closeMenu()">
-                <i class="fas fa-times"></i>
+            <div class="header-actions">
+                <button class="close-btn" onclick="closeMenu()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </header>
         
         <main>
             <aside class="sidebar">
-                <ul id="category-list">
-                    <!-- Gerado via JS -->
-                </ul>
+                <div class="sidebar-content">
+                    <ul id="category-list">
+                        <!-- Categorias geradas via JS -->
+                    </ul>
+                </div>
             </aside>
             
-            <section class="content">
-                <h2 id="current-category-title">Selecione uma Categoria</h2>
+            <section class="content-area">
+                <div class="category-header">
+                    <h2 id="current-category-title">SELECIONE UMA CATEGORIA</h2>
+                    <div class="category-line"></div>
+                </div>
+                
                 <div class="options-grid" id="options-grid">
-                    <!-- Gerado via JS -->
+                    <!-- Opções geradas via JS -->
                 </div>
             </section>
+            
+            <aside class="stats-panel">
+                <h3>PERFORMANCE</h3>
+                <div class="vehicle-info">
+                    <h4 id="vehicle-name">VEÍCULO</h4>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>VELOCIDADE MÁX.</span>
+                            <span id="stat-speed-val">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="stat-speed-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>ACELERAÇÃO</span>
+                            <span id="stat-accel-val">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="stat-accel-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>FRENAGEM</span>
+                            <span id="stat-brakes-val">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="stat-brakes-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">
+                            <span>TRAÇÃO</span>
+                            <span id="stat-traction-val">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="stat-traction-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="total-cost">
+                    <span>CUSTO TOTAL</span>
+                    <h2 id="total-price">$0</h2>
+                </div>
+                
+                <button class="checkout-btn" onclick="finishTuning()">
+                    <i class="fas fa-check-circle"></i> FINALIZAR & AVALIAR
+                </button>
+            </aside>
         </main>
     </div>
 
