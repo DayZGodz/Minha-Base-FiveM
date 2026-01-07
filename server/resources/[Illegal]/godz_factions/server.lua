@@ -131,7 +131,7 @@ function LogChestActivity(user_id, faction, item, amount, type)
                 local res = json.decode(text)
                 if res and res.alert then
                     -- Alerta retornado pela IA (Limpa-baú detectado)
-                    print("^1[FAMILÍA GOD AI] ALERTA DE LIMPA-BAÚ: ID " .. user_id)
+                    print("^1[GODZ AI] ALERTA DE LIMPA-BAÚ: ID " .. user_id)
                     -- Notificar Staff/Discord via Webhook (já feito no Python, mas podemos reforçar in-game)
                     local staff = vRP.getUsersByPermission("admin.permissao")
                     for _, sid in pairs(staff) do

@@ -1,60 +1,71 @@
-# 🐉 GODZ BASE - FiveM Server (Build 3407)
+# 🐉 GODZ BASE - MANUAL TÉCNICO VRPEX
 
-**GODZ BASE** é uma infraestrutura de alta performance para servidores FiveM, projetada para estabilidade, escalabilidade e integração nativa com Inteligência Artificial.
-
----
-
-## 🏗️ Arquitetura do Sistema
-
-Esta base utiliza o **Game Build 3407**, permitindo:
-*   **UI/UX 144hz**: Interfaces fluidas baseadas em Vue.js.
-*   **Carregamento Dinâmico**: Atualização de assets e recursos sem reinicialização total.
-*   **Novos Veículos e Roupas**: Acesso nativo ao conteúdo mais recente do GTA Online.
+**GODZ BASE** é o resultado da fusão definitiva das bases **Unity**, **Zirix** e **Bahamas**, refinada para performance extrema e integração com Inteligência Artificial. Este manual documenta a infraestrutura para desenvolvedores.
 
 ---
 
-## 💾 Estrutura de Banco de Dados (`godz_database`)
+## 🏗️ Fusão e Arquitetura
 
-Todo o core vRP foi migrado para tabelas prefixadas com `godz_`, garantindo isolamento e organização.
+A base unifica o melhor de três mundos:
+*   **Unity**: Sistema de inventário e economia robusta.
+*   **Zirix**: Interface limpa e otimizações de netcode.
+*   **Bahamas**: Scripts de RP avançados e sistema de organizações.
 
-### 👤 Identidade e Usuários
-*   `godz_users`: Tabela mestre (ID, Whitelist, Banimento, IP).
-*   `godz_user_ids`: Mapeamento de identificadores (Steam, Discord, License).
-*   `godz_user_identities`: Dados de RP (Nome, Sobrenome, Idade, Registro, Telefone).
-
-### 💰 Economia (Bank & Wallet)
-*   `godz_user_moneys`: 
-    *   `wallet`: Dinheiro em mão.
-    *   `bank`: Saldo bancário.
-    *   `coin`: Moeda premium.
-*   `godz_benefits`: Benefícios VIP e status global.
-
-### 📱 Ecossistema Mobile (Phone)
-*   `godz_phone_contacts`: Agenda de contatos sincronizada.
-*   `godz_phone_messages`: Histórico de SMS persistente.
-*   **Storage**: Fotos salvas localmente no Disco D (economizando espaço no SSD principal).
-
-### 🏠 Housing & Dados Diversos
-*   `godz_srv_data`: Armazenamento Key-Value para propriedades (homes), baús e configurações globais.
-*   `godz_user_data`: Dados específicos do jogador (roupas, customização, inventário datatable).
+### Game Build 3407 (Bottom Dollar Bounties)
+A base força o uso do Build 3407 (`sv_enforceGameBuild 3407`), garantindo:
+*   **144hz UI**: Suporte nativo a interfaces Vue.js/React com alta taxa de atualização.
+*   **Veículos/Roupas**: Acesso direto aos assets da DLC Bottom Dollar Bounties.
+*   **Estabilidade**: Correções de crash do motor do GTA V.
 
 ---
 
-## 🧠 Integração com IA (`godz_ai_bridge`)
+## 🔧 Fixes Críticos Aplicados
 
-A base conta com uma ponte Python-Lua que conecta o servidor ao modelo **Phi-3**.
-*   **Cache Otimizado**: O cache da IA é redirecionado para `D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache`, prevenindo lotação do Disco C.
-*   **Logs**: Monitoramento em tempo real via tag `[GODZ AI]`.
+### 1. Inicialização de Inventário (`vrp/base.lua` e `inventory.lua`)
+Foi corrigido o erro de indexação nula em itens:
+```lua
+-- Fix aplicado em inventory.lua
+vRP.items = {} -- Garante que a tabela exista antes de qualquer definição
+```
+
+### 2. Conexão de Banco de Dados
+Padronização para connection string URL para suporte a drivers modernos:
+```cfg
+set mysql_connection_string "mysql://root@localhost/godz_database?charset=utf8mb4"
+```
+
+### 3. Identidade e Tabelas `godz_`
+Migração completa de `vrp_` para `godz_`:
+*   `godz_users`: Tabela mestre.
+*   `godz_user_ids`: Identificadores.
+*   `godz_user_moneys`: Economia bancária.
 
 ---
 
-## 🚀 Como Iniciar
+## 🧠 Infraestrutura de IA (Phi-3 Mini)
 
-1.  **Database**: Importe `server/GODZ_INSTALL_DB.sql` e `server/GODZ_PHONE.sql`.
-2.  **Config**: Verifique `server/config/config.cfg` e a string de conexão `mysql://root@localhost/familia_god_db`.
-3.  **Start**: Execute `Start.bat` na raiz.
+A base opera um servidor de inferência local (`godz_ai_bridge.py`) rodando o modelo **Phi-3 Mini 4k Instruct**.
+
+### Especificações
+*   **Modelo**: Microsoft Phi-3 Mini (3.8B parâmetros).
+*   **Servidor HTTP**: Waitress (Production WSGI).
+*   **Endpoint**: `POST http://127.0.0.1:5000/ai_chat`.
+
+### Otimização de Armazenamento (Disco D:)
+Para preservar o SSD principal, o cache do Hugging Face é redirecionado:
+```python
+# Configuração no topo do bridge
+os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
+```
 
 ---
 
-**Desenvolvido por GODZ Dev Team**
+## 🚀 Inicialização
+
+1.  **Start.bat**: Inicia o servidor FiveM + Ponte de IA.
+2.  **Monitoramento**: Acompanhe os logs com prefixo `[GODZ]` e `[GODZ AI]`.
+
+---
+
+**GODZ Dev Team**
 *Copyright © 2026*

@@ -122,6 +122,7 @@ vRP.prepare("vRP/update_login", "UPDATE godz_users SET last_login = @ll WHERE id
 
 function vRP.getUserIdByIdentifiers(ids)
 	if ids and #ids then
+		print("[GODZ] DEBUG IDENTIFIERS:", json.encode(ids))
 		for i=1,#ids do
 			if (string.find(ids[i],"ip:") == nil) then
 				local rows = vRP.query("vRP/userid_byidentifier",{ identifier = ids[i] })
@@ -131,13 +132,13 @@ function vRP.getUserIdByIdentifiers(ids)
 			end
 		end
 
-		-- [FIX FAMILÍA GOD] Security Check for Database
+		-- [FIX GODZ] Security Check for Database
 		local status, rows = pcall(function()
 			return vRP.query("vRP/create_user",{})
 		end)
 
 		if not status then
-			print("[FAMILÍA GOD] CRITICAL ERROR: Failed to access database 'godz_users'. Check your MySQL connection and table structure.")
+			print("[GODZ] CRITICAL ERROR: Failed to access database 'godz_users'. Check your MySQL connection and table structure.")
 			return nil
 		end
 

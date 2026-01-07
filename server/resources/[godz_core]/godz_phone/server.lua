@@ -11,9 +11,9 @@ Citizen.CreateThread(function()
     local configFile = LoadResourceFile("godz_tuning", "GODZ_MASTER_CONFIG.json")
     if configFile then
         MASTER_CONFIG = json.decode(configFile)
-        print("[FAMILÍA GOD] God-Phone: Configuração Mestra Carregada com Sucesso.")
+        print("[GODZ] God-Phone: Configuração Mestra Carregada com Sucesso.")
     else
-        print("[FAMILÍA GOD] CRITICAL: Falha ao carregar GODZ_MASTER_CONFIG.json")
+        print("[GODZ] CRITICAL: Falha ao carregar GODZ_MASTER_CONFIG.json")
     end
 end)
 
@@ -25,7 +25,7 @@ AddEventHandler("godz_phone:askAI", function(question)
     
     if not user_id then return end
 
-    print("[FAMILÍA GOD AI] Processando pergunta de User " .. user_id .. ": " .. question)
+    print("[GODZ AI] Processando pergunta de User " .. user_id .. ": " .. question)
 
     PerformHttpRequest("http://127.0.0.1:5000/ai_chat", function(errorCode, resultData, resultHeaders)
         local answer = "A IA está dormindo no momento..."
@@ -36,7 +36,7 @@ AddEventHandler("godz_phone:askAI", function(question)
                 answer = data.response
             end
         else
-            print("[FAMILÍA GOD AI] Erro na conexão com a ponte: " .. tostring(errorCode))
+            print("[GODZ AI] Erro na conexão com a ponte: " .. tostring(errorCode))
         end
 
         TriggerClientEvent("godz_phone:receiveAIResponse", source, answer)
