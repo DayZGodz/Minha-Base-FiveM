@@ -123,3 +123,53 @@ RegisterServerEvent("trymala")
 AddEventHandler("trymala",function(nveh)
 	TriggerClientEvent("syncmala",-1,nveh)
 end)
+
+-- GODZ AI CONTEXTUAL TIPS
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(60000) -- Verifica a cada 60 segundos
+        for k,v in pairs(vRP.users) do
+            local user_id = v
+            local source = vRP.getUserSource(user_id)
+            if source then
+                local hunger = vRP.getHunger(user_id)
+                local thirst = vRP.getThirst(user_id)
+                
+                -- Se fome ou sede estiverem críticas (> 90 no vRP significa < 10% de saciedade)
+                if (hunger > 90 or thirst > 90) then
+                    if not vRP.ai_cooldowns then vRP.ai_cooldowns = {} end
+                    
+                    -- Cooldown de 5 minutos (300 segundos) para não spammar a IA
+                    if not vRP.ai_cooldowns[user_id] or (os.time() - vRP.ai_cooldowns[user_id]) > 300 then
+                        vRP.ai_cooldowns[user_id] = os.time()
+                        
+                        local condition = ""
+                        if hunger > 90 then condition = "morrendo de fome" end
+                        if thirst > 90 then condition = "morrendo de sede" end
+                        if hunger > 90 and thirst > 90 then condition = "morrendo de fome e sede" end
+                        
+                        local prompt = "O jogador está " .. condition .. ". Dê uma dica curta e imersiva de sobrevivência (máx 15 palavras) para o jogo GTA RP."
+                        
+                        -- Chama a IA (assumindo que a função vRP.askGodzAI existe ou adaptando para o padrão do servidor)
+                        -- Como não tenho a definição de vRP.askGodzAI, vou usar um print de debug e tentar chamar se existir, 
+                        -- ou apenas simular se for necessário. Mas o usuário pediu explicitamente para chamar o endpoint /ai_assist.
+                        -- Vou assumir que existe uma implementação de PerformHttpRequest para a IA ou usar a função nativa do vRP se houver.
+                        -- Vou implementar usando PerformHttpRequest direto para garantir.
+                        
+                        PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+                            if err == 200 then
+                                local data = json.decode(text)
+                                if data and data.response then
+                                    TriggerClientEvent("Notify", source, "ia_tip", data.response)
+                                end
+                            end
+                        end, "POST", json.encode({
+                            question = prompt,
+                            user_id = user_id
+                        }), { ["Content-Type"] = "application/json" })
+                    end
+                end
+            end
+        end
+    end
+end)

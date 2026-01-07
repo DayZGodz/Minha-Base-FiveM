@@ -1,36 +1,49 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-  <title>GODZ Interface</title>
+    <meta charset="UTF-8">
+    <title>Godz Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <div id="hud" class="hud">
-    <!-- Watermark -->
-    <div id="godz-watermark">
-      <span>GODZ <span class="accent">RP</span></span>
-    </div>
-    <div class="card">
-      <div class="row"><span>Saúde</span><div class="bar"><div id="health" class="fill"></div></div></div>
-      <div class="row"><span>Colete</span><div class="bar"><div id="armor" class="fill"></div></div></div>
-      <div class="row"><span>Fome</span><div class="bar"><div id="hunger" class="fill"></div></div></div>
-      <div class="row"><span>Sede</span><div class="bar"><div id="thirst" class="fill"></div></div></div>
-      <div class="row"><span>Oxigênio</span><div class="bar"><div id="oxygen" class="fill"></div></div></div>
-    </div>
-  </div>
+    
+    <div id="hud-container">
+        <div class="status-circle health">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle health-fill" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <i class="fas fa-heart"></i>
+        </div>
 
-  <div id="xp-toast" class="xp-toast hidden">
-    <div class="xp-info">
-      <span id="xp-job">Trabalho</span>
-      <span id="xp-amount" class="xp-gain">+100 XP</span>
-    </div>
-    <div class="xp-bar-bg">
-      <div id="xp-bar-fill" class="xp-bar-fill"></div>
-    </div>
-  </div>
+        <div class="status-circle armour" id="armour-container">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle armour-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <i class="fas fa-shield-alt"></i>
+        </div>
 
-  <script src="script.js"></script>
+        <div class="status-circle hunger">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle hunger-fill" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <i class="fas fa-hamburger"></i>
+        </div>
+
+        <div class="status-circle thirst">
+            <svg viewBox="0 0 36 36" class="circular-chart">
+                <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="circle thirst-fill" stroke-dasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <i class="fas fa-tint"></i>
+        </div>
+    </div>
+
+    <div id="notify-container"></div>
+
+    <script src="script.js"></script>
 </body>
 </html>
