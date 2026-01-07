@@ -1,5 +1,6 @@
 import sys
 import os
+from functools import wraps
 
 # [GODZ AI] Configuração de Cache no Disco D: (Deve vir antes dos imports do HF)
 os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
@@ -22,6 +23,19 @@ from colorama import init, Fore, Style
 init(autoreset=True)
 
 app = Flask(__name__)
+
+# ==================================================================================
+# SEGURANÇA (API KEY)
+# ==================================================================================
+API_KEY = "godz_secret_key_123"
+
+def require_api_key(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if request.headers.get('X-API-Key') != API_KEY:
+            return jsonify({"error": "Acesso negado: API Key inválida"}), 403
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Configuração do Logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -162,14 +176,23 @@ threading.Thread(target=load_model).start()
 # ==================================================================================
 # 2. CARREGAMENTO DE REGRAS (RAG LITE)
 # ==================================================================================
+RULES_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "REGRAS.txt")
 RULES_CONTENT = ""
-try:
-    with open("REGRAS.txt", "r", encoding="utf-8") as f:
-        RULES_CONTENT = f.read()
-    print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Regras carregadas na memória.")
-except Exception as e:
-    print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}REGRAS.txt não encontrado. Criando padrão...")
-    RULES_CONTENT = "Respeite as regras do servidor Família God."
+
+def load_rules():
+    global RULES_CONTENT
+    try:
+        with open(RULES_PATH, "r", encoding="utf-8") as f:
+            RULES_CONTENT = f.read()
+        print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Regras carregadas na memória.")
+        return True
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}REGRAS.txt não encontrado. Criando padrão...")
+        RULES_CONTENT = "Respeite as regras do servidor Família God."
+        return False
+
+# Carregamento Inicial
+load_rules()
 
 # ==================================================================================
 # 3. DISCORD BOT & WEBHOOKS
@@ -369,7 +392,20 @@ threading.Thread(target=run_discord_bot, daemon=True).start()
 # ENDPOINTS
 # ==================================================================================
 
+@app.route('/health', methods=['GET'])
+def health():
+    return "ok", 200
+
+@app.route('/reload_rules', methods=['POST'])
+@require_api_key
+def reload_rules():
+    if load_rules():
+        return jsonify({"status": "success", "message": "Regras recarregadas com sucesso"})
+    else:
+        return jsonify({"status": "error", "message": "Falha ao recarregar regras"}), 500
+
 @app.route('/config', methods=['GET'])
+@require_api_key
 def get_config():
     return jsonify(MASTER_CONFIG)
 
@@ -378,6 +414,7 @@ def status():
     return jsonify({"status": "online", "model": MODEL_NAME, "gpu": torch.cuda.is_available() if 'torch' in sys.modules else False})
 
 @app.route('/ai_assist', methods=['POST'])
+@require_api_key
 def ai_assist():
     data = request.json
     player_question = data.get('question', '')
@@ -406,11 +443,12 @@ def ai_assist():
             response_text = outputs[0]['generated_text'].strip()
         except Exception as e:
             logger.error(f"Erro na inferência: {e}")
-            response_text = "Erro ao processar sua dúvida."
+            response_text = "Estou processando muitas informações agora, tente novamente em instantes."
             
     return jsonify({"response": response_text})
 
 @app.route('/dispatch_ticket', methods=['POST'])
+@require_api_key
 def dispatch_ticket():
     data = request.json
     ticket_id = data.get('ticket_id')
@@ -436,6 +474,7 @@ def dispatch_ticket():
     return jsonify({"status": "sent"})
 
 @app.route('/ai_economy_simulation', methods=['POST'])
+@require_api_key
 def ai_economy_simulation():
     data = request.json
     
@@ -488,6 +527,7 @@ def ai_economy_simulation():
     return jsonify({"status": "success", "report": report_lines})
 
 @app.route('/sentinel_check', methods=['POST'])
+@require_api_key
 def sentinel_check():
     data = request.json
     user_id = data.get('user_id')
