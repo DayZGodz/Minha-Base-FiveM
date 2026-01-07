@@ -33,8 +33,10 @@ def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
-        if not auth_header or auth_header != f"Bearer {API_KEY}":
-            return jsonify({"error": "Acesso negado: API Key inválida"}), 403
+        print(f"DEBUG: Header recebido: {auth_header}")
+        
+        if not auth_header or auth_header != "Bearer godz_secret_key_123":
+            return jsonify({"error": "Unauthorized"}), 403
         return f(*args, **kwargs)
     return decorated_function
 

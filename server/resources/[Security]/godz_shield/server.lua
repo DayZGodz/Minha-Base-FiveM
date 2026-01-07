@@ -12,6 +12,10 @@ local API_KEY = "godz_secret_key_123"
 
 Citizen.CreateThread(function()
     Wait(2000) -- Aguarda API subir
+    print("[GODZ] Tentando conectar com a IA...")
+    local headers = { 
+       ["Authorization"] = "Bearer " .. API_KEY 
+    }
     PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
         if err == 200 then
             local data = json.decode(text)
@@ -22,7 +26,7 @@ Citizen.CreateThread(function()
         else
             print("^1[GODZ SHIELD] ^7Falha ao sincronizar config com IA (Erro " .. tostring(err) .. ")")
         end
-    end, 'GET', "", { ["Authorization"] = "Bearer " .. API_KEY })
+    end, 'GET', "", headers)
 end)
 
 local function IsWhitelisted(user_id)

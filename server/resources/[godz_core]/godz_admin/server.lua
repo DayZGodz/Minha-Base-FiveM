@@ -73,7 +73,7 @@ AddEventHandler("godz_admin:analyzePlayer", function(target_id)
             end
         end
         TriggerClientEvent("godz_admin:receiveReport", source, report)
-    end, 'POST', json.encode({prompt = prompt}), { ["Content-Type"] = 'application/json' })
+    end, 'POST', json.encode({prompt = prompt}), headers)
 end)
 
 RegisterServerEvent("godz_admin:action")

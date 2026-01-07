@@ -7,14 +7,17 @@ local API_KEY = "godz_secret_key_123"
 
 -- Função Global de Requisição
 function vRP.askGodzAI(endpoint, data, callback)
+    print("[GODZ] Tentando conectar com a IA...")
+    local headers = {
+        ["Content-Type"] = "application/json",
+        ["Authorization"] = "Bearer " .. API_KEY
+    }
+    
     PerformHttpRequest(API_URL .. endpoint, function(errorCode, resultData, resultHeaders)
         if callback then
             callback(errorCode, resultData, resultHeaders)
         end
-    end, 'POST', json.encode(data), {
-        ["Content-Type"] = "application/json",
-        ["X-API-Key"] = API_KEY
-    })
+    end, 'POST', json.encode(data), headers)
 end
 
 -- Comando /ajuda

@@ -43,6 +43,13 @@ function vRPN.Identidade()
 		end
 
 		local cnh = "Inválido"
+        
+        -- Proxy Safeguard: Check if identity exists before accessing properties
+        if identity == nil or type(identity) ~= "table" then
+            print("[GODZ DEBUG] Identidade retornou nula ou inválida para o ID " .. tostring(user_id))
+            return nil
+        end
+
 		if identity.driverlicense == 0 then
 			cnh = "Não habilitado"
 		elseif identity.driverlicense == 1 then
@@ -65,6 +72,12 @@ function vRPN.generateLore(name, firstname, age, job)
     local p = promise.new()
     local prompt = "Crie uma breve biografia (máximo 3 linhas) para um personagem de GTA RP chamado " .. name .. " " .. firstname .. ", " .. age .. " anos, que trabalha como " .. job .. ". O tom deve ser imersivo."
     
+    local headers = { 
+        ["Content-Type"] = "application/json", 
+        ["Authorization"] = "Bearer godz_secret_key_123" 
+    }
+    print("[GODZ] Tentando conectar com a IA...")
+
     PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
         if err == 200 then
             local data = json.decode(text)
@@ -79,7 +92,7 @@ function vRPN.generateLore(name, firstname, age, job)
     end, "POST", json.encode({
         question = prompt,
         user_id = 0 -- ID temporário
-    }), { ["Content-Type"] = "application/json" })
+    }), headers)
     
     return Citizen.Await(p)
 end
