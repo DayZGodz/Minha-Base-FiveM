@@ -8,6 +8,7 @@
     --godz-danger: #e74c3c;
     --godz-warning: #f1c40f;
     --godz-info: #3498db;
+    --godz-gold: #D4AF37;
     --godz-glass-bg: rgba(20, 20, 20, 0.85);
     --godz-glass-bg-dark: rgba(10, 10, 10, 0.95);
     --godz-glass-border: 1px solid rgba(255, 255, 255, 0.1);
@@ -83,6 +84,20 @@ body {
     background: linear-gradient(90deg, rgba(0, 229, 255, 0.1), var(--godz-glass-bg));
 }
 
+/* IA TIP - GOLDEN PULSE */
+.notification.ia_tip {
+    border-color: var(--godz-gold);
+    background: linear-gradient(90deg, rgba(212, 175, 55, 0.2), var(--godz-glass-bg));
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    animation: slideIn 0.5s ease forwards, pulseGold 2s infinite;
+}
+
+@keyframes pulseGold {
+    0% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+}
+
 .icon-container {
     margin-right: 15px;
     font-size: 1.5rem;
@@ -94,6 +109,7 @@ body {
 .error .icon-container { color: var(--godz-danger); }
 .warning .icon-container { color: var(--godz-warning); }
 .info .icon-container { color: var(--godz-accent); }
+.ia_tip .icon-container { color: var(--godz-gold); }
 
 .content {
     flex: 1;

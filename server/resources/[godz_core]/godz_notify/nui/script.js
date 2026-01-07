@@ -15,7 +15,8 @@ function createNotification(type, message, length = 5000) {
         success: { icon: "fa-check-circle", title: "Sucesso" },
         error: { icon: "fa-times-circle", title: "Erro" },
         warning: { icon: "fa-exclamation-triangle", title: "Aviso" },
-        info: { icon: "fa-info-circle", title: "Informação" }
+        info: { icon: "fa-info-circle", title: "Informação" },
+        ia_tip: { icon: "fa-robot", title: "GODZ AI" }
     };
 
     const style = config[type] || config.info;
