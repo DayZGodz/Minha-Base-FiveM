@@ -122,32 +122,40 @@ vRP.prepare("vRP/update_login", "UPDATE godz_users SET last_login = @ll WHERE id
 
 function vRP.getUserIdByIdentifiers(ids)
 	if ids and #ids then
-		print("[GODZ] DEBUG IDENTIFIERS:", json.encode(ids))
 		for i=1,#ids do
 			if (string.find(ids[i],"ip:") == nil) then
-				local rows = vRP.query("vRP/userid_byidentifier",{ identifier = ids[i] })
-				if #rows > 0 then
-					return rows[1].user_id
+				local status, user_id = pcall(function()
+					return exports.oxmysql:scalar_execute("SELECT user_id FROM godz_user_ids WHERE identifier = @identifier", { identifier = ids[i] })
+				end)
+
+				if not status then -- Fallback check
+					status, user_id = pcall(function()
+						return exports.oxmysql:scalar("SELECT user_id FROM godz_user_ids WHERE identifier = ?", { ids[i] })
+					end)
+				end
+
+				if status and user_id then
+					return user_id
 				end
 			end
 		end
 
 		-- [FIX GODZ] Security Check for Database
-		local status, rows = pcall(function()
-			return vRP.query("vRP/create_user",{})
+		local status, result = pcall(function()
+			return exports.oxmysql:insert("INSERT INTO godz_users(whitelisted,banned) VALUES(false,false)", {})
 		end)
 
-		if not status then
-			print("[GODZ] CRITICAL ERROR: Failed to access database 'godz_users'.")
-			print("ERRO MYSQL REAL: " .. tostring(rows))
-			return nil
+		if not status or not result then
+			print("[GODZ] Erro detectado no Banco de Dados!")
+			return false
 		end
 
-		if rows and #rows > 0 then
-			local user_id = rows[1].id
+		local user_id = result
+
+		if user_id then
 			for l,w in pairs(ids) do
 				if (string.find(w,"ip:") == nil) then
-					vRP.execute("vRP/add_identifier",{ user_id = user_id, identifier = w })
+					exports.oxmysql:execute("INSERT INTO godz_user_ids(identifier,user_id) VALUES(@identifier,@user_id)", { identifier = w, user_id = user_id })
 				end
 			end
 			return user_id
