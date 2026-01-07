@@ -97,28 +97,28 @@ function vRP.execute(name,params)
 	return vRP.query(name,params,"execute")
 end
 
-vRP.prepare("vRP/create_user","INSERT INTO vrp_users(whitelisted,banned) VALUES(false,false); SELECT LAST_INSERT_ID() AS id")
-vRP.prepare("vRP/add_identifier","INSERT INTO vrp_user_ids(identifier,user_id) VALUES(@identifier,@user_id)")
-vRP.prepare("vRP/add_benefitsChars", "INSERT INTO vrp_benefits(steam, user_id) VALUES(@identifier, @user_id)")
-vRP.prepare("vRP/userid_byidentifier","SELECT user_id FROM vrp_user_ids WHERE identifier = @identifier")
-vRP.prepare("vRP/get_usersBenefits","SELECT * FROM vrp_benefits WHERE steam = @steam")
-vRP.prepare("vRP/get_usersBenefitsId","SELECT * FROM vrp_benefits WHERE user_id = @user_id")
-vRP.prepare("vRP/identifier_byuserid", "SELECT * FROM vrp_user_ids WHERE user_id = @user_id")
-vRP.prepare("vRP/set_userdata","REPLACE INTO vrp_user_data(user_id,dkey,dvalue) VALUES(@user_id,@key,@value)")
-vRP.prepare("vRP/get_userdata","SELECT dvalue FROM vrp_user_data WHERE user_id = @user_id AND dkey = @key")
+vRP.prepare("vRP/create_user","INSERT INTO godz_users(whitelisted,banned) VALUES(false,false); SELECT LAST_INSERT_ID() AS id")
+vRP.prepare("vRP/add_identifier","INSERT INTO godz_user_ids(identifier,user_id) VALUES(@identifier,@user_id)")
+vRP.prepare("vRP/add_benefitsChars", "INSERT INTO godz_benefits(steam, user_id) VALUES(@identifier, @user_id)")
+vRP.prepare("vRP/userid_byidentifier","SELECT user_id FROM godz_user_ids WHERE identifier = @identifier")
+vRP.prepare("vRP/get_usersBenefits","SELECT * FROM godz_benefits WHERE steam = @steam")
+vRP.prepare("vRP/get_usersBenefitsId","SELECT * FROM godz_benefits WHERE user_id = @user_id")
+vRP.prepare("vRP/identifier_byuserid", "SELECT * FROM godz_user_ids WHERE user_id = @user_id")
+vRP.prepare("vRP/set_userdata","REPLACE INTO godz_user_data(user_id,dkey,dvalue) VALUES(@user_id,@key,@value)")
+vRP.prepare("vRP/get_userdata","SELECT dvalue FROM godz_user_data WHERE user_id = @user_id AND dkey = @key")
 
-vRP.prepare("vRP/set_srvdata","REPLACE INTO vrp_srv_data(dkey,dvalue) VALUES(@key,@value)")
-vRP.prepare("vRP/del_srvdata","DELETE FROM vrp_srv_data WHERE dkey = @key")
-vRP.prepare("vRP/get_srvdata","SELECT dvalue FROM vrp_srv_data WHERE dkey = @key")
-vRP.prepare("vRP/set2_srvdata","REPLACE INTO vrp_srv_data(dkey) VALUES(@key)")
+vRP.prepare("vRP/set_srvdata","REPLACE INTO godz_srv_data(dkey,dvalue) VALUES(@key,@value)")
+vRP.prepare("vRP/del_srvdata","DELETE FROM godz_srv_data WHERE dkey = @key")
+vRP.prepare("vRP/get_srvdata","SELECT dvalue FROM godz_srv_data WHERE dkey = @key")
+vRP.prepare("vRP/set2_srvdata","REPLACE INTO godz_srv_data(dkey) VALUES(@key)")
 
-vRP.prepare("vRP/get_banned","SELECT banned FROM vrp_users WHERE id = @user_id")
-vRP.prepare("vRP/set_banned","UPDATE vrp_users SET banned = @banned WHERE id = @user_id")
-vRP.prepare("vRP/set_bannedGlobal", "UPDATE vrp_benefits SET global_ban = @banned WHERE user_id = @user_id")
-vRP.prepare("vRP/get_whitelisted","SELECT whitelisted FROM vrp_users WHERE id = @user_id")
-vRP.prepare("vRP/set_whitelisted","UPDATE vrp_users SET whitelisted = @whitelisted WHERE id = @user_id")
-vRP.prepare("vRP/update_ip", "UPDATE vrp_users SET ip = @ip WHERE id = @uid")
-vRP.prepare("vRP/update_login", "UPDATE vrp_users SET last_login = @ll WHERE id = @uid")
+vRP.prepare("vRP/get_banned","SELECT banned FROM godz_users WHERE id = @user_id")
+vRP.prepare("vRP/set_banned","UPDATE godz_users SET banned = @banned WHERE id = @user_id")
+vRP.prepare("vRP/set_bannedGlobal", "UPDATE godz_benefits SET global_ban = @banned WHERE user_id = @user_id")
+vRP.prepare("vRP/get_whitelisted","SELECT whitelisted FROM godz_users WHERE id = @user_id")
+vRP.prepare("vRP/set_whitelisted","UPDATE godz_users SET whitelisted = @whitelisted WHERE id = @user_id")
+vRP.prepare("vRP/update_ip", "UPDATE godz_users SET ip = @ip WHERE id = @uid")
+vRP.prepare("vRP/update_login", "UPDATE godz_users SET last_login = @ll WHERE id = @uid")
 
 function vRP.getUserIdByIdentifiers(ids)
 	if ids and #ids then
@@ -137,7 +137,7 @@ function vRP.getUserIdByIdentifiers(ids)
 		end)
 
 		if not status then
-			print("[FAMILÍA GOD] CRITICAL ERROR: Failed to access database 'vrp_users'. Check your MySQL connection and table structure.")
+			print("[FAMILÍA GOD] CRITICAL ERROR: Failed to access database 'godz_users'. Check your MySQL connection and table structure.")
 			return nil
 		end
 

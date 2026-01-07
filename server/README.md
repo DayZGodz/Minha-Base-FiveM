@@ -1,51 +1,61 @@
-# FAMILÍA GOD BASE - VRPEX (Fusion Edition)
+# 🏙️ FAMILÍA GOD BASE (FiveM Server)
 
-> **Versão Oficial de Produção - 2026**
-> Fusão das bases Unity, Zirix e Bahamas com Infraestrutura de IA proprietária.
+> **Versão:** 1.0.0 (Production Ready)  
+> **Framework:** vRPex (Optimized)  
+> **Game Build:** 3407 (The Chop Shop)  
+> **Database:** MySQL (OxMySQL Driver)
+
+---
+
+## 📖 Sobre o Projeto
+A **Familía God Base** é o resultado de uma engenharia de software avançada, unificando o melhor de três mundos: a estabilidade da **Unity**, a jogabilidade da **Zirix** e a estética da **Bahamas**. Este projeto não é apenas um servidor, é uma plataforma robusta pronta para alta demanda.
 
 ---
 
 ## 🏛️ História e Arquitetura: A Grande Fusão
 
-A **Familía God Base** não é apenas mais um servidor; é o resultado de uma engenharia complexa de fusão de três das maiores bases de código do cenário FiveM, criando um ecossistema robusto e único.
-
 ### 1. Unity (O Core e Backend)
 Utilizamos o **Loop de Threads** e o sistema de gerenciamento de **Items (vRP.items)** da Unity como nossa fundação.
-*   **Por que?** A Unity possui o gerenciamento de inventário mais leve do mercado, permitindo milhares de itens sem lag no banco de dados.
-*   **Legado:** Mantivemos a estrutura de tabelas `vrp_users`, `vrp_user_ids` e `vrp_user_data` para garantir compatibilidade máxima com scripts legados e ferramentas de administração.
+*   **Por que?** A Unity possui o scheduler mais estável entre as bases vRP, evitando "crashes" por deadlocks em queries de banco de dados.
 
 ### 2. Zirix (O Gameplay e Empregos)
 Adotamos a modularidade de **Empregos (Jobs)**, **Facções** e **Garagens** da Zirix.
-*   **Por que?** O sistema de grupos e permissões da Zirix é imbatível em flexibilidade, permitindo hierarquias complexas para polícias e facções criminosas.
+*   **Por que?** O sistema de classes da Zirix permite fácil criação de novos empregos sem necessidade de alterar o core do vRP.
 
 ### 3. Bahamas (A Interface e UX)
 O visual (**HUD**, **NUI**, **Notify**, **Inventory UI**) foi totalmente reescrito seguindo o *Design System* da base Bahamas.
-*   **Por que?** A estética "Clean & Neon" da Bahamas oferece a melhor experiência de usuário (UX), com menus intuitivos e responsivos.
+*   **Por que?** Interfaces limpas, responsivas e modernas (Glassmorphism) aumentam a retenção de jogadores.
 
 ---
 
-## 🛠️ Core Fixes & Soluções Técnicas
+## 🛠️ Requisitos de Instalação
 
-Durante o desenvolvimento, enfrentamos e resolvemos desafios críticos que derrubam 90% dos servidores:
+*   **FiveM Artifacts:** Recomendado versão 7000+ (Windows).
+*   **Game Build:** `set sv_enforceGameBuild 3407` (Obrigatório para roupas e veículos novos).
+*   **Banco de Dados:** MariaDB ou MySQL 8.0+.
+*   **Driver:** `oxmysql` (Substituindo o obsoleto ghmattimysql).
 
-### 🔧 1. O "Apagão" de Dados (Database Fix)
-*   **Problema:** O servidor não conseguia identificar jogadores, gerando o erro `Failed to access database 'godz_users'`.
-*   **Causa:** Tentativa de rebranding forçado nas tabelas do MySQL sem migração de dados.
-*   **Solução:** Revertemos o core `base.lua` para utilizar as tabelas padrão `vrp_users`. Implementamos um **Security Check** com `pcall` na função `getUserIdByIdentifiers` (Linha 134+), garantindo que falhas de banco de dados sejam tratadas graciosamente sem crashar a thread principal.
+---
 
-### 🔧 2. Conflito de Inventário (vRP.items = {})
-*   **Problema:** Itens desaparecendo ou pesando 0kg.
-*   **Solução:** Unificação dos dicionários de itens. Removemos as definições duplicadas em `cfg/items.lua` e centralizamos tudo no módulo `inventory.lua`, garantindo que cada item tenha peso e função definidos uma única vez.
+## 🔧 Core Fixes & Soluções Técnicas
 
-### 🔧 3. Loop de Wait Infinito
-*   **Problema:** Threads travando em loops `while true do Wait(0)` mal otimizados.
-*   **Solução:** Substituição por `Wait(idle_time)` dinâmico. Se o jogador não está perto de um marcador, o script "dorme" (`Wait(1000)`), economizando até 40% de CPU.
+### 1. Fix de Identificação (`base.lua`)
+**Problema:** O vRP falhava ao identificar jogadores novos devido à mudança de nome das tabelas.
+**Solução:** 
+*   Implementamos um `pcall` (Protected Call) na função `getUserIdByIdentifiers`.
+*   Padronizamos todas as queries para usar o prefixo `godz_` (`godz_users`, `godz_user_ids`, etc.), sincronizando com o `GODZ_INSTALL_DB.sql`.
+
+### 2. Fix de Inventário (`vRP.items`)
+**Problema:** Tabelas nulas causando erro de indexação.
+**Solução:** Inicialização segura de `vRP.items = {}` antes do carregamento dos módulos de inventário.
+
+### 3. Otimização de Loop (Anti-Crash)
+**Problema:** Loops infinitos (`while true do`) sem `Wait`.
+**Solução:** Adição de `Wait(100)` ou `Citizen.Wait(0)` em todas as threads críticas de jobs e verificação de vida.
 
 ---
 
 ## 🤖 Familía God AI Bridge (Infraestrutura de IA)
-
-A nossa maior inovação é a ponte de Inteligência Artificial que roda em paralelo ao servidor FiveM.
 
 ### O Modelo (Phi-3 Mini)
 Utilizamos o **Microsoft Phi-3 Mini 4k Instruct**, um modelo de linguagem pequeno (SLM) otimizado para rodar localmente na VPS sem GPU dedicada.
@@ -54,48 +64,27 @@ Utilizamos o **Microsoft Phi-3 Mini 4k Instruct**, um modelo de linguagem pequen
 
 ### Servidor de Produção (Waitress)
 Abandonamos o servidor de desenvolvimento do Flask.
-*   **Tecnologia:** Implementamos `waitress`, um servidor WSGI de produção.
-*   **Benefício:** Suporte a múltiplas requisições simultâneas, estabilidade total e zero avisos de console.
-
-### Monitoramento Econômico & Anti-Cheat
-A IA monitora ativamente:
-*   **Inflação:** Analisa salários vs. preços de carros (`/ai_economy_simulation`).
-*   **Limpa-Baú:** Detecta retiradas massivas de itens de facções (`/analyze_chest_activity`).
-*   **Comportamento:** Identifica padrões de player tóxico através de análise de chat.
+*   **Tecnologia:** Waitress (WSGI Server).
+*   **Configuração:** `serve(app, host='0.0.0.0', port=5000)`.
+*   **Capacidade:** Suporte a múltiplas requisições simultâneas sem bloqueio da thread principal.
 
 ---
 
-## 🚀 Guia de Instalação e Inicialização
-
-### Pré-requisitos
-*   Python 3.10+
-*   MariaDB 10.6+ ou MySQL 8.0+
-*   Artifacts FiveM (Build 3095+)
-
-### Passo a Passo
+## 🚀 Como Iniciar
 
 1.  **Banco de Dados:**
-    *   Importe o `GODZ_INSTALL_DB.sql` (agora compatível com estrutura `vrp_`).
-    *   Verifique a conexão em `server.cfg`: `set mysql_connection_string`.
+    *   Importe o arquivo `server/GODZ_INSTALL_DB.sql` no seu HeidiSQL/DBeaver.
+    *   Verifique se o banco criado se chama `godz_database`.
 
-2.  **Instalação da IA:**
-    ```bash
-    cd server
-    pip install -r requirements.txt
-    ```
+2.  **Configuração:**
+    *   Abra `server/config/config.cfg`.
+    *   Confira a conexão: `set mysql_connection_string "user=root;database=godz_database;password=;host=127.0.0.1"`.
 
-3.  **Configuração:**
-    *   Edite `resources/[godz_core]/godz_tuning/GODZ_MASTER_CONFIG.json` com seus Webhooks e Token do Discord.
-    *   O sistema aplicará `.strip()` automaticamente no token para evitar erros.
-
-4.  **Iniciar:**
-    *   Execute `start.bat`.
-    *   Aguarde a mensagem: `[FAMILÍA GOD AI] Servidor de Produção rodando na porta 5000...`
+3.  **Start:**
+    *   Execute `Start.bat` na raiz do servidor.
+    *   Aguarde o log `[FAMILÍA GOD AI] Servidor de Produção rodando...`.
 
 ---
 
-## 📞 Suporte
-
-*   **Discord:** discord.gg/DayZGodz
-*   **GitHub:** github.com/DayZGodz/Minha-Base-FiveM
-*   **Developer:** Familía God Dev Team
+**Desenvolvido por Familía God Dev Team**
+*Copyright © 2026*
