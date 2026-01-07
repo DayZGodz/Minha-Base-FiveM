@@ -155,9 +155,11 @@ function vRP.getUserIdByIdentifiers(ids)
 		local user_id = result
 
 		if user_id then
+			print("[GODZ] ID Criado: " .. user_id .. ". Vinculando identificadores...")
 			for l,w in pairs(ids) do
 				if (string.find(w,"ip:") == nil) then
 					exports.oxmysql:execute("INSERT INTO godz_user_ids(identifier,user_id) VALUES(@identifier,@user_id)", { identifier = w, user_id = user_id })
+					print("[GODZ] Identificador vinculado: " .. w .. " -> ID: " .. user_id)
 				end
 			end
 			return user_id

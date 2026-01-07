@@ -1,82 +1,71 @@
 # 🌟 Familía God Base - VRPEX Premium
 
-Bem-vindo ao repositório oficial da **Base Familía God**. Este projeto representa o estado da arte em servidores FiveM, resultado de uma fusão meticulosa entre as melhores características das bases Unity, Zirix e Bahamas, estabilizada com correções críticas no núcleo do vRP e potencializada por uma Inteligência Artificial proprietária.
+Bem-vindo ao repositório oficial da **Base Familía God**. Este projeto é uma **Super Base** consolidada, nascida da fusão estratégica entre as arquiteturas Unity, Zirix e Bahamas, corrigida e otimizada para alta performance e roleplay sério.
 
 ![Banner](logo.png)
 
-## 🚀 Sobre o Projeto (Fusão de Bases)
+## 🏛️ História e Arquitetura
 
-A "Super Base" não é apenas um compilado de scripts; é uma arquitetura unificada.
+### A Fusão (Unity + Zirix + Bahamas)
+A Familía God não é apenas um "copia e cola". Analisamos o código-fonte das três maiores bases do cenário para criar um híbrido perfeito:
+1.  **Unity (O Core):** Utilizamos o loop de threads e o sistema de inventário (vRP.items) da Unity como fundação, pois são imbatíveis em performance sob estresse.
+2.  **Zirix (O Gameplay):** Adotamos a modularidade de empregos, facções e garagens da Zirix, que oferece a melhor experiência de configuração para donos de cidade.
+3.  **Bahamas (A Interface):** O visual (HUD, NUI, Notify) foi totalmente reescrito seguindo o design system da base Bahamas, garantindo modernidade e fluidez.
 
-*   **Legado Unity:** Herdamos o sistema de otimização de threads e o gerenciamento de inventário robusto, garantindo que o servidor suporte alta carga sem "crashar".
-*   **Core Zirix:** Utilizamos a estrutura modular de empregos e facções da Zirix, conhecida pela facilidade de configuração e estabilidade em roleplay sério.
-*   **UI Bahamas:** Integramos a interface visual moderna (HUD, Inventário, Notify) inspirada na base Bahamas, proporcionando uma experiência visual limpa e responsiva (NUI otimizada).
+### Estrutura de Pastas
+A base segue uma separação rigorosa para facilitar a manutenção DevOps:
+*   `artifacts/`: Binários do servidor (FiveM server builds). Mantemos separado para atualizações fáceis.
+*   `server/`: Onde a mágica acontece. Contém `resources`, `config` e scripts Python.
+    *   `resources/[vRP]`: O núcleo do framework.
+    *   `resources/[godz_core]`: Scripts exclusivos da Familía God (Identity, Tuning, AI).
 
 ---
 
-## 🛠️ Instalação e Configuração
+## 🔧 Core Fixes e Soluções Técnicas
 
-### Pré-requisitos
-*   **Game Build:** A base requer a build `3095` (ou superior) para carregar corretamente os assets de roupas e veículos. Isso já está configurado no `server.cfg` (`set sv_enforceGameBuild 3095`), mas certifique-se de mantê-la.
-*   Python 3.10+ (Para a ponte de IA).
-*   MySQL Server (XAMPP ou MariaDB).
+Durante o desenvolvimento, enfrentamos e resolvemos bugs críticos que derrubam 90% dos servidores novos:
 
-### 1. Configuração do Banco de Dados
-A base utiliza uma estrutura SQL otimizada. O arquivo `GODZ_INSTALL_DB.sql` na raiz contém todas as tabelas necessárias.
+### 1. O "Apagão" de Dados (vRP.getUserIdByIdentifiers)
+**Problema:** Ao migrar bases, o nome da tabela de usuários mudou de `vrp_users` para `godz_users`, mas o MySQL legado não foi atualizado. Isso fazia o servidor travar silenciosamente na entrada do player.
+**Solução:** Implementamos um `pcall` (Protected Call) no `base.lua`. Agora, o servidor verifica a conexão com o banco antes de tentar ler o ID. Se a tabela não existir, ele emite um alerta `[FAMILÍA GOD] CRITICAL ERROR` no console, mas **não derruba a thread principal**, permitindo que o admin veja o erro e corrija.
 
-1.  Crie um banco de dados chamado `godz_database` (ou `familia_god_db` se preferir renomear).
-2.  Importe o arquivo `GODZ_INSTALL_DB.sql`.
-3.  Verifique o `server.cfg` e garanta que a string de conexão corresponda:
-    ```cfg
-    set mysql_connection_string "user=root;database=godz_database;password=;host=127.0.0.1"
+### 2. Conflito de IDs (vRP.items = {})
+**Problema:** A fusão de itens da Zirix com a Unity gerou duplicidade de IDs e pesos conflitantes.
+**Solução:** Padronizamos o arquivo `items.lua` para usar a estrutura de metadados da Unity. Criamos um script de validação que remove chaves duplicadas na inicialização.
+
+### 3. Loop de Wait Infinito
+**Problema:** Scripts mal otimizados consumiam 100% da CPU em loops `while true do`.
+**Solução:** Refatoramos todos os loops globais para utilizar `Citizen.Wait` dinâmico, que aumenta o tempo de espera quando o jogador está ocioso.
+
+---
+
+## 🤖 Familía God AI Bridge
+
+A grande inovação desta base é a integração nativa com Inteligência Artificial Local.
+
+### O Modelo (Phi-3 Mini)
+Utilizamos o **Microsoft Phi-3 Mini 4k Instruct**, um modelo de linguagem pequeno (SLM) que roda localmente na VPS. Ele é capaz de:
+*   Responder dúvidas de RP com base no arquivo `REGRAS.txt`.
+*   Analisar logs de economia para detectar inflação.
+*   Identificar comportamentos suspeitos (anti-cheat comportamental).
+
+### Infraestrutura (Waitress WSGI)
+Abandonamos o servidor de desenvolvimento do Flask (`app.run`). O script `godz_ai_bridge.py` agora utiliza **Waitress**, um servidor WSGI de produção robusto.
+*   **Vantagem:** Suporta múltiplas requisições simultâneas (vários players perguntando ao mesmo tempo) sem bloquear a thread da IA.
+*   **Segurança:** O Token do Discord agora passa por um `.strip()` automático para evitar erros de formatação (`Improper token`) comuns em copy-paste.
+
+---
+
+## 🚀 Como Iniciar
+
+1.  **Banco de Dados:** Importe `GODZ_INSTALL_DB.sql` e configure o `server.cfg`.
+2.  **Dependências:**
+    ```bash
+    cd server
+    pip install -r requirements.txt
     ```
-    > **Nota:** Se o nome do banco no `server.cfg` não bater com o banco criado, o script `base.lua` agora emitirá um alerta crítico no console ao invés de travar o servidor silenciosamente.
-
-### 2. Dependências Python (IA)
-Para ativar a Inteligência Artificial, instale as dependências:
-```bash
-cd server
-pip install -r requirements.txt
-```
+3.  **Start:** Execute o `Start.bat` (ou `run.sh` no Linux).
+4.  **IA:** Em outro terminal, rode `python server/godz_ai_bridge.py`.
 
 ---
-
-## 🔧 Correções Críticas Realizadas
-
-### ✅ Fix do Core vRP (`base.lua`)
-Identificamos um erro fatal na função `getUserIdByIdentifiers` onde uma falha na conexão SQL ou ausência de tabela causava um crash silencioso no scheduler do FiveM.
-**Solução:** Implementamos um `pcall` (Protected Call) na linha 134 do `base.lua`. Agora, se o `oxmysql` falhar, o erro é capturado e uma mensagem amigável `[FAMILÍA GOD] CRITICAL ERROR` é exibida, prevenindo o colapso do servidor.
-
-### ✅ Correção de Inventário (`vRP.items`)
-Bases fundidas frequentemente sofrem com IDs de itens duplicados. Padronizamos o `items.lua` para garantir que não haja conflitos entre itens da Unity e da Zirix, utilizando o sistema de peso e stack da Unity como padrão mestre.
-
----
-
-## 🤖 Sistema de Inteligência Artificial (Familía God AI)
-
-A base conta com um sistema de IA exclusivo rodando localmente, projetado para monitorar a economia e auxiliar a administração.
-
-### Arquitetura
-*   **Modelo:** Microsoft Phi-3 Mini (4k Instruct) - Leve e eficiente para respostas rápidas.
-*   **Servidor:** Utilizamos `Waitress` como servidor WSGI de produção, substituindo o servidor de desenvolvimento do Flask. Isso garante suporte a múltiplas requisições simultâneas sem engasgos.
-*   **Ponte:** O script `godz_ai_bridge.py` conecta o servidor FiveM (via HTTP) ao modelo Python.
-
-### Funcionalidades
-1.  **Sentinela:** Monitora logs em busca de anomalias (ex: retiradas massivas de baús).
-2.  **Economista:** Analisa salários vs. preços de veículos para sugerir balanceamento.
-3.  **Suporte:** Um bot de Discord integrado responde dúvidas de jogadores baseando-se no arquivo `REGRAS.txt`.
-
-Para iniciar a IA:
-```bash
-python server/godz_ai_bridge.py
-```
-*(Certifique-se de configurar o Token do Discord no `GODZ_MASTER_CONFIG.json`)*
-
----
-
-## 🔗 Links Úteis
-*   **Repositório Oficial:** [https://github.com/DayZGodz/Minha-Base-FiveM](https://github.com/DayZGodz/Minha-Base-FiveM)
-*   **Discord de Suporte:** [Link do Discord]
-
----
-*Desenvolvido com ❤️ pela equipe Familía God.*
+*Documentação oficial mantida pela equipe de Engenharia da Familía God.*

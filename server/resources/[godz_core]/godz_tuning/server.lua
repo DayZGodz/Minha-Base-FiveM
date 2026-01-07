@@ -61,9 +61,9 @@ Citizen.CreateThread(function()
     if config then
         MasterConfig = json.decode(config)
         if MasterConfig then
-            print("^2[Família God Tuning] Master Config carregado com sucesso.^0")
+            print("^2[GODZ Tuning] Master Config carregado com sucesso.^0")
         else
-            print("^1[Família God Tuning] Erro de sintaxe no JSON. Usando valores padrão.^0")
+            print("^1[GODZ Tuning] Erro de sintaxe no JSON. Usando valores padrão.^0")
             -- Default values
             MasterConfig = {
                 ECONOMY = {
@@ -79,7 +79,7 @@ Citizen.CreateThread(function()
             }
         end
     else
-        print("^1[Família God Tuning] Erro: GODZ_MASTER_CONFIG.json não encontrado via LoadResourceFile.^0")
+        print("^1[GODZ Tuning] Erro: GODZ_MASTER_CONFIG.json não encontrado via LoadResourceFile.^0")
         MasterConfig = {
             ECONOMY = {
                 tuning_prices = {
