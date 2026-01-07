@@ -101,6 +101,6 @@ AddEventHandler("godz_phone:savePhoto", function(image64)
     -- Salva no diretório do recurso (Localizado no Disco D:)
     SaveResourceFile(GetCurrentResourceName(), "html/photos/" .. filename, image64, -1)
     
-    print("[FAMILÍA GOD PHONE] Foto salva no Disco D: " .. filename)
+    print("[GODZ PHONE] Foto salva no Disco D: " .. filename)
     TriggerClientEvent("godz_phone:photoSaved", source, filename)
 end)
