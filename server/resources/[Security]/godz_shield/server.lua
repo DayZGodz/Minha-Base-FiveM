@@ -22,7 +22,7 @@ Citizen.CreateThread(function()
         else
             print("^1[GODZ SHIELD] ^7Falha ao sincronizar config com IA (Erro " .. tostring(err) .. ")")
         end
-    end)
+    end, 'GET', "", { ["Authorization"] = "Bearer " .. API_KEY })
 end)
 
 local function IsWhitelisted(user_id)

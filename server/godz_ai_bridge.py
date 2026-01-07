@@ -32,7 +32,8 @@ API_KEY = "godz_secret_key_123"
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if request.headers.get('X-API-Key') != API_KEY:
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or auth_header != f"Bearer {API_KEY}":
             return jsonify({"error": "Acesso negado: API Key inválida"}), 403
         return f(*args, **kwargs)
     return decorated_function

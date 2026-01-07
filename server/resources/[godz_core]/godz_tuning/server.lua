@@ -9,6 +9,18 @@ local MasterConfig = {}
 -- Create Table for Mods and Report
 Citizen.CreateThread(function()
     Wait(1000)
+    
+    -- Fix: Ensure godz_user_vehicles exists (Protocolo de Estabilização Crítica)
+    MySQL.query([[
+        CREATE TABLE IF NOT EXISTS godz_user_vehicles (
+            user_id INT(11) NOT NULL,
+            vehicle VARCHAR(50) NOT NULL,
+            plate VARCHAR(20) NOT NULL,
+            mechanic_report TEXT DEFAULT NULL,
+            PRIMARY KEY (user_id, vehicle)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ]])
+
     MySQL.query([[
         CREATE TABLE IF NOT EXISTS godz_vehicle_mods (
             user_id int(11) NOT NULL,

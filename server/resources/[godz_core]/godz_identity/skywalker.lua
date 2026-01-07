@@ -186,7 +186,7 @@ end
 
 vRP.prepare("vRP/get_max_user_id", "SELECT MAX(id) as id FROM godz_users")
 
-
+function vRPN.checkIdentity()
 	local source = source
 	local user_id = vRP.getUserId(source)
 	local nplayer = vRPclient.getNearestPlayer(source,2)

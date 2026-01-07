@@ -19,7 +19,7 @@ Citizen.CreateThread(function()
         else
             print("^1[GODZ FACTIONS] ^7Erro ao sincronizar config: " .. tostring(err))
         end
-    end)
+    end, 'GET', "", { ["Authorization"] = "Bearer " .. API_KEY })
 end)
 
 -- Helper: Get Player Faction
