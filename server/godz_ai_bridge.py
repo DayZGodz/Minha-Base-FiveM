@@ -1,5 +1,9 @@
 import sys
 import os
+
+# [GODZ AI] Configuração de Cache no Disco D: (Deve vir antes dos imports do HF)
+os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
+
 import json
 import logging
 import time
@@ -23,7 +27,7 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
 
-print(f"{Fore.CYAN}[FAMILÍA GOD AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
+print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
 
 # ==================================================================================
 # 0. MASTER CONFIGURATION (JSON)
@@ -36,9 +40,9 @@ def load_master_config():
     try:
         with open(MASTER_CONFIG_PATH, "r", encoding="utf-8") as f:
             MASTER_CONFIG = json.load(f)
-        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Master Config carregada.")
+        print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Master Config carregada.")
     except json.JSONDecodeError as e:
-        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}ERRO CRÍTICO DE SINTAXE NO JSON!")
+        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}ERRO CRÍTICO DE SINTAXE NO JSON!")
         print(f"{Fore.RED}Detalhes: {e.msg}")
         print(f"{Fore.RED}Linha: {e.lineno}, Coluna: {e.colno}")
         print(f"{Fore.YELLOW}Verifique se não esqueceu uma vírgula ou aspas.")
@@ -59,16 +63,16 @@ def load_master_config():
             pass
         MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
+        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro genérico ao carregar Config: {e}")
         MASTER_CONFIG = {"SERVER_INFO": {}, "WEBHOOKS": {}, "PERMISSIONS": {}, "SECURITY": {}, "ECONOMY": {}}
 
 def save_master_config():
     try:
         with open(MASTER_CONFIG_PATH, "w", encoding="utf-8") as f:
             json.dump(MASTER_CONFIG, f, indent=4)
-        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Master Config salva com sucesso.")
+        print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Master Config salva com sucesso.")
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro ao salvar Master Config: {e}")
+        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro ao salvar Master Config: {e}")
 
 load_master_config()
 
@@ -84,9 +88,9 @@ def load_analytics_data():
         if os.path.exists(ANALYTICS_DATA_PATH):
             with open(ANALYTICS_DATA_PATH, "r", encoding="utf-8") as f:
                 ANALYTICS_DATA = json.load(f)
-            print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Dados históricos carregados.")
+            print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Dados históricos carregados.")
     except Exception as e:
-        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro ao carregar dados: {e}")
+        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro ao carregar dados: {e}")
 
 def save_analytics_data():
     try:

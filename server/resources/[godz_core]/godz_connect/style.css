@@ -70,21 +70,13 @@ body {
     animation: fadeInDown 1.5s ease-out;
 }
 
-.godz-logo {
-    font-size: 5rem;
-    font-weight: 800;
-    color: var(--text-color);
-    text-transform: uppercase;
-    letter-spacing: 5px;
-    text-shadow: 0 0 20px rgba(155, 89, 182, 0.6);
+.godz-logo-img {
+    max-width: 400px;
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.6));
     position: relative;
     z-index: 2;
     animation: glowPulse 3s infinite alternate;
-}
-
-.highlight {
-    color: var(--accent-color);
-    text-shadow: 0 0 20px rgba(0, 229, 255, 0.8);
 }
 
 .pulse-ring {

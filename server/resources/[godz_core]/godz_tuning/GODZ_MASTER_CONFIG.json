@@ -66,5 +66,9 @@
         "_staff_desc": "Log de A\u00e7\u00f5es da Staff",
         "news": "https://discord.com/api/webhooks/1458221684455772311/_jB34LtZOWagKlbDl_78cAuaD3zcKx4ouTxB1167BNXw1PL1-lBV3rTnNjFtLy4SKxdy",
         "_news_desc": "Canal de Not\u00edcias Autom\u00e1ticas"
+    },
+    "PHONE": {
+        "apps": ["god_ai", "contacts"],
+        "ai_bridge_url": "http://127.0.0.1:5000/ai_chat"
     }
 }
