@@ -628,7 +628,7 @@ AddEventHandler("playerDropped",playerDropped)
 
 Citizen.CreateThread(function()
 	while true do
-		Citizen.Wait(1)
+		Citizen.Wait(1000)
 		if exports and exports.connectqueue then
 			TriggerEvent("queue:onReady")
 			return
