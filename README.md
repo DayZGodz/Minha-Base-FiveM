@@ -1,120 +1,119 @@
-# 👑 Família God - Super Base Unified (2026)
+# Familía God - Base FiveM Premium
 
-## 📖 História do Projeto
-O projeto **Família God** nasceu da necessidade de elevar o padrão do Roleplay no Brasil. Unificamos três bases lendárias para criar algo único:
-*   **Unity Clean**: A base mais otimizada e leve do mercado.
-*   **Zirix v2**: Conhecida por seus sistemas robustos e testados em batalha.
-*   **Bahamas (Hensa)**: Referência em inovações de gameplay e economia balanceada.
+![Familía God Banner](https://via.placeholder.com/800x200.png?text=Familia+God+Base+Premium)
 
-Esta fusão resultou em uma super base focada em **Performance**, **Segurança** e **Escalabilidade**.
+## � Identidade e História
+A **Familía God** representa a culminação de anos de desenvolvimento e otimização no cenário FiveM. Esta base é o resultado de uma fusão estratégica e técnica entre três das mais respeitadas bases do mercado:
 
-## 🔭 Visão Geral
-Unificamos três bases consagradas (Unity Clean, Zirix v2, Bahamas/Hensa) para entregar a Super Base **Família God**. Mantemos o prefixo técnico `godz_` para compatibilidade e identidade operacional, enquanto toda a experiência e os logs exibem a marca **Família God**.
+*   **Unity Clean**: A fundação leve e otimizada, garantindo performance superior e zero lag.
+*   **Zirix v2**: A robustez e as funcionalidades clássicas que definiram uma era de RP.
+*   **Bahamas**: Sistemas exclusivos e inovações de jogabilidade que trazem modernidade.
 
----
-
-## 🏗️ Arquitetura de Dados
-Para garantir a integridade e velocidade das informações, realizamos mudanças estruturais profundas:
-
-### Banco de Dados Unificado (`godz_database`)
-Abandonamos o uso de múltiplos bancos fragmentados. Todo o ecossistema agora reside no schema `godz_database`, simplificando backups e manutenção.
-
-### Driver `oxmysql`
-Migramos 100% das queries para o **oxmysql**, aproveitando sua capacidade de execução assíncrona e suporte a transações complexas, eliminando travamentos na thread principal do servidor.
+O resultado é uma infraestrutura **híbrida e poderosa**, projetada para estabilidade, escalabilidade e uma experiência de jogador imersiva.
 
 ---
 
-## ⚙️ Estabilização do Core (vRP)
-O framework vRP recebeu correções críticas para eliminar erros históricos:
+## 🏗️ Arquitetura Técnica
+A estrutura do projeto foi reorganizada para separar claramente o ambiente de execução dos dados do servidor, facilitando atualizações e manutenção.
 
-### Inicialização de Tabelas
-Adicionamos a inicialização explícita de `vRP.items = {}` no boot do servidor. Isso previne o erro comum de *attempt to index a nil value* quando scripts tentam acessar itens antes do carregamento completo.
+### Estrutura de Diretórios
+*   **`artifacts/`**: Contém os binários do servidor FiveM (fxserver.exe e dependências). Mantemos esta pasta separada para facilitar a atualização da build do servidor sem afetar os scripts.
+*   **`server/`**: O coração da base.
+    *   `resources/`: Todos os scripts e recursos.
+    *   `server.cfg`: Configurações principais.
+    *   `start.bat`: Script de inicialização automatizado e estilizado.
 
-### Wait Logic (basic_items.lua)
-Implementamos uma lógica de espera (`Wait`) inteligente. O servidor agora aguarda a confirmação de conexão com o banco de dados e o carregamento dos dicionários de itens antes de liberar o acesso aos inventários, erradicando falhas de "inventário vazio" no login.
-
----
-
-## 📦 Módulos de Script (Godz Core)
-Cada módulo foi revisado e modernizado, mantendo o prefixo técnico `godz_` para integridade, mas exibindo a identidade **Família God**.
-
-### 🏦 Godz Bank
-*   **Função**: Sistema bancário completo com NUI, empréstimos e múltiplas contas.
-*   **Melhoria**: Logs de transações detalhados para auditoria.
-
-### 🆔 Godz Identity
-*   **Função**: Emissão e validação de RG, CNH e Passaporte.
-*   **Melhoria**: Vinculação direta e imutável ao ID do usuário no banco.
-
-### 🎒 Godz Inventory
-*   **Função**: Gerenciamento de itens, peso e hotbar.
-*   **Melhoria**: Proteção contra *dupes* via transações atômicas e validação server-side rigorosa.
-
-### 🔧 Godz Tuning
-*   **Função**: Customização veicular completa.
-*   **Melhoria Crítica**: Substituição de chamadas obsoletas de `io.open` pela função nativa `LoadResourceFile`. Isso resolve problemas de caminhos absolutos e permissões de arquivo em diferentes sistemas operacionais.
+Esta separação garante que a lógica de negócio (`server/`) esteja desacoplada da runtime (`artifacts/`), seguindo as melhores práticas de DevOps para FiveM.
 
 ---
 
-## 🤖 IA & Monitoramento (Godz AI Bridge)
-A **GODZ AI BRIDGE** é o cérebro invisível que protege a economia e a integridade do servidor Família God. Diferente de sistemas de log passivos, nossa IA atua ativamente para identificar anomalias.
+## 🔧 Core vRP Fixes
+Para garantir a estabilidade absoluta, realizamos correções profundas no núcleo do vRP.
 
-### 🧠 Tecnologia Neural (Transformers)
-Utilizamos a biblioteca `transformers` (Hugging Face) para carregar modelos de linguagem locais (como `Phi-3` ou `TinyLlama`), permitindo que o servidor "entenda" o contexto dos logs.
-*   **Análise Semântica**: A IA não busca apenas palavras-chave; ela analisa o contexto. Ex: Um jogador recebendo $1.000.000 de um Admin é normal (evento), mas receber de um desconhecido é flagrado como suspeito.
-*   **Hardware Agnostic**: O script detecta automaticamente se há GPU (CUDA) disponível; caso contrário, roda em modo otimizado para CPU.
+### 1. Inicialização de Itens (`vRP.items = {}`)
+Um erro comum em bases vRP é a tentativa de indexar `vRP.items` antes de sua definição.
+**Correção:** Em `vrp/modules/inventory.lua`, garantimos a inicialização explícita no topo do arquivo:
+```lua
+vRP.items = {} -- Inicialização preventiva
+-- ... restante do código
+```
+Isso previne erros de "attempt to index a nil value" durante o carregamento de módulos dependentes.
 
-### 📊 Auditoria Econômica em Tempo Real
-O módulo de economia utiliza algoritmos preditivos para monitorar o fluxo de caixa:
-*   **Threshold de Alerta**: Facções que geram mais de **$20.000/hora** ativam um alerta nível DEFCON 3.
-*   **Detecção de Dupes**: Padrões repetitivos de transações (ex: sacar/depositar valores idênticos em milissegundos) são bloqueados e reportados.
-
-### 🤖 Configuração do Bot Discord
-O **Família God Bot** conecta o servidor in-game ao seu Discord.
-1.  **Token**: Insira seu token no arquivo `server/resources/[godz_core]/godz_tuning/GODZ_MASTER_CONFIG.json`.
-    ```json
-    "discord_token": "SEU_TOKEN_AQUI"
-    ```
-2.  **Permissões**: O bot requer intents de `guilds` e `message_content` ativados no Portal do Desenvolvedor.
- 3.  **Logs Automáticos**: Ao iniciar, o bot cria automaticamente categorias e canais de log (Audit, Sentinel, Bank) se não existirem.
+### 2. Lógica de Wait (Prevenção de Nil Value)
+Implementamos loops de verificação (`Wait`) em scripts críticos (como inventário e identidade) para aguardar o carregamento completo das tabelas do banco de dados e do objeto vRP antes de prosseguir.
+**Exemplo de Lógica:**
+```lua
+Citizen.CreateThread(function()
+    while not vRP or not vRP.getUserId do
+        Wait(100)
+    end
+    -- Execução segura após carregamento
+end)
+```
+Essa abordagem elimina condições de corrida (race conditions) na inicialização do servidor.
 
 ---
 
-## 🧩 Requisitos do Sistema
-- Python 3.12+
-- Torch (CPU/GPU conforme disponibilidade)
-- Accelerate (gerência de dispositivos e paralelismo)
-- Transformers (modelos de linguagem locais)
-- Hugging Face Hub (com extra `hf_xet` para aceleração de downloads)
+## � Módulos God (Godz Scripts)
+A base conta com uma suite exclusiva de scripts desenvolvidos ou refatorados pela equipe Familía God, prefixados com `godz_` para fácil identificação e padronização.
 
-Instalação rápida:
+### Lista de Módulos Principais
+*   **`godz_core`**: Núcleo de funções compartilhadas.
+*   **`godz_admin`**: Ferramentas administrativas avançadas.
+*   **`godz_bank`**: Sistema bancário com UI moderna.
+*   **`godz_chest`**: Baús de facções e casas otimizados.
+*   **`godz_clothing`**: Loja de roupas com persistência robusta.
+*   **`godz_factions`**: Gerenciamento completo de facções ilegais.
+*   **`godz_garages`**: Sistema de garagens com salvamento de estado.
+*   **`godz_housing`**: Sistema imobiliário dinâmico.
+*   **`godz_identity`**: Criação e gestão de identidade (RG).
+*   **`godz_inventory`**: Inventário com peso, slots e hotbar, altamente responsivo.
+*   **`godz_missions`**: Missões interativas para empregos.
+*   **`godz_phone`**: Smartphone funcional integrado (banco, twitter, fotos).
+*   **`godz_tuning`**: Oficina de tunagem completa.
 
-```bash
-pip install -r server/requirements.txt
-pip install accelerate "huggingface-hub[hf_xet]"
-# Em ambientes Linux com CUDA: pip install flash-attn
+### Destaque Técnico: Tuning Otimizado
+No módulo `godz_tuning`, substituímos chamadas pesadas de banco de dados por arquivos de configuração JSON carregados via `LoadResourceFile`.
+**Benefício:** Carregamento instantâneo de preços e configurações de peças, sem latência de SQL.
+```lua
+-- Exemplo em godz_tuning/server.lua
+local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
+MasterConfig = json.decode(config)
 ```
 
-Observação: em Windows, o pacote flash-attn pode não possuir wheel pré‑compilado; use WSL2 + CUDA para instalação.
+---
 
-## 🛠️ Manual do Desenvolvedor (vRP)
-- Carregamento de Itens: o vRP inicializa dicionários de itens no boot. Defina `vRP.items = {}` antes de módulos dependentes para evitar erros de nil.
-- Wait Logic: aguarde conexão do banco e dicionários populados antes de liberar inventário. Evita inventário vazio no login.
-- Permissões: use `vRP.hasPermission(user_id, "perm.nome")` para gates de ações críticas (banco, chest, tuning).
-- Integração com IA: endpoints expostos via Flask (`/status`, `/config`, `/ai_assist`) e webhooks do Discord para auditoria.
+## 🤖 Familía God AI
+A inovação central desta base é a integração com Inteligência Artificial para monitoramento e gestão.
 
-## 🧯 Solução de Problemas
-- players.json indisponível: habilite `sv_endpointPrivacy` corretamente e confirme porta 30120 aberta; a IA usa `http://127.0.0.1:30120/players.json` para contabilizar online.
-- Symlinks no Windows: ative o Developer Mode para permitir links simbólicos (necessário em alguns fluxos de IA/recursos).
-  - Windows 11: Configurações → Privacidade e Segurança → Para Desenvolvedores → Ativar Modo de Desenvolvedor.
-  - Windows 10: Configurações → Atualização e Segurança → Para Desenvolvedores → Modo de Desenvolvedor.
-- Flash‑Attention no Windows: prefira WSL2 com CUDA e drivers NVIDIA; caso indisponível, use `Accelerate`/CPU como fallback.
+### Modelo de IA
+Utilizamos o modelo **`microsoft/Phi-3-mini-4k-instruct`**, um LLM (Large Language Model) leve e poderoso, capaz de rodar localmente com alta eficiência.
+*   **Otimização:** Uso de `flash-attn` e `hf_xet` para aceleração de inferência.
+*   **Sanitização:** O bridge Python (`godz_ai_bridge.py`) implementa limpeza automática de tokens (`.strip()`) para evitar erros de autenticação no Discord.
 
-## 🚀 Instalação e Suporte
+### Monitoramento de Facções
+A IA analisa logs em tempo real para calcular o lucro das facções:
+1.  Coleta dados de transações (vendas de drogas, lavagem de dinheiro).
+2.  Processa os valores via Python.
+3.  Gera relatórios de eficiência e alerta sobre anomalias econômicas.
 
-1.  Clone o repositório.
-2.  Importe o `godz_database.sql`.
-3.  Configure o `server.cfg` com suas chaves.
-4.  Inicie o servidor e aproveite a estabilidade da **Família God**.
+---
 
-> *Desenvolvido para quem leva o RP a sério.*
+## 🚀 Como Iniciar
+
+### Pré-requisitos
+*   Python 3.10+
+*   Dependências Python:
+    ```bash
+    pip install -r server/requirements.txt
+    ```
+    *(Nota: `flash-attn` é recomendado para GPUs NVIDIA, mas opcional em Windows se houver problemas de compilação)*
+
+### Start
+Execute o arquivo `server/start.bat`. O script irá:
+1.  Limpar o cache automaticamente.
+2.  Iniciar a bridge de IA.
+3.  Subir o servidor FiveM.
+
+---
+*Desenvolvido por Familía God Dev Team - 2025*

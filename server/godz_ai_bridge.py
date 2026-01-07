@@ -99,7 +99,7 @@ load_analytics_data()
 # ==================================================================================
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
 # ==================================================================================
-DISCORD_TOKEN = MASTER_CONFIG.get("SERVER_INFO", {}).get("discord_token", "")
+DISCORD_TOKEN = str(MASTER_CONFIG.get("SERVER_INFO", {}).get("discord_token", "")).strip()
 DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
 DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
 DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")
