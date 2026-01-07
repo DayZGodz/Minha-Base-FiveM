@@ -17,7 +17,7 @@ end
 
 -- Verificação da coluna 'biography' na tabela 'godz_user_identities'
 Citizen.CreateThread(function()
-    vRP.execute("vRP/add_biography_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS biography TEXT")
+    vRP.execute("vRP/add_biography_column", {})
 end)
 
 --[ FUNÇÕES ]----------------------------------------------------------------------------------------------------------------------------
