@@ -92,6 +92,6 @@ A ponte de IA (`godz_ai_bridge.py`) utiliza o servidor WSGI `Waitress` para prod
     *   **Auto-Criação**: Se o jogador não existir, o sistema cria automaticamente um novo ID na tabela `godz_users` e vincula os identificadores em `godz_user_ids`.
     *   **Proteção contra Nil**: Tratamento específico para evitar que falhas de query retornem `nil` crítico para o scheduler.
     *   **Logs Claros**: Exibe `[GODZ] Novo jogador detectado...` em vez de erros assustadores.
-    *   Usa `exports.oxmysql:scalar` com `LAST_INSERT_ID()` para garantir sincronia na criação de usuários.
+    *   **Performance**: Utiliza `exports.oxmysql:insert` para captura assíncrona otimizada do ID, garantindo o login mais rápido do cenário.
     *   Totalmente otimizado para o driver `oxmysql` moderno e Build 3407.
 *   **Dynamic Loading**: Recursos utilizam `LoadResourceFile` e `SaveResourceFile` para persistência local quando apropriado.

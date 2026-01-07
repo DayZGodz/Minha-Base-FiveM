@@ -143,8 +143,8 @@ function vRP.getUserIdByIdentifiers(ids)
 		-- [FIX GODZ] Auto-Create User if Not Found
 		print("[GODZ] Novo jogador detectado, criando identificadores....")
 		local status, result = pcall(function()
-			-- Usar scalar com LAST_INSERT_ID para garantir retorno síncrono do ID
-			return exports.oxmysql:scalar("INSERT INTO godz_users(whitelisted,banned) VALUES(false,false); SELECT LAST_INSERT_ID()", {})
+			-- Usar insert para obter o ID diretamente (compatível com oxmysql async)
+			return exports.oxmysql:insert("INSERT INTO godz_users(whitelisted,banned) VALUES(false,false)", {})
 		end)
 
 		if not status then
