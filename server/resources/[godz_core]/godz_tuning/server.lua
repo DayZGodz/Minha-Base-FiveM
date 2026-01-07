@@ -56,10 +56,10 @@ end
 
 -- Load Master Config
 Citizen.CreateThread(function()
-    local content = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
+    local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
     
-    if content then
-        MasterConfig = json.decode(content)
+    if config then
+        MasterConfig = json.decode(config)
         if MasterConfig then
             print("^2[GODZ Tuning] Master Config carregado com sucesso.^0")
         else
