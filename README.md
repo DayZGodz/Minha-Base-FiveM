@@ -65,3 +65,5 @@ A identidade visual da GODZ é inconfundível, projetada para transmitir luxo, e
 *   **Glassmorphism UI:** Todas as interfaces utilizam desfoque de fundo (`backdrop-filter`) e transparências calculadas, criando uma estética de vidro fosco moderna que mantém a imersão no ambiente 3D.
     
 *   **Notificações `ia_tip`:** Um sistema exclusivo de alertas com animação de **pulso dourado**, utilizado especificamente para indicar interações diretas com a Inteligência Artificial do servidor, diferenciando-as de notificações comuns do sistema.
+
+<!-- GODZ ENGINE - PROPRIETARY TECHNOLOGY -->
