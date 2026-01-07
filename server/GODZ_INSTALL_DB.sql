@@ -5,8 +5,8 @@ USE `godz_database`;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- --------------------------------------------------------
--- GODZ DATABASE SCHEMA (UNIFIED)
--- Version: 2.0 (Merged Core + Phone + Housing)
+-- GODZ DATABASE SCHEMA (UNIFIED MASTER V2.1)
+-- Version: 2.1 (Core + Phone + Housing + Bank + Customs)
 -- --------------------------------------------------------
 
 -- --------------------------------------------------------
@@ -14,7 +14,6 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- --------------------------------------------------------
 
 -- Tabela Mestra: godz_users
--- Fix: last_login e ip agora aceitam NULL para evitar falhas no INSERT inicial
 CREATE TABLE IF NOT EXISTS `godz_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `last_login` varchar(255) DEFAULT NULL,
@@ -107,10 +106,9 @@ CREATE TABLE IF NOT EXISTS `godz_benefits` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
--- PHONE TABLES (Added from GODZ_PHONE.sql)
+-- PHONE TABLES
 -- --------------------------------------------------------
 
--- godz_phone_contacts
 CREATE TABLE IF NOT EXISTS `godz_phone_contacts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -122,7 +120,6 @@ CREATE TABLE IF NOT EXISTS `godz_phone_contacts` (
   CONSTRAINT `fk_phone_contacts_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- godz_phone_messages
 CREATE TABLE IF NOT EXISTS `godz_phone_messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -134,6 +131,69 @@ CREATE TABLE IF NOT EXISTS `godz_phone_messages` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_phone_messages_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- BANKING TABLES
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `godz_bank_loans` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `remaining_amount` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_bank_loans_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `godz_bank_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `value` int(11) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `sender_id` (`sender_id`),
+  KEY `receiver_id` (`receiver_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- HOUSING TABLES
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `godz_housing_homes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `price` int(11) NOT NULL,
+  `coords` text NOT NULL,
+  `shell` varchar(50) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `owner_id` (`owner_id`),
+  CONSTRAINT `fk_housing_users` FOREIGN KEY (`owner_id`) REFERENCES `godz_users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `godz_housing_keys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `home_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `home_id` (`home_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_housing_keys_home` FOREIGN KEY (`home_id`) REFERENCES `godz_housing_homes` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_housing_keys_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- RENZU CUSTOMS
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `renzu_customs` (
+  `shop` VARCHAR(64) NOT NULL DEFAULT '[]',
+  `inventory` LONGTEXT NULL DEFAULT '[]',
+  PRIMARY KEY (`shop`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
