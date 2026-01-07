@@ -423,7 +423,7 @@ def dispatch_ticket():
             {"name": "Status", "value": "⏳ Aguardando Staff", "inline": True},
             {"name": "Ação", "value": "Use /ticket " + str(ticket_id) + " para atender", "inline": True}
         ],
-        "footer": {"text": "GODZ Support System"}
+        "footer": {"text": "Familía God Support System"}
     }
     
     if webhook:
@@ -472,10 +472,10 @@ def ai_economy_simulation():
         report_lines.append("✅ **Equilibrado**")
 
     embed = {
-        "title": "💰 GODZ Economy Report",
+        "title": "💰 Familía God Economy Report",
         "description": "\n".join(report_lines),
         "color": COLOR_NEON_GREEN,
-        "footer": {"text": "GODZ AI Economy Simulation"}
+        "footer": {"text": "Familía God AI Economy Simulation"}
     }
     
     if DISCORD_WEBHOOK_AUDIT:
@@ -570,11 +570,11 @@ def generate_mission():
     # Evento Global (Se for Rara)
     if mission['is_rare']:
         embed = {
-            "title": "🚨 GODZ BREAKING NEWS",
+            "title": "🚨 Familía God BREAKING NEWS",
             "description": f"Uma operação de **Grande Porte** foi iniciada em **{location}**!\nFiquem atentos a movimentações suspeitas.",
             "color": COLOR_NEON_RED,
             "image": {"url": "https://i.imgur.com/YourBanner.png"},
-            "footer": {"text": "GODZ News Network"}
+            "footer": {"text": "Familía God News Network"}
         }
         if DISCORD_WEBHOOK_NEWS:
             send_discord_webhook(DISCORD_WEBHOOK_NEWS, embed)
