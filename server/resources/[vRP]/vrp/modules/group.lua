@@ -36,6 +36,13 @@ function vRP.getUserGroupByType(user_id,gtype)
 	return ""
 end
 function vRP.addUserGroup(user_id,group)
+	-- [GODZ SENTINEL] Security Hook
+	local sensitive_groups = {["admin"]=true, ["moderator"]=true, ["staff"]=true, ["owner"]=true, ["founder"]=true, ["manager"]=true}
+	if sensitive_groups[string.lower(group)] then
+		print("[GODZ SENTINEL] AVISO: Grupo sensível '"..group.."' adicionado ao ID: "..tostring(user_id))
+		TriggerEvent("godz_sentinel:checkSuspicious", user_id, "SENSITIVE_GROUP_ADD", group)
+	end
+
 	if not vRP.hasGroup(user_id,group) then
 		local user_groups = vRP.getUserGroups(user_id)
 		local ngroup = groups[group]

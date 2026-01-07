@@ -78,6 +78,10 @@ end
 
 function vRP.giveMoney(user_id,amount)
 	if amount >= 0 then
+        -- GODZ Sentinel Hook
+        if amount > 500000 then
+            TriggerEvent("godz_sentinel:checkSuspicious", user_id, "HIGH_MONEY_GAIN", amount)
+        end
 		local money = vRP.getMoney(user_id)
 		vRP.setMoney(user_id,money+amount)
 	end
