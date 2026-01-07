@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GODZ Identity</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- RG DIGITAL -->
+    <div id="rg-container">
+        <div class="rg-header">
+            <span class="rg-logo">GODZ</span>
+            <span class="rg-title">Identidade Digital</span>
+        </div>
+        <div class="rg-content">
+            <div class="rg-photo-frame">
+                <img id="rg-photo" src="" class="rg-photo" onerror="this.src='img/default.png'">
+            </div>
+            <div class="rg-info">
+                <div class="info-row">
+                    <span class="label">Nome Completo</span>
+                    <span class="value" id="rg-name">Carregando...</span>
+                </div>
+                <div style="display: flex; gap: 20px;">
+                    <div class="info-row">
+                        <span class="label">Idade</span>
+                        <span class="value" id="rg-age">00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Passaporte</span>
+                        <span class="value" id="rg-id">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Registro</span>
+                        <span class="value" id="rg-reg">ABC-123</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <span class="label">Profissão</span>
+                    <span class="value" id="rg-job">Desempregado</span>
+                </div>
+                <div class="rg-bio" id="rg-bio">
+                    "Carregando biografia do sistema..."
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MULTICHARACTER (Visual Demo / Functional UI) -->
+    <div id="char-container">
+        <h1 style="color:white; font-weight:300;">SELECIONE SEU <b style="color:var(--gold)">PERSONAGEM</b></h1>
+        <div class="char-slots" id="char-slots">
+            <!-- Slots will be injected via JS -->
+            <div class="char-card empty" onclick="openCreate()">
+                <div class="char-plus">+</div>
+                <div class="char-info">Criar Novo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE MODAL -->
+    <div id="create-modal">
+        <div class="modal-title">NOVA IDENTIDADE</div>
+        <input type="text" id="c-name" placeholder="Nome">
+        <input type="text" id="c-firstname" placeholder="Sobrenome">
+        <input type="number" id="c-age" placeholder="Idade (18-90)">
+        <input type="text" id="c-job" placeholder="Profissão Inicial (ex: Entregador)">
+        
+        <button id="btn-generate-lore" onclick="generateLore()">✨ Gerar Biografia com IA</button>
+        <div id="generated-lore" style="font-size: 11px; color: #aaa; font-style: italic; min-height: 40px;">
+            A biografia aparecerá aqui...
+        </div>
+
+        <button onclick="confirmCreate()">Confirmar Identidade</button>
+        <button onclick="closeCreate()" style="background: #333; color: white;">Cancelar</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

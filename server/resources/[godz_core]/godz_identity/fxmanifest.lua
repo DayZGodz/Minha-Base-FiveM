@@ -5,6 +5,15 @@ description 'GODZ Ecosystem - Identity & Character Creation'
 author 'GODZ DEV TEAM'
 contact 'E-mail: contato@ziraflix.com - Discord: discord.gg/ziraflix'
 
+ui_page 'nui/index.html'
+
+files {
+    'nui/index.html',
+    'nui/style.css',
+    'nui/script.js',
+    'nui/img/*.png'
+}
+
 client_scripts {
 	'@vrp/lib/utils.lua',
 	'hansolo/*.lua'

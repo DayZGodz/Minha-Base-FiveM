@@ -10,7 +10,10 @@ Proxy.addInterface("godz_identity",vRPN)
 local cfg = module("vrp","cfg/groups")
 local groups = cfg.groups
 
-local identidade = false
+-- Verificação da coluna 'biography' na tabela 'godz_user_identities'
+Citizen.CreateThread(function()
+    vRP.execute("vRP/add_biography_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS biography TEXT")
+end)
 
 --[ FUNÇÕES ]----------------------------------------------------------------------------------------------------------------------------
 
@@ -42,14 +45,50 @@ function vRPN.Identidade()
 		elseif identity.driverlicense == 3 then
 			cnh = "Cassada"
 		end
+        
+        -- Fallback para biografia
+        local bio = identity.biography or "Cidadão de Los Santos."
 
 		if identity then
-			return identity.foto,identity.name,identity.firstname,identity.user_id,identity.registration,identity.age,identity.phone,vRP.format(parseInt(banco)),vRP.format(parseInt(mymultas)),groupv,cnh
+			return identity.foto,identity.name,identity.firstname,identity.user_id,identity.registration,identity.age,identity.phone,vRP.format(parseInt(banco)),vRP.format(parseInt(mymultas)),groupv,cnh,bio
 		end
 	end
 end
 
+-- LORE GENERATOR (AI)
+function vRPN.generateLore(name, firstname, age, job)
+    local p = promise.new()
+    local prompt = "Crie uma breve biografia (máximo 3 linhas) para um personagem de GTA RP chamado " .. name .. " " .. firstname .. ", " .. age .. " anos, que trabalha como " .. job .. ". O tom deve ser imersivo."
+    
+    PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+        if err == 200 then
+            local data = json.decode(text)
+            if data and data.response then
+                p:resolve(data.response)
+            else
+                p:resolve("Cidadão misterioso de Los Santos.")
+            end
+        else
+            p:resolve("Cidadão de Los Santos.")
+        end
+    end, "POST", json.encode({
+        question = prompt,
+        user_id = 0 -- ID temporário
+    }), { ["Content-Type"] = "application/json" })
+    
+    return Citizen.Await(p)
+end
+
+function vRPN.saveBiography(user_id, bio)
+    vRP.execute("vRP/update_biography", { user_id = user_id, biography = bio })
+end
+
+-- Prepare Queries
+vRP.prepare("vRP/update_biography", "UPDATE godz_user_identities SET biography = @biography WHERE user_id = @user_id")
+vRP.prepare("vRP/add_biography_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS biography TEXT")
+
 function vRPN.nuIdentidade()
+
 	local source = source
 	local user_id = vRP.getUserId(source)
 	local nplayer = vRPclient.getNearestPlayer(source,2)

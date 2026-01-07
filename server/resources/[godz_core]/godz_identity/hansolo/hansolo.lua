@@ -3,199 +3,64 @@ local Proxy = module("vrp","lib/Proxy")
 vRP = Proxy.getInterface("vRP")
 vRPNserver = Tunnel.getInterface("godz_identity")
 
+--[ NUI CALLBACKS ]----------------------------------------------------------------------------------------------------------------------
 
---[ IDENTIDADE ]-------------------------------------------------------------------------------------------------------------------------
+RegisterNUICallback("close", function(data, cb)
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
 
-local css = [[
-	@import url('https://fonts.googleapis.com/css?family=Muli:300,400,700');
+RegisterNUICallback("generateLore", function(data, cb)
+    local lore = vRPNserver.generateLore(data.name, data.firstname, data.age, data.job)
+    cb({ lore = lore })
+end)
 
-	.clear {
-		clear: both;
-	}
+--[ COMANDOS ]---------------------------------------------------------------------------------------------------------------------------
 
-	#DocumentSection {
-		background-color: rgba(0,0,0,0.55);
-		width: 350px;
-		min-height: 250px;
-		border-radius: 5px;
-		box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.08);
-		text-align: center;
-		position: absolute;
-		right: 20px;
-		bottom: 145px;
-		font-family: 'Muli';
-		color: #999;
-		padding-bottom: 15px;
-		z-index: 1;
-		overflow: hidden;
-	}
+local showRG = false
+RegisterCommand("rg", function(source, args)
+    if showRG then
+        showRG = false
+        SendNUIMessage({ action = "hide" })
+        SetNuiFocus(false, false)
+    else
+        -- Fetch data
+        local foto, name, firstname, user_id, registration, age, phone, banco, multas, groupname, cnh, bio = vRPNserver.Identidade()
+        
+        if user_id then
+            showRG = true
+            SetNuiFocus(true, true)
+            SendNUIMessage({
+                action = "openRG",
+                foto = foto,
+                nome = name,
+                sobrenome = firstname,
+                user_id = user_id,
+                registro = registration,
+                idade = age,
+                emprego = groupname,
+                biografia = bio
+            })
+        end
+    end
+end)
 
-	#DocumentSectionNu {
-		background-color: rgba(0,0,0,0.55);
-		width: 350px;
-		min-height: 200px;
-		border-radius: 5px;
-		box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.08);
-		text-align: center;
-		position: absolute;
-		right: 20px;
-		bottom: 145px;
-		font-family: 'Muli';
-		color: #999;
-		padding-bottom: 15px;
-		z-index: 1;
-		overflow: hidden;
-	}
+RegisterCommand("char", function(source, args)
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = "openMulticharacter" })
+end)
 
-	#DocumentSection:before {
-		background-color: rgba(255,255,255, 0.4);
-		top: -193%;
-		left: -100%;
-		transform: rotate(-5deg);
-		z-index: 1;
-	}
-
-	#DocumentSection:after {
-		background-color: rgba(255,255,255, 0.5);
-		top: -191%;
-		left: -100%;
-		transform: rotate(-6deg);
-		z-index: 0;
-	}
-
-	#DocumentSection .avatar-img {
-		width: 50px;
-		height:1px;
-		margin: 50px auto 0 auto;
-		overflow:hidden;
-		border-radius: 50px;
-		opacity: 0%;
-	}
-
-	#DocumentSection .avatar-img img {
-		width: 100%;
-		opacity: 0%;
-	}
-
-	#DocumentSection .each-info {
-		display: block;
-		margin: 0;
-		width: 70%;
-		margin: 0 auto;
-	}
-
-	#DocumentSection .each-info.person-name {
-		font-size: 20px;
-	}
-
-	#DocumentSection .each-info.person-age {
-		font-size: 15px;
-	}
-
-	#DocumentSection .each-info.person-job {
-		border-top: 1px solid rgba(255,255,255, 0.5);
-		border-bottom: 1px solid rgba(255,255,255, 0.5);
-		margin: 25px auto;
-		padding: 10px 0;
-		color: #b1b1b1;
-		font-size: 18px;
-	}
-
-	#DocumentSection .secondary-info {
-		margin-top: 15px;
-	}
-
-	#DocumentSection .secondary-info .clear {
-		margin-bottom: 3px;
-		display: block;
-	}
-
-	#DocumentSection .secondary-info .each-info strong {
-		float: left;
-		font-weight: 300;
-	}
-
-	#DocumentSection .secondary-info .each-info span {
-		float: right;
-		font-weight: bold;
-		color: #b1b1b1;
-	}
-]]
-
-local identity = false
+-- Tecla F11 para abrir RG (Legacy support)
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
 		if IsControlJustPressed(0,344) then
-			
-			if identity then
-				vRP._removeDiv("rg")
-				identity = false
-				vRP._DeletarObjeto(tablet)
-				TaskClearLookAt(GetPlayerPed(-1))
-			else
-				local foto, name, firstname, user_id, registration, age, phone, banco, multas, groupname, cnh = vRPNserver.Identidade()
-				if foto == nil or foto == "" then
-					foto  = ""
-				end
-				local html = string.format("<div id='DocumentSection'><div class='avatar-img'><img src='%s'></div> <div class='infos'><div class='main-info'>"..
-					"<h1 class='each-info person-name'>%s %s</h1>"..
-					"<div class='secondary-info'>"..
-					"<div class='each-info'><strong>Idade:</strong><span class='person-age'>%s Anos</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Passaporte:</strong><span class='person-id'>%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Registro: </strong><span class='person-passport'>%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Cargo:</strong><span class='person-job'>%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>CNH:</strong><span class='person-job'>%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Telefone:</strong><span class='person-phone'>%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Banco:</strong><span class='person-phone'>R$%s</span></div>"..
-					"<div class='clear'></div>"..
-					"<div class='each-info'><strong>Multas:</strong><span class='person-phone'>$%s</span></div>"..
-					"<div class='clear'></div>"..
-					"</div>"..
-					"</div>"..
-					"</div>", foto, name, firstname, age, user_id, registration, groupname, cnh, phone, banco, multas)
-				vRP._setDiv("rg", css, html)
-				identity = true
-			end
+            ExecuteCommand("rg")
 		end
 	end
 end)
 
-local nuidentity = false
-RegisterCommand("rg",function(source,args)
-	if nuidentity then
-		vRP._removeDiv("rg")
-		nuidentity = false
-		vRP._DeletarObjeto(tablet)
-		TaskClearLookAt(GetPlayerPed(-1))
-	else
-		local foto, name, firstname, registration, age, cnh = vRPNserver.nuIdentidade()
-		if foto == nil or foto == "" then
-			foto  = ""
-		end
-		local html = string.format("<div id='DocumentSectionNu'><div class='avatar-img'><img src='%s'></div> <div class='infos'><div class='main-info'>"..
-			"<h1 class='each-info person-nameNu'>%s %s</h1>"..
-			"<div class='secondary-info'>"..
-			"<div class='each-info'><strong>Idade:</strong><span class='person-age'> %s Anos</span></div>"..
-			"<div class='clear'></div>"..
-			"<div class='each-info'><strong>Registro: </strong><span class='person-passport'> %s</span></div>"..
-			"<div class='clear'></div>"..
-			"<div class='each-info'><strong>CNH:</strong><span class='person-job'> %s</span></div>"..
-			"<div class='clear'></div>"..
-			"</div>"..
-			"</div>"..
-			"</div>", foto, name, firstname, age, registration, cnh)
-		vRP._setDiv("rg", css, html)
-		nuidentity = true
-	end
-end)
-
+--[ LOCALIZAÇÕES ]-----------------------------------------------------------------------------------------------------------------------
 
 local ponto = {
 	{ ['x'] = -552.85, ['y'] = -190.74, ['z'] = 38.22 }
@@ -212,15 +77,15 @@ Citizen.CreateThread(function()
 			local ponto = ponto[k]
 
 			if GetDistanceBetweenCoords(GetEntityCoords(PlayerPedId()), ponto.x, ponto.y, ponto.z, true ) < 5.1 then
-				DrawText3D(ponto.x, ponto.y, ponto.z, "Pressione [~p~E~w~] para criar a sua ~p~IDENTIDADE~w~.")
+				DrawText3D(ponto.x, ponto.y, ponto.z, "Pressione [~p~E~w~] para abrir o ~p~MULTICHARACTER (Demo)~w~.")
 			end
 			
 			if distance < 10.1 then
 				DrawMarker(23,ponto.x,ponto.y,ponto.z-0.99,0,0,0,0,0,0,0.7,0.7,0.5,136, 96, 240, 180,0,0,0,0)
 				idle = 5
 				if distance < 1.2 then
-					if IsControlJustPressed(0,38) and vRPNserver.modifyIdentidade() then
-						print('okay')
+					if IsControlJustPressed(0,38) then
+						ExecuteCommand("char")
 					end
 				end
 			end

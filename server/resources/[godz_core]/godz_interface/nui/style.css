@@ -1,149 +1,156 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* Estilo Dark Gold - GODZ Signature */
+:root {
+    --primary-color: #d4af37; /* Dourado Metálico */
+    --secondary-color: #1a1a1a; /* Preto Carbono */
+    --accent-color: #f1c40f;
+    --text-color: #ffffff;
+    --background-gradient: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+}
 
 body {
     margin: 0;
     padding: 0;
+    font-family: 'Montserrat', sans-serif;
     overflow: hidden;
-    font-family: 'Poppins', sans-serif;
 }
 
 #hud-container {
     position: absolute;
-    bottom: 2vh;
-    left: 2vh;
+    bottom: 30px;
+    left: 30px;
     display: flex;
     gap: 15px;
     align-items: center;
-    transition: opacity 0.5s;
 }
 
 .status-circle {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 50%;
+    border: 1px solid rgba(212, 175, 55, 0.3); /* Borda sutil dourada */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.status-circle i {
-    font-size: 18px;
-    color: white;
+.status-icon {
+    width: 20px;
+    height: 20px;
     z-index: 2;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
 }
 
-.circular-chart {
+svg {
     position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
     width: 100%;
     height: 100%;
-    transform: rotate(-90deg);
 }
 
 .circle-bg {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.2);
-    stroke-width: 3.8;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 3;
 }
 
 .circle {
     fill: none;
-    stroke-width: 2.8;
+    stroke-width: 3;
     stroke-linecap: round;
     transition: stroke-dasharray 0.5s ease;
 }
 
-.health-fill { stroke: #e74c3c; }
-.armour-fill { stroke: #3498db; }
-.hunger-fill { stroke: #f39c12; }
-.thirst-fill { stroke: #00cec9; }
+/* Cores específicas com toque Dark Gold */
+.health .circle { stroke: #e74c3c; filter: drop-shadow(0 0 3px #c0392b); }
+.armour .circle { stroke: #3498db; filter: drop-shadow(0 0 3px #2980b9); }
+.hunger .circle { stroke: #d35400; filter: drop-shadow(0 0 3px #e67e22); }
+.thirst .circle { stroke: #00cec9; filter: drop-shadow(0 0 3px #00b894); }
 
-/* NOTIFY */
+/* Notifications */
 #notify-container {
     position: absolute;
-    top: 15%;
-    right: 20px;
+    top: 100px;
+    right: 0; /* Começa fora da tela ou na borda direita */
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 320px;
+    padding-right: 20px;
+    max-height: 80vh;
+    overflow: hidden;
+    width: 350px;
 }
 
 .notify {
-    background: rgba(15, 15, 15, 0.95);
-    color: white;
-    padding: 15px;
-    border-radius: 8px;
+    background: var(--background-gradient);
+    color: var(--text-color);
+    padding: 15px 20px;
+    border-radius: 4px; /* Mais quadrado para visual premium */
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     display: flex;
-    align-items: center;
-    gap: 15px;
-    animation: slideIn 0.5s ease forwards;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    border-left: 4px solid #fff;
-    overflow: hidden;
+    flex-direction: column;
     position: relative;
-}
-
-.notify::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    background: rgba(255,255,255,0.3);
-    width: 100%;
-    animation: timeBar 5s linear forwards;
+    overflow: hidden;
+    
+    /* Animação Slide-In */
+    transform: translateX(120%);
+    animation: slideIn 0.5s forwards ease-out;
 }
 
 .notify.sucesso { border-left-color: #2ecc71; }
-.notify.sucesso i { color: #2ecc71; }
-
 .notify.erro { border-left-color: #e74c3c; }
-.notify.erro i { color: #e74c3c; }
-
 .notify.aviso { border-left-color: #f1c40f; }
-.notify.aviso i { color: #f1c40f; }
-
 .notify.ia_tip { 
     border-left-color: #9b59b6; 
     background: linear-gradient(90deg, rgba(40,0,60,0.95), rgba(10,10,10,0.95));
 }
-.notify.ia_tip i { color: #9b59b6; }
 
-.notify i {
-    font-size: 24px;
-}
-
-.notify-content {
-    flex: 1;
-}
-
-.notify-content h4 {
-    margin: 0;
+.notify-title {
+    font-weight: 700;
     font-size: 14px;
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    color: var(--primary-color);
 }
 
-.notify-content p {
-    margin: 5px 0 0 0;
+.notify-message {
     font-size: 12px;
-    color: #ccc;
+    font-weight: 300;
     line-height: 1.4;
 }
 
 @keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+    from { transform: translateX(120%); }
+    to { transform: translateX(0); }
 }
 
-@keyframes fadeOut {
-    to { transform: translateX(100%); opacity: 0; }
+@keyframes slideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(120%); opacity: 0; }
 }
 
-@keyframes timeBar {
-    from { width: 100%; }
-    to { width: 0%; }
+.notify.hide {
+    animation: slideOut 0.5s forwards ease-in;
+}
+
+/* Watermark GODZ */
+#watermark {
+    position: absolute;
+    bottom: 210px; /* Ajustado para ficar acima do minimapa */
+    left: 45px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    opacity: 0.8;
+    letter-spacing: 2px;
+    pointer-events: none;
+    z-index: 0;
 }

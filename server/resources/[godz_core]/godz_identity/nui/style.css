@@ -1,0 +1,245 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap');
+
+:root {
+    --gold: #d4af37;
+    --dark: #1a1a1a;
+    --glass: rgba(20, 20, 20, 0.85);
+    --glass-border: rgba(212, 175, 55, 0.2);
+    --text: #ffffff;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+    display: none; /* Controlled by JS */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: transparent;
+}
+
+/* --- RG DIGITAL --- */
+#rg-container {
+    display: none;
+    position: relative;
+    width: 600px;
+    height: 350px;
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    overflow: hidden;
+}
+
+.rg-header {
+    height: 50px;
+    background: linear-gradient(90deg, var(--gold), #b8860b);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.rg-logo {
+    font-weight: 900;
+    font-size: 24px;
+    color: var(--dark);
+    letter-spacing: 2px;
+}
+
+.rg-title {
+    font-weight: 600;
+    color: var(--dark);
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.rg-content {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+}
+
+.rg-photo-frame {
+    width: 150px;
+    height: 180px;
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.3);
+}
+
+.rg-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rg-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 10px;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.value {
+    font-size: 16px;
+    font-weight: 400;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 2px;
+}
+
+.rg-bio {
+    margin-top: 10px;
+    font-size: 12px;
+    font-style: italic;
+    color: #ccc;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 2px solid var(--gold);
+}
+
+/* --- MULTICHARACTER --- */
+#char-container {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(30,30,30,0.8), #000);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.char-slots {
+    display: flex;
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.char-card {
+    width: 250px;
+    height: 400px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.char-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
+
+.char-card.empty {
+    border-style: dashed;
+}
+
+.char-plus {
+    font-size: 50px;
+    color: rgba(255,255,255,0.3);
+}
+
+.char-name {
+    margin-top: 15px;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--gold);
+}
+
+.char-info {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 5px;
+}
+
+/* Create Modal */
+#create-modal {
+    display: none;
+    position: absolute;
+    width: 400px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 30px;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.9);
+}
+
+.modal-title {
+    color: var(--gold);
+    font-size: 20px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+input {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-bottom: 2px solid #333;
+    padding: 10px;
+    color: white;
+    font-family: 'Montserrat';
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-bottom-color: var(--gold);
+}
+
+button {
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    padding: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+    border-radius: 4px;
+}
+
+button:hover {
+    background: #f1c40f;
+    transform: scale(1.02);
+}
+
+#btn-generate-lore {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+}
+
+#btn-generate-lore:hover {
+    background: var(--gold);
+    color: var(--dark);
+}
