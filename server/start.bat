@@ -1,12 +1,9 @@
 @echo off
 title GODZ SERVER CONTROLLER
 
-echo ===---------[GODZ BASE]---------===
-echo     GODZ DEV BASE VRPEX (release)
-echo     Performance/Seguranca/Otimizacao
-echo     Developed by: GODZ Dev 
-echo     Discord: github.com/DayZGodz
-echo ===---------------------------------===
+echo ==================================================
+echo       FAMÍLIA GOD - SUPER BASE UNIFIED (2026)
+echo ==================================================
 
 echo [GODZ INFRA] Verificando atualizações do FXServer....
 python infra/godz_updater.py
