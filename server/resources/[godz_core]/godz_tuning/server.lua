@@ -130,36 +130,42 @@ AddEventHandler("godz_tuning:finish", function(mods, model, plate)
     local user_id = vRP.getUserId(source)
     if not user_id then return end
     
-    -- Integrar com AI (Simulado)
-    -- "Peça à IA para gerar um 'Laudo do Mecânico'"
-    
-    -- Construir prompt
+    -- Integrar com AI (Real)
     local prompt = "Gere um laudo mecânico curto e técnico (max 20 palavras) para um veículo modelo " .. tostring(model) .. " com as seguintes modificações: "
     if mods.engine == 3 then prompt = prompt .. "Motor Nível 4, " end
     if mods.turbo then prompt = prompt .. "Turbo, " end
     if mods.suspension == 3 then prompt = prompt .. "Suspensão Competição, " end
+    if mods.brakes == 2 then prompt = prompt .. "Freios de Corrida, " end
+    if mods.transmission == 2 then prompt = prompt .. "Transmissão Esportiva, " end
     prompt = prompt .. ". Fale sobre desempenho em retas e curvas."
-    
-    -- Simulação de chamada AI (substituir por PerformHttpRequest real se tiver endpoint)
-    
-    local report = ""
-    if mods.engine == 3 and mods.turbo then
-        report = "Com esse setup, seu veículo é um monstro nas retas, mas cuidado com o torque excessivo nas curvas."
-    elseif mods.suspension == 3 then
-        report = "Estabilidade máxima atingida. Perfeito para circuitos técnicos, mas suspensão rígida para a cidade."
-    else
-        report = "Configuração equilibrada para uso urbano. Boa resposta, mas sem exageros."
-    end
-    
-    -- Salvar laudo
-    if plate then
-        MySQL.update("UPDATE godz_user_vehicles SET mechanic_report = @report WHERE user_id = @user_id AND vehicle_plate = @plate", {
-            report = report,
-            user_id = user_id,
-            plate = plate
-        })
-    end
-    
-    -- Notificar Client
-    TriggerClientEvent("Notify", source, "ia_tip", "Laudo Mecânico: " .. report)
+
+    PerformHttpRequest("http://localhost:3000/ai_assist", function(err, text, headers)
+        local report = "Laudo indisponível no momento."
+        
+        if err == 200 and text then
+            local data = json.decode(text)
+            if data and data.report then
+                report = data.report
+            end
+        else
+            -- Fallback em caso de erro da API
+            if mods.engine == 3 and mods.turbo then
+                report = "Com esse setup, seu veículo é um monstro nas retas, mas cuidado com o torque excessivo nas curvas."
+            else
+                report = "Configuração equilibrada para uso urbano. Boa resposta, mas sem exageros."
+            end
+        end
+
+        -- Salvar laudo
+        if plate then
+            MySQL.update("UPDATE godz_user_vehicles SET mechanic_report = @report WHERE user_id = @user_id AND vehicle_plate = @plate", {
+                report = report,
+                user_id = user_id,
+                plate = plate
+            })
+        end
+
+        -- Notificar Client
+        TriggerClientEvent("Notify", source, "ia_tip", "Laudo Mecânico: " .. report)
+    end, 'POST', json.encode({prompt = prompt}), { ["Content-Type"] = 'application/json' })
 end)
