@@ -145,7 +145,7 @@ function LogChestActivity(user_id, faction, item, amount, type)
             faction = faction,
             item = item,
             amount = amount
-        }), { ["Content-Type"] = "application/json" })
+        }), { ["Content-Type"] = "application/json", ["Authorization"] = "Bearer " .. API_KEY })
     end
 end
 

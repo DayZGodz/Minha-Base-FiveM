@@ -46,12 +46,14 @@ function vRPN.Identidade()
         
         -- [FIX GODZ] Verificação de integridade da identidade antes do Proxy
         local identity_check = vRP.query("godz/get_identity", {user_id = user_id})
-        if not identity_check or #identity_check == 0 then 
-            print("[GODZ] Identidade não encontrada para o ID: " .. tostring(user_id)) 
-            return nil 
+        
+        -- Safeguard: Se identidade não existe (primeira conexão), retorna valores temporários
+        if not identity_check or #identity_check == 0 or not identity or type(identity) ~= "table" then 
+            print("[GODZ SAFEGUARD] Identidade nula detectada para ID: " .. tostring(user_id) .. ". Usando perfil temporário.") 
+            return "default.png", "Cidadão", "Novo", user_id, "000AAA", 18, "000-000", vRP.format(parseInt(banco)), vRP.format(parseInt(mymultas)), groupv, cnh, "Recém-chegado em Los Santos."
         end
 
-        -- Proxy Safeguard: Check if identity exists before accessing properties
+        -- Proxy Safeguard: Check if identity exists before accessing properties (Redundant but safe)
         if identity == nil or type(identity) ~= "table" then
             print("[GODZ DEBUG] Identidade retornou nula ou inválida para o ID " .. tostring(user_id))
             return nil

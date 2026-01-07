@@ -137,4 +137,15 @@ Estrutura otimizada para segurança e performance.
 
 ---
 
+## 🛠️ TECHNICAL UPDATES
+**Patch Notes - Identidade e Persistência de Dados**
+
+O sistema de identificação recebeu atualizações críticas para garantir a estabilidade e a integridade dos dados desde a primeira conexão:
+
+*   **🛡️ Redundância de Identidade (Safeguard):** Implementada proteção lógica no `godz_identity`. Caso os dados de identidade retornem nulos (comum na primeira conexão antes da persistência total), o sistema agora atribui valores temporários seguros em vez de rejeitar a conexão, eliminando o erro "Problema de identificação".
+*   **💾 Persistência Forçada (OxMySQL):** O registro de `IP` e `Last Login` na tabela `godz_users` agora é forçado via `exports.oxmysql:execute` com callback de confirmação no momento exato da conexão (`playerConnecting`). Isso resolve definitivamente o problema de campos `NULL` no banco de dados.
+*   **🤖 Sincronização de IA:** Padronização completa dos headers de autenticação (`Authorization: Bearer ...`) em todos os módulos (`godz_shield`, `godz_factions`), eliminando erros 403 e garantindo comunicação fluida com o GODZ AI NEXUS.
+
+---
+
 > *GODZ ENGINE - Desenvolvido para quem exige a perfeição.*
