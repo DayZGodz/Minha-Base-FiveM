@@ -44,6 +44,13 @@ function vRPN.Identidade()
 
 		local cnh = "Inválido"
         
+        -- [FIX GODZ] Verificação de integridade da identidade antes do Proxy
+        local identity_check = vRP.query("godz/get_identity", {user_id = user_id})
+        if not identity_check or #identity_check == 0 then 
+            print("[GODZ] Identidade não encontrada para o ID: " .. tostring(user_id)) 
+            return nil 
+        end
+
         -- Proxy Safeguard: Check if identity exists before accessing properties
         if identity == nil or type(identity) ~= "table" then
             print("[GODZ DEBUG] Identidade retornou nula ou inválida para o ID " .. tostring(user_id))
@@ -160,6 +167,10 @@ function vRPN.createCharacter(name, firstname, age, job, bio, slot)
 
     -- Check exist
     local rows = vRP.query("vRP/get_user_by_identifier", { identifier = identifier })
+    if rows == nil or type(rows) ~= "table" then
+        print("[GODZ DEBUG] Falha crítica na verificação de existência para: " .. identifier)
+        return false, "Erro interno de banco de dados."
+    end
     if #rows > 0 then return false, "Personagem já existe neste slot!" end
 
     -- Create User
