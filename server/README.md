@@ -73,7 +73,7 @@ O Build 3407 traz nativos modernos de persistência.
 ## 🔧 Configurações do Servidor
 
 ### Build 3407
-O servidor força o build 3407 via `server.cfg`:
+O servidor força o build 3407 via `server.cfg` (e `start.bat`):
 ```cfg
 set sv_enforceGameBuild 3407
 ```
@@ -88,5 +88,9 @@ A ponte de IA (`godz_ai_bridge.py`) utiliza o servidor WSGI `Waitress` para prod
 
 ## 🛠️ Manutenção e Soluções
 *   **Debug SQL**: `vrp/base.lua` agora exibe o erro RAW do MySQL no console se a conexão falhar.
-*   **Fix de Login**: `godz_users` aceita `NULL` em `last_login` e `ip` para garantir cadastro inicial.
+*   **Fix de Login (V2)**: O sistema de autenticação foi blindado contra falhas de "error handling":
+    *   Usa `exports.oxmysql:scalar` protegido (pcall) para evitar crashes do scheduler.
+    *   Retorna `false` graciosamente se o banco falhar, impedindo erros de concatenação de strings.
+    *   **Diagnóstico**: Se o login falhar, o console exibirá `[GODZ] ERRO SQL REAL: <erro>` para fácil correção (ex: 'Unknown column').
+    *   Totalmente otimizado para o driver `oxmysql` moderno e Build 3407.
 *   **Dynamic Loading**: Recursos utilizam `LoadResourceFile` e `SaveResourceFile` para persistência local quando apropriado.

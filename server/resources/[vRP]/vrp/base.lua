@@ -146,7 +146,7 @@ function vRP.getUserIdByIdentifiers(ids)
 		end)
 
 		if not status or not result then
-			print("[GODZ] Erro detectado no Banco de Dados!")
+			print('[GODZ] ERRO SQL REAL: ' .. (tostring(result) or 'Erro Desconhecido'))
 			return false
 		end
 
