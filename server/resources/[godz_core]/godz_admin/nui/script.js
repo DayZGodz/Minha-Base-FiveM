@@ -4,9 +4,12 @@ window.addEventListener('message', function(event) {
     const data = event.data;
     if (data.type === 'OPEN') {
         document.getElementById('app').style.display = 'flex';
-        loadAlerts(data.alerts);
-    } else if (data.type === 'NEW_ALERT') {
-        addAlert(data.alert);
+        if (data.players) loadPlayers(data.players);
+        if (data.multiplier) document.getElementById('economy-multiplier').innerText = data.multiplier + 'x';
+    } else if (data.type === 'AI_REPORT') {
+        showAIReport(data.report);
+    } else if (data.type === 'CLOSE') {
+        closeMenu();
     }
 });
 
@@ -30,114 +33,132 @@ function switchTab(tabId) {
     document.querySelectorAll('.nav li').forEach(el => el.classList.remove('active'));
     
     document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    // Encontra o li que chamou a função (simplificado)
+    const navItems = document.querySelectorAll('.nav li');
+    if (tabId === 'dashboard') navItems[0].classList.add('active');
+    if (tabId === 'players') navItems[1].classList.add('active');
+    if (tabId === 'economy') navItems[2].classList.add('active');
+    if (tabId === 'shield') navItems[3].classList.add('active');
 }
 
-// ALERTS SYSTEM
-function loadAlerts(alerts) {
-    const container = document.getElementById('alertList');
+// PLAYERS & AI
+function loadPlayers(players) {
+    const container = document.getElementById('online-players-list');
     container.innerHTML = '';
-    if (!alerts || alerts.length === 0) {
-        container.innerHTML = '<div class="alert-item placeholder"><span>Sem alertas recentes.</span></div>';
-        return;
-    }
-    alerts.forEach(addAlert);
-}
-
-function addAlert(alert) {
-    const container = document.getElementById('alertList');
-    const placeholder = container.querySelector('.placeholder');
-    if (placeholder) placeholder.remove();
-
-    const div = document.createElement('div');
-    div.className = 'alert-item';
-    div.innerHTML = `
-        <div class="alert-info">
-            <span class="alert-type">${alert.type}</span>
-            <span class="alert-user">User ID: ${alert.user_id}</span>
-            <small>${alert.details}</small>
-        </div>
-        <span>${alert.time}</span>
-    `;
-    container.prepend(div);
-}
-
-// ACTIONS
-function doAction(action) {
-    const targetId = document.getElementById('target_id').value;
     
-    if (action === 'ban') {
-        if (!targetId) return showNotification('Informe o ID!', 'error');
-        openModal('Motivo do Banimento', '<input type="text" id="modalInput" placeholder="Motivo">', () => {
-            const reason = document.getElementById('modalInput').value;
-            sendAction('ban', { target_id: targetId, reason: reason });
-        });
-    } else if (action === 'unban') {
-        if (!targetId) return showNotification('Informe o ID!', 'error');
-        sendAction('unban', { target_id: targetId });
-    }
-}
-
-function promptSpawnVehicle() {
-    openModal('Spawnar Veículo', '<input type="text" id="modalInput" placeholder="Nome do modelo (ex: adder)">', () => {
-        const model = document.getElementById('modalInput').value;
-        if (model) sendAction('spawnVehicle', { model: model });
+    players.forEach(p => {
+        const div = document.createElement('div');
+        div.className = `player-row ${p.suspicious ? 'suspicious' : ''}`;
+        div.innerHTML = `
+            <div>
+                <strong style="color: var(--gold)">ID ${p.user_id}</strong> - ${p.name || 'Desconhecido'}
+                <br><small>Ping: ${p.ping}ms</small>
+            </div>
+            <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;" onclick="selectPlayer(${p.user_id})">
+                Selecionar
+            </button>
+        `;
+        container.appendChild(div);
     });
 }
 
-function promptRevive() {
-    openModal('Reviver Jogador', '<input type="number" id="modalInput" placeholder="ID do Jogador">', () => {
-        const id = document.getElementById('modalInput').value;
-        if (id) sendAction('revive', { target_id: id });
+function selectPlayer(id) {
+    document.getElementById('target_id').value = id;
+}
+
+function analyzePlayer() {
+    const id = document.getElementById('target_id').value;
+    if (!id) return showNotification('Informe um ID para analisar!', 'error');
+    
+    document.getElementById('ai-report-area').style.display = 'block';
+    document.getElementById('ai-report-text').innerText = "Conectando ao Neural Core... Analisando logs...";
+    
+    fetch(`https://${GetParentResourceName()}/analyzePlayer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify({ user_id: id })
     });
 }
 
-function promptGiveItem() {
-    const targetId = document.getElementById('target_id').value;
-    if (!targetId) return showNotification('Informe o ID no campo acima!', 'error');
-    
-    const html = `
-        <input type="text" id="modalItem" placeholder="Nome do Item (ex: water)" style="margin-bottom:10px">
-        <input type="number" id="modalAmount" placeholder="Quantidade">
-    `;
-    
-    openModal('Dar Item', html, () => {
-        const item = document.getElementById('modalItem').value;
-        const amount = document.getElementById('modalAmount').value;
-        if (item && amount) sendAction('giveItem', { target_id: targetId, item: item, amount: amount });
-    });
+function showAIReport(text) {
+    document.getElementById('ai-report-area').style.display = 'block';
+    document.getElementById('ai-report-text').innerText = text;
 }
 
+// ACTIONS GENERICAS
 function sendAction(action, data) {
     fetch(`https://${GetParentResourceName()}/action`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-        body: JSON.stringify({ action: action, ...data })
+        body: JSON.stringify({ action: action, data: data })
     });
     closeModal();
+}
+
+function doAction(type) {
+    const id = document.getElementById('target_id').value;
+    if (type === 'ban') {
+        openModal('Banir Jogador', '<input type="text" id="modalInput" placeholder="Motivo">', () => {
+            const reason = document.getElementById('modalInput').value;
+            sendAction('ban', { target_id: id, reason: reason });
+        });
+    } else if (type === 'unban') {
+        sendAction('unban', { target_id: id });
+    }
+}
+
+function promptSpawnVehicle() {
+    openModal('Spawnar Veículo', '<input type="text" id="modalInput" placeholder="Modelo (ex: t20)">', () => {
+        const val = document.getElementById('modalInput').value;
+        sendAction('spawnVehicle', { model: val });
+    });
+}
+
+function promptRevive() {
+    openModal('Reviver ID', '<input type="number" id="modalInput" placeholder="ID (vazio = você)">', () => {
+        const val = document.getElementById('modalInput').value;
+        sendAction('revive', { target_id: val });
+    });
+}
+
+function promptGiveItem() {
+    const id = document.getElementById('target_id').value;
+    if(!id) return alert('Selecione um ID');
+    
+    openModal('Dar Item', 
+        '<input type="text" id="mItem" placeholder="Item"><br><br><input type="number" id="mQtd" placeholder="Quantidade">', 
+        () => {
+            const item = document.getElementById('mItem').value;
+            const qtd = document.getElementById('mQtd').value;
+            sendAction('giveItem', { target_id: id, item: item, amount: qtd });
+    });
+}
+
+function resetEconomy() {
+    openModal('CONFIRMAR RESET', '<p style="color:red">Tem certeza? Isso recalculará todos os preços baseados na inflação zero.</p>', () => {
+        sendAction('resetEconomy', {});
+    });
 }
 
 // MODAL SYSTEM
 function openModal(title, html, callback) {
     document.getElementById('modalTitle').innerText = title;
     document.getElementById('modalBody').innerHTML = html;
-    
-    currentCallback = callback;
     document.getElementById('customModal').style.display = 'flex';
-}
-
-function closeModal() {
-    document.getElementById('customModal').style.display = 'none';
-    document.getElementById('modalBody').innerHTML = '';
-    currentCallback = null;
+    currentCallback = callback;
 }
 
 function confirmModal() {
     if (currentCallback) currentCallback();
+    closeModal();
+}
+
+function closeModal() {
+    document.getElementById('customModal').style.display = 'none';
+    currentCallback = null;
 }
 
 function showNotification(msg, type) {
-    // Simple alert for now, or custom toast
-    // alert(msg);
-    // Use NUI feedback?
+    // Simples alert por enquanto, pode ser melhorado
+    alert(msg);
 }

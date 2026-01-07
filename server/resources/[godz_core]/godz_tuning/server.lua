@@ -139,7 +139,7 @@ AddEventHandler("godz_tuning:finish", function(mods, model, plate)
     if mods.transmission == 2 then prompt = prompt .. "Transmissão Esportiva, " end
     prompt = prompt .. ". Fale sobre desempenho em retas e curvas."
 
-    PerformHttpRequest("http://localhost:3000/ai_assist", function(err, text, headers)
+    PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
         local report = "Laudo indisponível no momento."
         
         if err == 200 and text then

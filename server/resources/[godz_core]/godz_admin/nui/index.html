@@ -2,16 +2,16 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Unity Admin Tablet</title>
+    <title>GODZ Admin Panel</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container" id="app" style="display: none;">
-        <!-- Modal -->
+        <!-- Modal Genérico -->
         <div id="customModal" class="modal-overlay" style="display: none;">
             <div class="modal-box">
-                <h3 id="modalTitle">Título</h3>
+                <h3 id="modalTitle" style="color: var(--gold); margin-bottom: 15px;">Título</h3>
                 <div id="modalBody"></div>
                 <div class="modal-buttons">
                     <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
@@ -20,21 +20,29 @@
             </div>
         </div>
 
+        <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">
-                <i class="fas fa-shield-alt"></i> UNITY ADMIN
+                <i class="fas fa-crown"></i> GODZ ADMIN
             </div>
             <ul class="nav">
                 <li class="active" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Dashboard</li>
                 <li onclick="switchTab('players')"><i class="fas fa-users"></i> Jogadores</li>
-                <li onclick="switchTab('shield')"><i class="fas fa-user-shield"></i> Unity Shield</li>
+                <li onclick="switchTab('economy')"><i class="fas fa-chart-line"></i> Economia</li>
+                <li onclick="switchTab('shield')"><i class="fas fa-shield-alt"></i> GODZ Shield</li>
             </ul>
+            <div class="godz-seal">
+                <i class="fas fa-check-circle" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <br>
+                VERIFIED BY GODZ
+            </div>
         </div>
         
+        <!-- Conteúdo Principal -->
         <div class="main-content">
             <!-- DASHBOARD TAB -->
             <div id="dashboard" class="tab-content active">
-                <h2>Ações Rápidas</h2>
+                <h2>Painel de Controle</h2>
                 <div class="grid-actions">
                     <div class="card" onclick="promptSpawnVehicle()">
                         <i class="fas fa-car"></i>
@@ -44,6 +52,14 @@
                         <i class="fas fa-heartbeat"></i>
                         <span>Reviver ID</span>
                     </div>
+                    <div class="card" onclick="promptTeleport()">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Teleporte (TP)</span>
+                    </div>
+                    <div class="card" onclick="promptKill()">
+                        <i class="fas fa-skull"></i>
+                        <span>Kill Player</span>
+                    </div>
                 </div>
             </div>
 
@@ -51,23 +67,54 @@
             <div id="players" class="tab-content">
                 <h2>Gerenciamento de Jogadores</h2>
                 <div class="form-group">
-                    <input type="number" id="target_id" placeholder="ID do Jogador">
+                    <input type="number" id="target_id" placeholder="ID do Jogador Alvo">
+                    <button class="btn btn-primary" onclick="analyzePlayer()">
+                        <i class="fas fa-brain"></i> Analisar (IA)
+                    </button>
                 </div>
                 
-                <div class="actions-list">
-                    <button class="btn btn-danger" onclick="doAction('ban')"><i class="fas fa-ban"></i> Banir</button>
-                    <button class="btn btn-warning" onclick="doAction('unban')"><i class="fas fa-unlock"></i> Desbanir</button>
-                    <button class="btn btn-success" onclick="promptGiveItem()"><i class="fas fa-gift"></i> Dar Item</button>
+                <!-- AI Report Area -->
+                <div id="ai-report-area" class="ai-report-box">
+                    <div class="ai-report-header">
+                        <i class="fas fa-robot"></i> RELATÓRIO DA INTELIGÊNCIA ARTIFICIAL
+                    </div>
+                    <div id="ai-report-text" class="ai-report-content">
+                        Processando dados comportamentais...
+                    </div>
                 </div>
+
+                <div class="actions-list" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button class="btn btn-danger" onclick="doAction('ban')"><i class="fas fa-ban"></i> Banir</button>
+                    <button class="btn btn-success" onclick="doAction('unban')"><i class="fas fa-unlock"></i> Desbanir</button>
+                    <button class="btn btn-primary" onclick="promptGiveItem()"><i class="fas fa-gift"></i> Dar Item</button>
+                </div>
+
+                <h3 style="margin-top: 30px; margin-bottom: 15px; color: #ccc; font-size: 1rem;">JOGADORES ONLINE</h3>
+                <div id="online-players-list">
+                    <!-- Lista injetada via JS -->
+                </div>
+            </div>
+
+            <!-- ECONOMY TAB -->
+            <div id="economy" class="tab-content">
+                <h2>Gestão Econômica</h2>
+                <div class="economy-stat">
+                    Multiplicador Atual (IA): <strong id="economy-multiplier">1.0x</strong>
+                </div>
+                <p style="color: #aaa; margin-bottom: 20px;">
+                    O multiplicador é ajustado automaticamente pela IA com base na inflação e fluxo de caixa do servidor.
+                </p>
+                <button class="btn btn-danger" onclick="resetEconomy()">
+                    <i class="fas fa-sync-alt"></i> FORÇAR RESET DE MERCADO
+                </button>
             </div>
 
             <!-- SHIELD TAB -->
             <div id="shield" class="tab-content">
-                <h2>Monitoramento Unity Shield</h2>
+                <h2>Monitoramento GODZ Shield</h2>
                 <div class="alert-list" id="alertList">
-                    <!-- Alerts will be injected here -->
-                    <div class="alert-item placeholder">
-                        <span>Aguardando alertas...</span>
+                    <div class="alert-item placeholder" style="color: #666; text-align: center; padding: 20px;">
+                        <span>Aguardando alertas de segurança...</span>
                     </div>
                 </div>
             </div>
