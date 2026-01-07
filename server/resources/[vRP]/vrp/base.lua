@@ -303,15 +303,46 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 
 	if ids ~= nil and #ids > 0 then
 		deferrals.update("Carregando...")
-		local user_id = vRP.getUserIdByIdentifiers(ids)
+		local user_id = nil
+		pcall(function()
+			user_id = vRP.getUserIdByIdentifiers(ids)
+		end)
+		
 		if user_id then
+			-- [FIX GODZ] Atualização Forçada de IP e Login (Compatível com OxMySQL)
+			local ep = vRP.getPlayerEndpoint(source)
+			local last_login = os.date("%d.%m.%Y %H:%M:%S")
+			
+			-- Executa update direto via oxmysql para garantir persistência
+			print("[GODZ] Atualizando dados do jogador ID: "..user_id.." | IP: "..tostring(ep).." | Data: "..tostring(last_login))
+			pcall(function()
+				exports.oxmysql:execute("UPDATE godz_users SET ip = @ip, last_login = @last_login WHERE id = @user_id", {
+					ip = ep,
+					last_login = last_login,
+					user_id = user_id
+				})
+			end)
+
 			deferrals.update("Verificando se você está banido.")
-			if not vRP.isBanned(user_id) then
+			local banned = false
+			local status_ban = pcall(function()
+				banned = vRP.isBanned(user_id)
+			end)
+
+			if status_ban and not banned then
 				deferrals.update("Verificando seu IP...")
-				if vRP.isWhitelisted(user_id) then
+				local whitelisted = false
+				local status_wl = pcall(function()
+					whitelisted = vRP.isWhitelisted(user_id)
+				end)
+
+				if status_wl and whitelisted then
 					if vRP.rusers[user_id] == nil then
 						deferrals.update("Carregando banco de dados.")
-						local sdata = vRP.getUData(user_id,"vRP:datatable")
+						local sdata = nil
+						pcall(function()
+							sdata = vRP.getUData(user_id,"vRP:datatable")
+						end)
 
 						local plySource = vRP.user_sources[user_id]
 						if plySource then
@@ -331,15 +362,17 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 						local tmpdata = vRP.getUserTmpTable(user_id)
 						tmpdata.spawns = 0
 
+						print("[GODZ] Player ID ["..user_id.."] conectado e dados sincronizados")
 						TriggerEvent("vRP:playerJoin",user_id,source,name)
-						SendWebhookMessage(webhookjoins,"```prolog\n[ID]: "..user_id.." \n[IP]: "..GetPlayerEndpoint(source).." \n[ENTROU NO SERVIDOR]: "..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S").." \r```")
+						SendWebhookMessage(webhookjoins,"```prolog\n[ID]: "..user_id.." \n[IP]: "..GetPlayerEndpoint(source).." \n[ENTROU NO SERVIDOR]: "..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S").." \r```")
 
-						print("[ENTRANDO] Jogador [",user_id,"]"..os.date("\n[Data]: %d/%m/%Y [Hora]: %H:%M:%S"))
+						print("[ENTRANDO] Jogador [",user_id,"]"..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S"))
 						deferrals.done()
 					else
 						local tmpdata = vRP.getUserTmpTable(user_id)
 						tmpdata.spawns = 0
 
+						print("[GODZ] Player ID ["..user_id.."] conectado e dados sincronizados (Rejoin)")
 						TriggerEvent("vRP:playerRejoin",user_id,source,name)
 						deferrals.done()
 					end
