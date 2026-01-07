@@ -121,21 +121,21 @@ model = None
 def load_model():
     global pipeline, tokenizer, model
     try:
-        print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}Verificando aceleradores de hardware...")
+        print(f"{Fore.YELLOW}[FAMILÍA GOD AI] {Fore.WHITE}Verificando aceleradores de hardware...")
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline as hf_pipeline
 
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Hardware detectado: {Fore.MAGENTA}{device.upper()}")
+        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Hardware detectado: {Fore.MAGENTA}{device.upper()}")
 
-        print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}Carregando modelo {MODEL_NAME}... (Isso pode demorar na primeira vez)")
+        print(f"{Fore.YELLOW}[FAMILÍA GOD AI] {Fore.WHITE}Carregando modelo {MODEL_NAME}... (Isso pode demorar na primeira vez)")
         
         # Carregamento otimizado
         tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, trust_remote_code=True)
         model = AutoModelForCausalLM.from_pretrained(
-            MODEL_NAME, 
-            device_map=device, 
-            torch_dtype="auto", 
+            MODEL_NAME,
+            device_map=device,
+            dtype="auto",
             trust_remote_code=True
         )
         
@@ -146,10 +146,10 @@ def load_model():
             max_new_tokens=500
         )
         
-        print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Modelo carregado com SUCESSO!")
+        print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Modelo carregado com SUCESSO!")
     except Exception as e:
-        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro ao carregar modelo IA: {e}")
-        print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}O sistema funcionará em modo 'Fallback' (Regras estáticas).")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}Erro ao carregar modelo IA: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}O sistema funcionará em modo 'Fallback' (Regras estáticas).")
 
 # Iniciar carregamento em thread separada para não travar o boot
 threading.Thread(target=load_model).start()
@@ -161,10 +161,10 @@ RULES_CONTENT = ""
 try:
     with open("REGRAS.txt", "r", encoding="utf-8") as f:
         RULES_CONTENT = f.read()
-    print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Regras carregadas na memória.")
+    print(f"{Fore.GREEN}[FAMILÍA GOD AI] {Fore.WHITE}Regras carregadas na memória.")
 except Exception as e:
-    print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}REGRAS.txt não encontrado. Criando padrão...")
-    RULES_CONTENT = "Respeite as regras do servidor GODZ."
+    print(f"{Fore.RED}[FAMILÍA GOD AI] {Fore.WHITE}REGRAS.txt não encontrado. Criando padrão...")
+    RULES_CONTENT = "Respeite as regras do servidor Família God."
 
 # ==================================================================================
 # 3. DISCORD BOT & WEBHOOKS
@@ -177,7 +177,7 @@ def send_discord_webhook(url, embed):
     
     payload = {
         "embeds": [embed],
-        "username": "GODZ Support",
+        "username": "Família God Support",
         "avatar_url": "https://i.imgur.com/YourLogoHere.png"
     }
     
@@ -355,7 +355,7 @@ def run_discord_bot():
     try:
         bot.run(DISCORD_TOKEN)
     except Exception as e:
-        print(f"{Fore.RED}[GODZ BOT] Erro ao iniciar Bot: {e}")
+        print(f"{Fore.RED}[FAMILÍA GOD BOT] Erro ao iniciar Bot: {e}")
 
 threading.Thread(target=run_discord_bot, daemon=True).start()
 
@@ -382,7 +382,7 @@ def ai_assist():
 
     prompt = f"""
     <|system|>
-    Você é o GODZ AI, um assistente virtual de elite do servidor GODZ Roleplay.
+    Você é o FAMILÍA GOD AI, um assistente virtual de elite do servidor Família God Roleplay.
     Responda de forma curta (máximo 3 frases) e prestativa.
     Baseie-se nas regras:
     {RULES_CONTENT}
@@ -611,5 +611,5 @@ def analytics_ingest():
     return jsonify({"status": "received"})
 
 if __name__ == '__main__':
-    print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor rodando na porta 5000...")
+    print(f"{Fore.CYAN}[FAMILÍA GOD AI] {Fore.WHITE}Servidor rodando na porta 5000...")
     app.run(host='0.0.0.0', port=5000)
