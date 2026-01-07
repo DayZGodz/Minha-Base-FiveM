@@ -1,0 +1,6 @@
+flask
+discord.py
+requests
+numpy
+colorama
+torch

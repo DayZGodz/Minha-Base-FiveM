@@ -1,0 +1,83 @@
+{
+    "_metadata": {
+        "description": "Dados estat\u00edsticos do servidor coletados a cada 30 minutos.",
+        "usage": "Utilizado pelo comando /stats e relat\u00f3rios de IA.",
+        "generated_by": "GODZ AI",
+        "warning": "N\u00e3o edite manualmente."
+    },
+    "history": [
+        {
+            "timestamp": "2026-01-06T19:21:38.987546",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T07:22:17.311199",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T07:58:15.792032",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:01:37.601877",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:08:11.825986",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:14:45.660773",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:16:23.451934",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:25:09.978728",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:28:58.819866",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:31:24.535542",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:32:45.509688",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-07T08:41:12.412528",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
+        }
+    ],
+    "player_last_seen": {}
+}

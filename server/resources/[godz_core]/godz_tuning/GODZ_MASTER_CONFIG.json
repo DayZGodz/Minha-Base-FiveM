@@ -1,0 +1,70 @@
+{
+    "SERVER_INFO": {
+        "server_name": "GODZ Roleplay",
+        "_server_name_desc": "Nome oficial que aparecer\u00e1 na HUD e Discord",
+        "discord_token": "YOUR_TOKEN_HERE",
+        "_discord_token_desc": "Token do Bot Discord (Obtenha em discord.com/developers)",
+        "guild_id": 1394591451597246494,
+        "_guild_id_desc": "ID do Servidor Discord principal"
+    },
+    "DATABASE": {
+        "connection_string": "mysql://root@localhost/godz_database?multipleStatements=true",
+        "_connection_string_desc": "String de conex\u00e3o do banco de dados unificado"
+    },
+    "PERMISSIONS": {
+        "ceos": [
+            1,
+            2
+        ],
+        "_ceos_desc": "Donos/Fundadores (Acesso total)",
+        "admins": [
+            3,
+            4
+        ],
+        "_admins_desc": "Administradores (Gerenciamento geral)",
+        "moderators": [
+            5,
+            6
+        ],
+        "_moderators_desc": "Moderadores (Suporte b\u00e1sico)"
+    },
+    "ECONOMY": {
+        "tuning_prices": {
+            "engine_base": 5000,
+            "turbo_base": 15000,
+            "brakes_base": 2000,
+            "transmission_base": 3000,
+            "suspension_base": 2500,
+            "armor_base": 10000
+        },
+        "_tuning_prices_desc": "Pre\u00e7os base para customiza\u00e7\u00e3o de ve\u00edculos (godz_tuning)"
+    },
+    "SECURITY": {
+        "ignored_by_sentinel": [
+            1,
+            2,
+            3,
+            4
+        ],
+        "_ignored_by_sentinel_desc": "IDs ignorados pelo Anti-Cheat",
+        "ignored_by_auditor": [
+            1,
+            2
+        ],
+        "_ignored_by_auditor_desc": "IDs ignorados pela IA de Economia"
+    },
+    "WEBHOOKS": {
+        "audit": "https://discord.com/api/webhooks/1458221642391228569/DuExYvz5iCHII9uT8ld5FV90gchEWcwjXZv1bfALWjGk0CFmJemcgt7Te_OQhiSxanxB",
+        "_audit_desc": "Log de Auditoria Econ\u00f4mica",
+        "sentinel": "https://discord.com/api/webhooks/1458221652046250044/ercvfHRBg58IHJiHV8eoboDUq8igFHW_x8M-hV1IYO-0CObhjZ9eNq0RoJuk3HxBXBD-",
+        "_sentinel_desc": "Log do Anti-Cheat",
+        "bank": "https://discord.com/api/webhooks/1458221658723582057/_RYQ4tvETWgSBZcI26P_DDEb5K0nCdcZvG5ZWgx1yS869HyChMY-tpio0BXtnRptVHTf",
+        "_bank_desc": "Log de Transa\u00e7\u00f5es Banc\u00e1rias",
+        "support": "https://discord.com/api/webhooks/1458221667493871838/YSGTONfsBXGFbcbQXh3xVIkW5bNhnl4DmyImCkJUfeoEzunN3HG2fd1vbzkukN3-Be23",
+        "_support_desc": "Log de Tickets de Suporte",
+        "staff": "https://discord.com/api/webhooks/1458221676184469504/PFK2PVXWYTeX_NCFD_UEA1QCacxTY1h2YTkeNKPIcdfQdB8dVyEwo3ARF50m5KWmfBS9",
+        "_staff_desc": "Log de A\u00e7\u00f5es da Staff",
+        "news": "https://discord.com/api/webhooks/1458221684455772311/_jB34LtZOWagKlbDl_78cAuaD3zcKx4ouTxB1167BNXw1PL1-lBV3rTnNjFtLy4SKxdy",
+        "_news_desc": "Canal de Not\u00edcias Autom\u00e1ticas"
+    }
+}
