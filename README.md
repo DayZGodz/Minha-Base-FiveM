@@ -1,112 +1,98 @@
-# 🌟 GODZ ENGINE - O FUTURO DO ROLEPLAY
+# 👑 GODZ ENGINE - O ÁPICE DA ENGENHARIA
 
-> **"Ecossistema Proprietário. Inteligência Soberana. Tecnologia de Elite."**
+> **"Engenharia Proprietária. Inteligência Soberana. Tecnologia de Elite."**
 
-Bem-vindo à documentação oficial da **GODZ BASE**. Este projeto representa o ápice do desenvolvimento FiveM, operando sob uma arquitetura de software independente e otimizada para performance extrema. Não utilizamos "partes" de outras bases; todo o ecossistema **GODZ** foi projetado para funcionar como uma unidade coesa, estável e inovadora.
+Bem-vindo à documentação oficial da **GODZ BASE**. Este projeto representa o ápice do desenvolvimento FiveM, operando sob uma arquitetura de software independente e otimizada para performance extrema. Desenvolvida do zero com foco em estabilidade e imersão, a **GODZ ENGINE** não é apenas uma base; é um ecossistema de simulação governado por inteligência artificial.
 
 ![Banner](logo.png)
 
 ---
 
-## 🤖 2. GODZ AI NEXUS & DISCORD INTEGRATION
+## 🤖 2. O CÉREBRO: GODZ AI NEXUS & DISCORD BOT
 
-O cérebro da nossa cidade não é humano, é digital. A **GODZ ENGINE** integra nativamente modelos de Inteligência Artificial e automação via Discord.
+A infraestrutura da GODZ é híbrida, unindo o poder de processamento local da IA com a versatilidade de automação do Discord.
 
-### 🧠 GODZ AI Bridge (Phi-3 Mini)
-Utilizamos o modelo **Microsoft Phi-3 Mini 4k Instruct** rodando localmente para processamento de linguagem natural em tempo real.
-*   **AI Support (/ajuda):** Um assistente neural que entende o contexto do servidor e tira dúvidas de regras instantaneamente.
-*   **Lore Generator (/rg):** Criação dinâmica de biografias para personagens baseada em suas características e histórico.
-*   **Automotive Consultant:** Gera laudos técnicos de engenharia mecânica após o tuning de veículos.
-*   **Smart Dispatch:** Analisa chamados de emergência e coordena as unidades policiais com relatórios táticos.
+### 🧠 GODZ AI Nexus (Phi-3 Mini)
+O núcleo de inteligência que roda localmente no servidor, processando linguagem natural em tempo real.
+*   **Suporte Inteligente (/ajuda):** Um assistente que entende o contexto da dúvida do jogador e responde instantaneamente.
+*   **Despacho Tático (/911):** Analisa ocorrências e coordena unidades policiais com relatórios de situação precisos.
+*   **Lore Generator (/rg):** Cria biografias profundas e únicas para cada personagem no momento da criação.
+*   **Engenharia Automotiva:** Gera laudos técnicos detalhados sobre o desempenho veicular após modificações.
 
-### 🎮 Discord Bot Integration (Python)
-Um bot customizado em Python que atua como a ponte entre o jogo e a comunidade.
-*   **Sincronização de Cargos:** Atualiza automaticamente as permissões no jogo baseadas nos cargos do Discord.
-*   **Logs Administrativos:** Espelhamento de ações da staff em canais privados para auditoria.
-*   **Comandos Remotos:** Permite que administradores executem ações no servidor diretamente pelo chat do Discord.
-
----
-
-## � 3. ARQUITETURA DE ARQUIVOS (GODZ CORE)
-
-Nossa estrutura de pastas é modular, organizada e intuitiva. Cada recurso é um micro-serviço independente.
-
-### 🔹 Núcleo GODZ ([godz_core])
-O coração do sistema. Aqui residem os scripts vitais para o funcionamento da cidade:
-
-*   **godz_admin:** Painel de gestão administrativa avançada com ferramentas de espectador e banimento.
-*   **godz_bank:** Sistema financeiro exclusivo com interface bancária, transferências e histórico.
-*   **godz_economy:** Gerenciador dinâmico de inflação que ajusta preços baseado na circulação de dinheiro.
-*   **godz_sentinel:** Sistema de proteção ativa (Anti-Cheat) que blinda triggers e monitora injeções.
-*   **godz_identity:** Sistema de criação de personagens (Multicharacter) com geração de Lore via IA.
-*   **godz_interface & godz_notify:** Framework de UI/UX responsável pelo design Dark Gold e Glassmorphism.
-*   **godz_chest:** Sistema de baús e armazéns com persistência de dados.
-*   **godz_connect:** Gerenciador de fila e tela de carregamento otimizada.
-*   **godz_dispatch:** Central de chamados de emergência integrada à IA.
-*   **godz_events:** Diretor de eventos automáticos que cria dinâmicas globais no mapa.
-*   **godz_garage:** Gestão de frotas pessoais e apreensão de veículos.
-*   **godz_housing:** Sistema imobiliário com compra, venda e decoração de propriedades.
-*   **godz_inventory:** Inventário inteligente com sistema de peso e durabilidade de itens.
-*   **godz_jobs:** Central de empregos com missões procedurais.
-*   **godz_logs:** Auditoria completa de ações dos jogadores (tiros, compras, trocas).
-*   **godz_missions:** Framework de missões diárias e desafios.
-*   **godz_phone:** Smartphone funcional com aplicativos sociais e utilitários.
-*   **godz_target:** Sistema de interação visual (Olho) para NPCs e objetos.
-*   **godz_tuning:** Oficina mecânica com persistência de modificações e laudos técnicos.
-
-### � Especializações ([godz_modules])
-Módulos focados em gameplay específico:
-
-*   **godz_factions:** Gestão de organizações criminosas e corporações legais.
-*   **godz_illegal:** Rotas de drogas, desmanches e lavagem de dinheiro.
-*   **godz_shield:** Camada extra de firewall contra ataques DDoS e flood.
-*   **godz_support:** Sistema de tickets e atendimento ao jogador in-game.
-*   **godz_garages:** Expansão para garagens de facções e empresas.
-
-### ⚙️ Módulos de Sistema ([system])
-Infraestrutura técnica de suporte:
-
-*   **[builders]:** Compiladores de mapas e scripts C#.
-*   **[chat]:** Sistema de chat customizado com canais e comandos.
-*   **[voip]:** Integração de voz de alta qualidade (PMA-Voice otimizado).
-*   **screenshot-basic:** Utilitário para captura de tela (usado pelo Phone e Logs).
-*   **mapmanager:** Gerenciador de carregamento de mapas e interiores (MLOs).
+### 🎮 GODZ Bot (Python Integration)
+A ponte de comando e controle que conecta o jogo à comunidade.
+*   **Sincronia em Tempo Real:** Atualiza cargos e permissões no jogo instantaneamente via Discord.
+*   **Logs de Auditoria:** Espelha ações administrativas sensíveis em canais privados para segurança.
+*   **Comando Remoto:** Permite gestão de whitelist e banimentos diretamente pelo chat do Discord.
 
 ---
 
-## � 4. ESTRUTURA DE DADOS (DATABASE)
+## 📂 3. ARQUITETURA MODULAR (DETALHAMENTO TÉCNICO)
 
-Nossa base de dados `godz_users` é otimizada para segurança e rastreabilidade total.
+Nossa estrutura é composta por micro-serviços independentes, garantindo que a falha de um módulo não afete o restante do sistema.
 
-### Tabela Mestra: `godz_users`
-| Coluna | Descrição Técnica | Segurança |
+| Módulo | Descrição da Tecnologia |
+| :--- | :--- |
+| **godz_admin** | Gestão administrativa avançada com ferramentas de espectador, banimento e noclip. |
+| **godz_bank** | Sistema financeiro completo com interface bancária, PIX, transferências e histórico. |
+| **godz_economy** | Gestor dinâmico de inflação que ajusta preços baseado na circulação total de capital. |
+| **godz_sentinel** | Proteção ativa (Anti-Cheat) de nível kernel que blinda triggers e monitora injeções. |
+| **godz_identity** | Sistema multicharacter robusto com geração de Lore assistida por IA. |
+| **godz_interface** | Framework UI/UX proprietário com design system Dark Gold e Glassmorphism. |
+| **godz_inventory** | Inventário inteligente com sistema de peso, durabilidade e hotbar responsiva. |
+| **godz_factions** | Gestão hierárquica de organizações criminosas e corporações legais. |
+| **godz_illegal** | Ecossistema de rotas de drogas, desmanches e lavagem de dinheiro. |
+| **godz_shield** | Firewall lógico adicional contra ataques DDoS e inundações de pacotes. |
+| **godz_chest** | Sistema de armazenamento persistente para facções, casas e veículos. |
+| **godz_connect** | Gerenciador de fila de conexão otimizado com tela de carregamento interativa. |
+| **godz_dispatch** | Central de chamados de emergência integrada ao AI Nexus para triagem automática. |
+| **godz_events** | Diretor de eventos automáticos que gera dinâmicas globais no mapa a cada hora. |
+| **godz_garage** | Gestão de frotas pessoais, garagens de facção e sistema de apreensão. |
+| **godz_housing** | Sistema imobiliário completo com compra, venda e decoração de interiores. |
+| **godz_jobs** | Central de empregos com missões procedurais geradas aleatoriamente. |
+| **godz_logs** | Auditoria forense de todas as ações dos jogadores (tiros, trocas, compras). |
+| **godz_missions** | Framework de missões diárias (Battle Pass) e desafios semanais. |
+| **godz_phone** | Smartphone funcional com redes sociais, câmera e aplicativos bancários. |
+| **godz_target** | Sistema de interação visual (Olho) otimizado para baixo consumo de CPU. |
+| **godz_tuning** | Oficina mecânica com persistência total de mods e laudos técnicos via IA. |
+| **godz_support** | Sistema de tickets in-game para atendimento rápido ao jogador. |
+
+---
+
+## 🗄️ 4. ESTRUTURA DE DADOS (DATABASE)
+
+Nossa tabela mestra `godz_users` foi desenhada para segurança e rastreabilidade total.
+
+### 🔐 Schema: `godz_users`
+
+| Coluna | Tipo | Função Crítica |
 | :--- | :--- | :--- |
-| `id` | Identificador único do cidadão. | Primary Key |
-| `whitelisted` | Status de aprovação na cidade. | Boolean |
-| `banned` | Status de banimento global. | Boolean |
-| `ip` | Último endereço IP de conexão. | Rastreio de Segurança |
-| `last_login` | Timestamp da última sessão. | Auditoria de Atividade |
-| `moedas` | Saldo de moeda VIP/Premium. | Protegido Server-Side |
-| `pet` | Dados do animal de estimação vinculado. | JSON |
-| `garagem` | Array de veículos possuídos. | JSON |
+| `id` | INT (PK) | Identificador único e imutável do cidadão. |
+| `whitelisted` | BOOL | Controle de acesso (Aprovado/Reprovado). |
+| `banned` | BOOL | Status de banimento global (HWID/IP). |
+| `ip` | VARCHAR | Rastreio de segurança e prevenção de evasão. |
+| `last_login` | TIMESTAMP | Auditoria de atividade para limpeza de inativos. |
+| `moedas` | INT | Saldo de moeda Premium (protegido server-side). |
+| `pet` | JSON | Dados estruturados do animal de estimação vinculado. |
+| `garagem` | JSON | Array complexo com todos os veículos e suas modificações. |
 
 ---
 
-## 💎 5. IDENTIDADE VISUAL & UX
+## 💎 5. DIFERENCIAIS TECNOLÓGICOS
 
-A **GODZ BASE** possui uma assinatura visual inconfundível.
+A assinatura tecnológica que coloca a GODZ anos à frente da concorrência.
 
-*   **Dark Gold Standard:** Paleta de cores exclusiva utilizando Preto Carbono e Dourado Metálico (`#D4AF37`).
-*   **Glassmorphism:** Todas as interfaces utilizam desfoque de fundo (backdrop-filter) para imersão e modernidade.
-*   **Pulse Notifications:** O sistema `ia_tip` utiliza animações de pulsação para destacar informações críticas da IA.
+*   **Glassmorphism UI:** Todas as interfaces utilizam desfoque de fundo (backdrop-filter) e transparências calculadas, criando uma estética de vidro fosco moderna e luxuosa.
+*   **Performance Core:** O núcleo da GODZ Engine utiliza processamento assíncrono, garantindo que operações pesadas (como salvar no banco) nunca congelem o servidor. Zero Lag.
+*   **Dark Gold Standard:** Uma identidade visual coesa utilizando Preto Carbono e Dourado Metálico (`#D4AF37`) em todos os elementos visuais.
 
 ---
 
 ## 🔄 Protocolo de Atualização
 
-**Regra de Ouro:** Este documento é vivo. Qualquer alteração no código, adição de mod ou correção de bug **DEVE** ser refletida imediatamente nesta documentação técnica.
+**Regra de Ouro:** Este documento é vivo. A cada atualização de código, o manual deve ser revisado para refletir a realidade do servidor.
 
-> *"Na GODZ ENGINE, a documentação é tão importante quanto o código."*
+> *"Na GODZ ENGINE, a excelência não é um objetivo, é o padrão."*
 
 ---
 *Copyright © 2025 GODZ Technologies. All rights reserved.*
