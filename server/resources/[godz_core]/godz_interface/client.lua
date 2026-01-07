@@ -65,6 +65,11 @@ end)
 -- Notify
 RegisterNetEvent("godz_interface:Notify")
 AddEventHandler("godz_interface:Notify", function(type, title, message, duration)
+    -- Sound Effect (Premium Click)
+    if type == "sucesso" or type == "ia_tip" then
+        PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+    end
+
     SendNUIMessage({
         action = "notify",
         type = type,
@@ -85,6 +90,7 @@ AddEventHandler("Notify", function(type, message)
     if type == "sucesso" then
         title = "SUCESSO"
         cssType = "sucesso"
+        PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     elseif type == "negado" or type == "erro" then
         title = "ERRO"
         cssType = "erro"
@@ -94,6 +100,7 @@ AddEventHandler("Notify", function(type, message)
     elseif type == "ia_tip" then
         title = "DICA INTELIGENTE"
         cssType = "ia_tip"
+        PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
     end
 
     SendNUIMessage({

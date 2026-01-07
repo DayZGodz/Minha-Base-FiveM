@@ -1,10 +1,10 @@
 /* Estilo Dark Gold - GODZ Signature */
 :root {
     --primary-color: #d4af37; /* Dourado Metálico */
-    --secondary-color: #1a1a1a; /* Preto Carbono */
+    --secondary-color: #121212; /* Preto Carbono Puro */
     --accent-color: #f1c40f;
     --text-color: #ffffff;
-    --background-gradient: linear-gradient(135deg, rgba(26,26,26,0.95), rgba(10,10,10,0.95));
+    --background-gradient: linear-gradient(135deg, rgba(18,18,18,0.95), rgba(0,0,0,0.95));
 }
 
 body {
@@ -108,6 +108,7 @@ svg {
 .notify.ia_tip { 
     border-left-color: #9b59b6; 
     background: linear-gradient(90deg, rgba(40,0,60,0.95), rgba(10,10,10,0.95));
+    animation: slideIn 0.5s forwards ease-out, pulse-gold 2s infinite ease-in-out;
 }
 
 .notify-title {
@@ -133,6 +134,12 @@ svg {
 @keyframes slideOut {
     from { transform: translateX(0); }
     to { transform: translateX(120%); opacity: 0; }
+}
+
+@keyframes pulse-gold {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
 }
 
 .notify.hide {
