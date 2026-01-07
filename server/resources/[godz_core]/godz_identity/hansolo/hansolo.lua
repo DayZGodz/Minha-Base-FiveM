@@ -15,6 +15,25 @@ RegisterNUICallback("generateLore", function(data, cb)
     cb({ lore = lore })
 end)
 
+RegisterNUICallback("createCharacter", function(data, cb)
+    local success, message = vRPNserver.createCharacter(data.name, data.firstname, data.age, data.job, data.bio, data.slot)
+    if success then
+        -- Refresh characters
+        local characters = vRPNserver.getCharacters()
+        cb({ success = true, characters = characters })
+    else
+        cb({ success = false, message = message })
+    end
+end)
+
+RegisterNUICallback("playCharacter", function(data, cb)
+    -- Logic to select character (Simulated for now)
+    TriggerEvent("Notify", "sucesso", "Personagem selecionado: " .. data.user_id)
+    SendNUIMessage({ action = "hide" })
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
+
 --[ COMANDOS ]---------------------------------------------------------------------------------------------------------------------------
 
 local showRG = false
@@ -46,8 +65,12 @@ RegisterCommand("rg", function(source, args)
 end)
 
 RegisterCommand("char", function(source, args)
+    local characters = vRPNserver.getCharacters()
     SetNuiFocus(true, true)
-    SendNUIMessage({ action = "openMulticharacter" })
+    SendNUIMessage({ 
+        action = "openMulticharacter",
+        characters = characters
+    })
 end)
 
 -- Tecla F11 para abrir RG (Legacy support)

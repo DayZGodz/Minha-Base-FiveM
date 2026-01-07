@@ -1,3 +1,5 @@
+let currentSlot = 1;
+
 document.addEventListener('keydown', function(event) {
     if(event.key === "Escape") {
         closeAll();
@@ -23,19 +25,48 @@ window.addEventListener('message', function(event) {
         document.body.style.display = 'flex';
         document.getElementById('rg-container').style.display = 'none';
         document.getElementById('char-container').style.display = 'flex';
-        // Populate slots (mockup or real data if passed)
+        renderCharacters(data.characters || []);
     }
     else if (data.action == 'hide') {
         closeAll();
     }
 });
 
+function renderCharacters(characters) {
+    const container = document.getElementById('char-slots');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= 3; i++) {
+        const char = characters.find(c => c.slot == i);
+        const div = document.createElement('div');
+        
+        if (char) {
+            div.className = 'char-card';
+            div.innerHTML = `
+                <div class="char-name" style="margin-bottom: 5px;">${char.name} ${char.firstname}</div>
+                <div class="char-info" style="font-size: 14px; color: #fff;">ID: ${char.user_id}</div>
+                <div class="char-info">${char.age} anos | ${char.job}</div>
+                <button onclick="playCharacter(${char.user_id})" style="margin-top:auto; margin-bottom:20px; padding: 10px 30px; background: var(--gold); border: none; font-weight: bold; cursor: pointer;">JOGAR</button>
+            `;
+        } else {
+            div.className = 'char-card empty';
+            div.onclick = () => openCreate(i);
+            div.innerHTML = `
+                <div class="char-plus">+</div>
+                <div class="char-info">Criar Novo</div>
+            `;
+        }
+        container.appendChild(div);
+    }
+}
+
 function closeAll() {
     document.body.style.display = 'none';
     fetch('http://godz_identity/close', { method: 'POST' });
 }
 
-function openCreate() {
+function openCreate(slot) {
+    currentSlot = slot;
     document.getElementById('create-modal').style.display = 'flex';
 }
 
@@ -64,7 +95,33 @@ function generateLore() {
 }
 
 function confirmCreate() {
-    // Logic to save character
-    // ...
-    closeCreate();
+    let name = document.getElementById('c-name').value;
+    let firstname = document.getElementById('c-firstname').value;
+    let age = document.getElementById('c-age').value;
+    let job = document.getElementById('c-job').value;
+    let bio = document.getElementById('generated-lore').textContent;
+    
+    if (bio.includes("A biografia aparecerá aqui") || bio.includes("IA está escrevendo")) bio = "Cidadão novo na cidade.";
+
+    fetch('http://godz_identity/createCharacter', {
+        method: 'POST',
+        body: JSON.stringify({ name, firstname, age, job, bio, slot: currentSlot })
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if (data.success) {
+            closeCreate();
+            renderCharacters(data.characters);
+        } else {
+            // Show error (console for now or alert if allowed)
+            console.error(data.message);
+        }
+    });
+}
+
+function playCharacter(user_id) {
+    fetch('http://godz_identity/playCharacter', {
+        method: 'POST',
+        body: JSON.stringify({ user_id })
+    });
 }

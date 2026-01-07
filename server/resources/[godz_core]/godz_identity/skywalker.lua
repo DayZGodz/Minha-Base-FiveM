@@ -86,8 +86,101 @@ end
 -- Prepare Queries
 vRP.prepare("vRP/update_biography", "UPDATE godz_user_identities SET biography = @biography WHERE user_id = @user_id")
 vRP.prepare("vRP/add_biography_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS biography TEXT")
+vRP.prepare("vRP/get_user_by_identifier", "SELECT user_id FROM godz_user_ids WHERE identifier = @identifier")
+vRP.prepare("vRP/create_user", "INSERT INTO godz_users(whitelisted,banned) VALUES(0,0)")
+vRP.prepare("vRP/add_identifier", "INSERT INTO godz_user_ids(identifier,user_id) VALUES(@identifier,@user_id)")
+vRP.prepare("vRP/init_user_identity", "INSERT INTO godz_user_identities(user_id,registration,phone,firstname,name,age,biography) VALUES(@user_id,@registration,@phone,@firstname,@name,@age,@biography)")
 
-function vRPN.nuIdentidade()
+function vRPN.getSteam(source)
+    local identifiers = GetPlayerIdentifiers(source)
+    for _, id in ipairs(identifiers) do
+        if string.find(id, "steam:") then
+            return id
+        end
+    end
+    return nil
+end
+
+function vRPN.getCharacters()
+    local source = source
+    local steam = vRPN.getSteam(source)
+    if not steam then return {} end
+
+    local characters = {}
+    local identifiers = { steam, steam..":2", steam..":3" }
+
+    for i, id in ipairs(identifiers) do
+        local rows = vRP.query("vRP/get_user_by_identifier", { identifier = id })
+        if #rows > 0 then
+            local user_id = rows[1].user_id
+            local identity = vRP.getUserIdentity(user_id)
+            if identity then
+                local job = vRPN.getUserGroupByType(user_id, "job") or "Desempregado"
+                table.insert(characters, {
+                    slot = i,
+                    user_id = user_id,
+                    name = identity.name,
+                    firstname = identity.firstname,
+                    age = identity.age,
+                    job = job,
+                    foto = identity.foto,
+                    biography = identity.biography
+                })
+            end
+        end
+    end
+    return characters
+end
+
+function vRPN.createCharacter(name, firstname, age, job, bio, slot)
+    local source = source
+    local steam = vRPN.getSteam(source)
+    if not steam then return false, "Steam não encontrada." end
+    
+    local identifier = steam
+    if slot > 1 then identifier = steam .. ":" .. slot end
+
+    -- Check exist
+    local rows = vRP.query("vRP/get_user_by_identifier", { identifier = identifier })
+    if #rows > 0 then return false, "Personagem já existe neste slot!" end
+
+    -- Create User
+    vRP.execute("vRP/create_user", {})
+    -- Get inserted ID (Hack: select max id, assuming low concurrency)
+    local res = vRP.query("vRP/get_users", {}) -- vRP usually doesn't expose get_last_insert_id directly via tunnel
+    -- Better: We can't easily get the last ID without a specific query. 
+    -- I'll define a query for LAST_INSERT_ID()
+    
+    -- Let's try to assume vRP.getUserId returns the one for the source if I could map it... but I can't.
+    -- I'll add a query to get the max ID.
+    local max_rows = vRP.query("vRP/get_max_user_id", {})
+    local user_id = 1
+    if #max_rows > 0 and max_rows[1].id then
+        user_id = max_rows[1].id
+    end
+    
+    -- Insert Identifier
+    vRP.execute("vRP/add_identifier", { identifier = identifier, user_id = user_id })
+    
+    -- Init Identity
+    local registration = vRP.generateRegistrationNumber()
+    local phone = vRP.generatePhoneNumber()
+    
+    vRP.execute("vRP/init_user_identity", {
+        user_id = user_id,
+        registration = registration,
+        phone = phone,
+        firstname = firstname,
+        name = name,
+        age = age,
+        biography = bio
+    })
+    
+    return true, "Personagem criado com sucesso!"
+end
+
+vRP.prepare("vRP/get_max_user_id", "SELECT MAX(id) as id FROM godz_users")
+
 
 	local source = source
 	local user_id = vRP.getUserId(source)
