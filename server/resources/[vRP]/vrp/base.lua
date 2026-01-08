@@ -305,17 +305,19 @@ function vRP.dropPlayer(source)
 	local user_id = vRP.getUserId(source)
 	vRPclient._removePlayer(-1,source)
 	if user_id then
-		vRP.execute("garagem/reset_player_inroad",{user_id = user_id, in_road = 0})
-		print("[QUITOU] Jogador [ ",parseInt(user_id)," ] seus veículos foram definidos como in_road = 0.")
-		if user_id and source then
-			TriggerEvent("vRP:playerLeave",user_id,source)
-		end
-		vRP.setUData(user_id,"vRP:datatable",json.encode(vRP.getUserDataTable(user_id)))
-		vRP.users[vRP.rusers[user_id]] = nil
-		vRP.rusers[user_id] = nil
-		vRP.user_tables[user_id] = nil
-		vRP.user_tmp_tables[user_id] = nil
-		vRP.user_sources[user_id] = nil
+		pcall(function()
+			vRP.execute("garagem/reset_player_inroad",{user_id = user_id, in_road = 0})
+			print("[QUITOU] Jogador [ ",parseInt(user_id)," ] seus veículos foram definidos como in_road = 0.")
+			if user_id and source then
+				TriggerEvent("vRP:playerLeave",user_id,source)
+			end
+			vRP.setUData(user_id,"vRP:datatable",json.encode(vRP.getUserDataTable(user_id)))
+			vRP.users[vRP.rusers[user_id]] = nil
+			vRP.rusers[user_id] = nil
+			vRP.user_tables[user_id] = nil
+			vRP.user_tmp_tables[user_id] = nil
+			vRP.user_sources[user_id] = nil
+		end)
 	end
 end
 

@@ -68,6 +68,7 @@ Ecossistema criminal profundo com rotas de produção de drogas, riscos calculad
 **Firewall Anti-DDoS & Anticheat**
 Camada extra de proteção de rede para mitigar ataques de negação de serviço e manter o servidor online e estável.
 *   **Sentinel:** Módulo de detecção heurística de injeções (Godmode, TriggerBot, Executor).
+*   **Proteção Adaptativa:** O sistema agora diferencia carregamento de assets (join) de ataques reais, com Grace Period de 10s e Bypass para Admins.
 
 ### 🎫 GODZ SUPPORT (`godz_support`)
 **Sistema de Tickets In-Game**

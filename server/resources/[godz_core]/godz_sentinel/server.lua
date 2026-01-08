@@ -58,6 +58,13 @@ AddEventHandler("entityCreating", function(entity)
     
     local user_id = vRP.getUserId(source)
     if not user_id then return end
+    
+    -- [GODZ SENTINEL] Bypass para Admin/Dono (ID 1)
+    if user_id == 1 then return end
+
+    -- [GODZ SENTINEL] Grace Period (10s após login) para evitar falso positivo no loading
+    local joinTime = vRP.getUserDataTable(user_id) and vRP.getUserDataTable(user_id).login_time or 0
+    if (GetGameTimer() - joinTime) < 10000 then return end
 
     if not entity_creation_log[user_id] then entity_creation_log[user_id] = {} end
 
