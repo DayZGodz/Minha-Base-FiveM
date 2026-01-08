@@ -1,7 +1,3 @@
-local tunnel = module("vrp", "lib/Tunnel")
-local proxy = module("vrp", "lib/Proxy")
-
-vRP = proxy.getInterface("vRP")
 
 local isUiOpen = false
 

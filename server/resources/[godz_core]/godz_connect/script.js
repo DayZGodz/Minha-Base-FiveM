@@ -156,6 +156,15 @@ window.onload = () => {
     audio.play().catch(e => {
         console.log("Autoplay blocked. User interaction required.");
     });
+
+    // Proactive AI Narration (Explaining Systems)
+    setTimeout(() => {
+        const introText = "Bem-vindo à GODZ City. Eu sou a Nexus, sua assistente virtual. " +
+                          "Enquanto carregamos seus dados, saiba que contamos com proteção anti-DDOS exclusiva, " +
+                          "economia balanceada e um sistema de facções dinâmico. " +
+                          "Você pode usar seu microfone para me fazer perguntas agora mesmo.";
+        speakAi(introText);
+    }, 2000);
 };
 
 // FiveM Loading Events

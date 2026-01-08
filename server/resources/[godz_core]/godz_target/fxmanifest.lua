@@ -27,5 +27,8 @@ exports {
     'AddTargetCircle',
     'RemoveTargetModel',
     'RemoveTargetEntity',
-    'RemoveTargetCircle'
+    'RemoveTargetCircle',
+    'AddCircleZone',
+    'AddGlobalVehicle',
+    'AddTargetPlayer'
 }

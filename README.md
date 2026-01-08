@@ -1,100 +1,60 @@
-# 👑 GODZ ENGINE - THE PINNACLE OF PERFORMANCE
+# GODZ BASE FIVEM - ULTIMATE EDITION
 
-> *O ecossistema definitivo para FiveM, unindo Inteligência Artificial, Segurança de Elite e UX Premium.*
-
----
-
-## 🧠 GODZ AI NEXUS (Inteligência Artificial)
-
-### 🤖 AI BRIDGE & HANDSHAKE
-**Integração Neural Segura**
-O servidor utiliza um protocolo de handshake criptografado para comunicação entre Lua e Python (LLM).
-*   **Bearer Token Authentication:** Cada requisição à IA é assinada digitalmente, impedindo injeções externas.
-*   **Contexto Dinâmico:** A IA recebe em tempo real o estado do jogador (fome, sede, emprego, saldo) para gerar respostas coerentes.
-
-### 🆘 SISTEMA DE AJUDA INTELIGENTE (`/ajuda`)
-**Suporte Automatizado 24/7**
-Esqueça os tickets de suporte repetitivos. O comando `/ajuda` conecta o jogador diretamente à IA.
-*   **Resolução de Dúvidas:** "Como compro um carro?", "Onde fica a prefeitura?". A IA responde com base na Wiki do servidor.
-*   **Filtragem de Tickets:** Reduz em 90% a carga da staff, permitindo foco em problemas reais.
-
-### 🎭 GODZ INTERACTIVE LOBBY
-**Tela de Carregamento Viva com IA**
-A primeira impressão é a que fica. O servidor implementa uma experiência de carregamento revolucionária.
-*   **Avatar GODZ NEXUS:** Uma interface visual que reage à voz do jogador enquanto os recursos são baixados.
-*   **Interação em Tempo Real:** O jogador pode tirar dúvidas sobre economia, lore ou comandos antes mesmo de spawnar.
-*   **Tecnologia NUI + Python:** Utiliza Web Speech API para captura de voz e SpeechSynthesis para respostas, processadas pelo `godz_ai_bridge` via CORS.
+Bem-vindo à **GODZ BASE**, uma infraestrutura de alta performance para servidores FiveM, focada em segurança, inteligência artificial e modularidade.
 
 ---
 
-## 📦 GODZ CORE (Módulos Essenciais)
+## 🛡️ GODZ ENGINE CORE
 
-A espinha dorsal do servidor, contendo os sistemas fundamentais para o funcionamento da cidade.
+O coração do servidor. Desenvolvido para estabilidade e segurança máxima.
 
-### 🛡️ GODZ IDENTITY & SECURITY
-**Gestão de Identidade Blindada**
-Sistema de login reescrito do zero para evitar duplicação de IDs e garantir integridade dos dados.
-*   **Atomic Login Flow:** Uso de Promises e Await para garantir que o jogador só entre no servidor após o banco de dados confirmar a gravação do IP.
-*   **Anti-Duplicate:** Verificação robusta de identificadores (Steam, Discord, License) antes de gerar novos IDs.
-
-### 🛡️ GODZ ADMIN (`godz_admin`)
-**Gestão Administrativa & Auditoria**
-Painel administrativo completo com ferramentas de monitoramento em tempo real e logs de auditoria detalhados.
-
-### 💰 GODZ BANK (`godz_bank`)
-**Finanças, PIX e Histórico Digital**
-Sistema bancário moderno com interface Glassmorphism, suporte a transferências instantâneas (PIX), extratos detalhados e gestão de cartões de crédito.
-
-### 📉 GODZ ECONOMY (`godz_economy`)
-**Inteligência Econômica**
-Algoritmo avançado que regula a inflação e os preços de mercado dinamicamente, mantendo o equilíbrio financeiro do servidor.
-
-### 👥 GODZ IDENTITY (`godz_identity`)
-**Multicharacter com Lore IA**
-Criação de personagens imersiva onde a IA gera biografias únicas baseadas nas escolhas do jogador. Interface visual premium para seleção de personagens.
-
-### 🎒 GODZ INVENTORY (`godz_inventory`)
-**Gestão de Itens com Metadados**
-Inventário inteligente que suporta metadados (durabilidade, número de série, etc.) e drag-and-drop fluido.
+*   **Secure Login System**: Eliminação completa de injeções SQL e campos NULL. Validação rigorosa de identificadores (Steam, Discord, License).
+*   **IP Tracking & Security**: Monitoramento em tempo real de conexões. Sistema de whitelist integrado com verificação de hardware (HWID) e IP, garantindo que apenas jogadores autorizados acessem o servidor.
+*   **Otimização de Network**: OneSync Infinity Ready. Sincronização de entidades otimizada para suportar +1024 jogadores sem lag.
 
 ---
 
-## 🛡️ GODZ MODULES (Especializações)
+## 🤖 GODZ AI NEXUS
 
-Módulos de expansão que adicionam profundidade e gameplay avançado.
+A revolução da interação em FiveM. Uma Inteligência Artificial integrada ao client e server.
 
-### ⚔️ GODZ FACTIONS (`godz_factions`)
-**Gestão de Organizações**
-Painel completo para líderes de facções gerenciarem membros, cargos, salários e o cofre da organização.
-
-### 💊 GODZ ILLEGAL (`godz_illegal`)
-**Rotas de Drogas & Lavagem**
-Ecossistema criminal profundo com rotas de produção de drogas, riscos calculados e sistemas de lavagem de dinheiro.
-
-### 🔥 GODZ SHIELD (`godz_shield`)
-**Firewall Anti-DDoS & Anticheat**
-Camada extra de proteção de rede para mitigar ataques de negação de serviço e manter o servidor online e estável.
-*   **Sentinel:** Módulo de detecção heurística de injeções (Godmode, TriggerBot, Executor).
-*   **Proteção Adaptativa:** O sistema agora diferencia carregamento de assets (join) de ataques reais, com Grace Period de 10s e Bypass para Admins.
-
-### 🎫 GODZ SUPPORT (`godz_support`)
-**Sistema de Tickets In-Game**
-Ferramenta integrada para jogadores reportarem bugs ou denúncias diretamente para a staff sem sair do jogo.
-
-### 🚗 GODZ GARAGES (`godz_garages`)
-**Expansão Empresarial**
-Módulo estendido de garagens focado em empresas, permitindo frotas corporativas e compartilhamento de veículos entre funcionários.
+*   **Interactive Loading Screen**: Avatar Digital Dourado com reconhecimento de voz (Web Speech API). Os jogadores podem conversar com a Nexus enquanto carregam, tirando dúvidas sobre a cidade.
+*   **Smart Audio Ducking**: A música de fundo (Sci-Fi/Luxury) reduz o volume automaticamente quando a IA fala ou o jogador interage.
+*   **In-Game Support**: A Nexus continua disponível dentro do jogo (via comando ou celular) para resolver tickets simples e guiar novatos, reduzindo a carga da staff.
 
 ---
 
-## 🚀 INSTALAÇÃO & SUPORTE
+## 👁️ GODZ SENTINEL
 
-1.  Clone o repositório.
-2.  Importe o arquivo `godz_database.sql`.
-3.  Configure o `server.cfg` com sua License Key e Steam Web API.
-4.  Inicie o servidor.
+Proteção ativa 24/7.
 
-Entre em contato com a equipe de desenvolvimento GODZ para suporte técnico.
+*   **Anti-Spam Monitor**: Bloqueio inteligente de eventos (Triggers) spammados.
+*   **Exploit Prevention**: Proteção contra injeção de Lua e ferramentas externas (Mod Menus).
+*   **Log System**: Registro detalhado de todas as ações suspeitas, tiros, transações bancárias e admin commands, enviados diretamente para canais seguros do Discord.
 
 ---
-*Powered by GODZ AI NEXUS*
+
+## ⚙️ GODZ SYSTEMS
+
+Módulos exclusivos desenvolvidos para imersão e performance.
+
+*   **GODZ ADMIN**: Painel administrativo completo com NUI moderna, spectate avançado, banimento por HWID e gestão de players em tempo real.
+*   **GODZ BANK**: Sistema bancário com interface NuBank/Inter, empréstimos, faturas e sistema de PIX instantâneo entre players.
+*   **GODZ ECONOMY**: Economia balanceada e dinâmica. Inflação controlada e preços ajustáveis via config central.
+*   **GODZ GARAGE**: Garagem visual com preview de veículos, sistema de seguradora e compartilhamento de chaves.
+*   **GODZ JOBS**: Central de empregos interativa. Jobs legais (Entregador, Lixeiro, Caminhoneiro) com progressão de nível e XP.
+*   **GODZ FACTIONS**: Gestão de facções criminosas e legais. Baús compartilhados, sistema de hierarquia e territórios domináveis.
+*   **GODZ ILLEGAL**: Rotas de drogas complexas, desmanche de veículos e sistema de lavagem de dinheiro com riscos reais.
+
+---
+
+### 🚀 Instalação
+
+1. Clone o repositório.
+2. Configure o `server.cfg` com sua License Key.
+3. Importe o banco de dados `godz_base.sql`.
+4. Inicie o servidor e aproveite a **GODZ EXPERIENCE**.
+
+---
+
+*Desenvolvido por DayZGodz Team - 2025*

@@ -1,7 +1,3 @@
-local Tunnel = module("vrp", "lib/Tunnel")
-local Proxy = module("vrp", "lib/Proxy")
-vRP = Proxy.getInterface("vRP")
-
 local hunger = 0
 local thirst = 0
 local lastHealth = -1

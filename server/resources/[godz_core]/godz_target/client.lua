@@ -68,17 +68,21 @@ local function CheckEntity(entity, coords)
         end
 
         -- Check Config Global Targets
-            for _, data in pairs(Config.GlobalTargets) do
-                if data.models then
-                    for _, m in ipairs(data.models) do
-                        if GetHashKey(m) == model then
-                            for _, opt in ipairs(data.options) do
-                                table.insert(options, opt)
-                            end
+        for key, data in pairs(Config.GlobalTargets) do
+            if data.models then
+                for _, m in ipairs(data.models) do
+                    if GetHashKey(m) == model then
+                        for _, opt in ipairs(data.options) do
+                            table.insert(options, opt)
                         end
                     end
                 end
+            elseif key == "all_vehicles" and IsEntityAVehicle(entity) then
+                for _, opt in ipairs(data.options) do
+                    table.insert(options, opt)
+                end
             end
+        end
             
             -- Check Players
             if IsPedAPlayer(entity) and Config.GlobalTargets["player"] then
@@ -200,8 +204,47 @@ function RemoveTargetCircle(name)
     Zones[name] = nil
 end
 
+function AddCircleZone(name, center, radius, params, targetoptions)
+    -- Wrapper for god_factions compatibility
+    -- params: { name, debugPoly, useZ, ... } - mostly ignored by simple target
+    -- targetoptions: { options = {}, distance = ... }
+    if targetoptions and targetoptions.options then
+        AddTargetCircle(name, center, radius, { options = targetoptions.options })
+    end
+end
+
+function AddGlobalVehicle(options)
+    -- Adds options to all vehicles generally or specific classes if we enhanced the system
+    -- For now, we will add to a generic 'vehicle' entry if it existed, 
+    -- but Config.GlobalTargets keys are models. 
+    -- To support "Global Vehicle", we might need to iterate all vehicle keys or add a special check in CheckEntity.
+    -- Let's look at CheckEntity: it checks Models, Config.GlobalTargets (by model), and Entities.
+    -- It does NOT have a "All Vehicles" check.
+    -- We should add one in CheckEntity or add to a new list.
+    -- For simplest implementation matching current code:
+    -- We'll assume this adds to a list we check in CheckEntity.
+    if not Config.GlobalTargets["all_vehicles"] then
+        Config.GlobalTargets["all_vehicles"] = { options = {} }
+    end
+    for _, opt in ipairs(options) do
+        table.insert(Config.GlobalTargets["all_vehicles"].options, opt)
+    end
+end
+
+function AddTargetPlayer(options)
+    if not Config.GlobalTargets["player"] then
+        Config.GlobalTargets["player"] = { options = {} }
+    end
+    for _, opt in ipairs(options) do
+        table.insert(Config.GlobalTargets["player"].options, opt)
+    end
+end
+
 -- Exports for External Use
 exports("AddTargetModel", AddTargetModel)
 exports("AddTargetEntity", AddTargetEntity)
 exports("AddTargetCircle", AddTargetCircle)
+exports("AddCircleZone", AddCircleZone)
+exports("AddGlobalVehicle", AddGlobalVehicle)
+exports("AddTargetPlayer", AddTargetPlayer)
 
