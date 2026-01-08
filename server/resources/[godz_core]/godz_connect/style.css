@@ -22,6 +22,11 @@ body {
     color: white;
 }
 
+.loading-screen, #main-container {
+    background: transparent !important;
+    background-color: rgba(0,0,0,0) !important;
+}
+
 /* Background Removed for 3D View */
 .video-background {
     display: none;
