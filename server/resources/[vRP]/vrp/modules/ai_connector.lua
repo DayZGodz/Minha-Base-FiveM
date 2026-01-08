@@ -18,8 +18,8 @@ function vRP.askGodzAI(endpoint, data, callback, attempt)
     
     PerformHttpRequest(API_URL .. endpoint, function(errorCode, resultData, resultHeaders)
         -- Se der erro 0 (Connection Refused) e ainda tiver tentativas
-        if (errorCode == 0 or errorCode == 500) and currentAttempt < maxAttempts then
-            print("[GODZ] Erro de conexão com a IA (" .. errorCode .. "). Tentando reconectar em 5 segundos...")
+        if (errorCode == 0 or errorCode == 404 or errorCode == 500) and currentAttempt < maxAttempts then
+            print("[NEXUS] Tentando reconectar ao cérebro... (Tentativa " .. currentAttempt .. ")")
             SetTimeout(5000, function()
                 vRP.askGodzAI(endpoint, data, callback, currentAttempt + 1)
             end)
