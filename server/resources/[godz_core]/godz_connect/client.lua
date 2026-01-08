@@ -159,7 +159,14 @@ AddEventHandler("godz_connect:receiveStatus", function(status)
     if isWhitelistedClient or isCreator then
         -- Se estiver na WL, inicia sequência de jogo
         PlaySoundFrontend(-1, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS", true)
-        StartGameSequence()
+        
+        -- [GODZ] Nexus Awakening Protocol
+        -- Instead of starting immediately, we trigger the intro sequence
+        SendNUIMessage({ 
+            action = "startIntro", 
+            playerName = status.playerName,
+            isCreator = isCreator
+        })
     else
         -- Acesso Negado (Nativo)
         SetNotificationTextEntry("STRING")
@@ -170,7 +177,7 @@ end)
 
 -- Fallback de Segurança (Force Spawn se travar em 3% ou NUI falhar)
 Citizen.CreateThread(function()
-    Wait(5000) -- 5 segundos de tolerância
+    Wait(20000) -- [GODZ] Increased to 20s to allow Nexus Intro Speech
     
     -- Verifica se o jogador ainda não spawnou (ainda está no lobby ou loading)
     if nexusPed or GetIsLoadingScreenActive() then
@@ -198,4 +205,10 @@ RegisterCommand('godz_ai_talk', function()
         while not HasAnimDictLoaded("mp_facial") do Wait(0) end
         PlayFacialAnim(playerPed, "mic_chatter", "mp_facial")
     end
+end)
+
+-- [GODZ] Callback when Nexus finishes introduction
+RegisterNUICallback('introFinished', function(data, cb)
+    StartGameSequence()
+    if cb then cb('OK') end
 end)

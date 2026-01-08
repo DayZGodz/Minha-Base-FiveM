@@ -82,6 +82,21 @@ window.addEventListener('message', function(event) {
         document.body.innerHTML = '';
     } else if (event.data.action === "toggleVoice") {
         if (micBtn) micBtn.click();
+    } else if (event.data.action === "startIntro") {
+        const playerName = event.data.playerName || "Cidadão";
+        const isCreator = event.data.isCreator;
+        
+        // Show HUD
+        const introHud = document.querySelector('.intro-hud');
+        if (introHud) introHud.style.opacity = '1';
+        
+        let msg = `Olá ${playerName}. Eu sou a Nexus. Bem-vindo de volta à GODZ.`;
+        if (isCreator || (playerName && playerName.toLowerCase().includes('bob'))) {
+             msg = "Olá Diretor Bob, eu sou a Nexus. Bem-vindo de volta.";
+        }
+        
+        // Call AI Speech with Intro Flag
+        speakAi(msg, true);
     }
 });
 

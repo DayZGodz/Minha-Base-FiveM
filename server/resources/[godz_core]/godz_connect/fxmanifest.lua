@@ -5,7 +5,7 @@ description 'GODZ Ecosystem - Loading Screen'
 author 'GODZ Dev'
 version '1.0.0'
 
--- loadscreen 'index.html'
+loadscreen 'index.html'
 
 server_scripts {
     '@vrp/lib/utils.lua',
@@ -13,10 +13,12 @@ server_scripts {
 }
 client_script 'client.lua'
 
--- files {
---     'index.html',
---     'style.css',
---     'script.js',
--- }
+files {
+    'index.html',
+    'style.css',
+    'script.js',
+    'sounds/nexus_voice.wav',
+    'sounds/Hack_Success.wav'
+}
 
 loadscreen_manual_shutdown 'yes'
