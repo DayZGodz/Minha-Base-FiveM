@@ -121,6 +121,29 @@ RegisterNUICallback('stopLipSync', function(data, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('startBioScan', function(data, cb)
+    if nexusPed and DoesEntityExist(nexusPed) then
+        Citizen.CreateThread(function()
+            local startTime = GetGameTimer()
+            local duration = 3000 -- Duração do Scan (Sincronizado com a fala)
+            local startZ = lobbyCoords.z + 1.8 -- Cabeça
+            local endZ = lobbyCoords.z - 0.9 -- Pés
+            
+            while (GetGameTimer() - startTime) < duration do
+                local progress = (GetGameTimer() - startTime) / duration
+                local currentZ = startZ - (progress * (startZ - endZ))
+                
+                -- Luz de Scan (Azul Ciano Tecnológico - Spotlight Simulado)
+                -- Posicionada levemente à frente do PED para iluminar o rosto/corpo de cima a baixo
+                DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 0.8, currentZ, 0, 255, 255, 2.5, 5.0)
+                
+                Wait(0)
+            end
+        end)
+    end
+    cb('ok')
+end)
+
 -- 3. TRANSIÇÃO E LIMPEZA
 AddEventHandler('playerSpawned', function()
     -- Gesto de Finalização (Despedida da Nexus)

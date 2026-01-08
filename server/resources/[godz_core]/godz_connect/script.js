@@ -115,9 +115,8 @@ function speakAi(text) {
     // Voice Selection Logic (Prioritizing Natural/Neural voices)
     const voices = synth.getVoices();
     const voice = voices.find(v => v.name.includes('Microsoft Francisca Online (Natural)')) ||
-                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && v.lang.includes('pt-BR')) ||
-                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.includes('pt-BR')) ||
-                  voices.find(v => v.name.includes('Google') && v.lang.includes('pt-BR')) || 
+                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && (v.name.includes('Female') || v.name.includes('Feminina')) && v.lang.includes('pt-BR')) ||
+                  voices.find(v => (v.name.includes('Female') || v.name.includes('Feminina')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => v.lang.includes('pt-BR')) ||
                   voices[0];
                   
@@ -125,10 +124,17 @@ function speakAi(text) {
 
     // Android/AI Cadence
     utterThis.pitch = 1.0; 
-    utterThis.rate = 1.0; 
+    utterThis.rate = 0.9; 
 
     // Start Lip Sync (Client Trigger)
     fetch('https://godz_connect/startLipSync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    }).catch(err => {});
+
+    // Start Bio Scan (Client Trigger)
+    fetch('https://godz_connect/startBioScan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
