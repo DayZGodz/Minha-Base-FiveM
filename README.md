@@ -22,6 +22,26 @@ A revolução da interação em FiveM. Uma Inteligência Artificial integrada ao
 *   **Smart Audio Ducking**: A música de fundo (Sci-Fi/Luxury) reduz o volume automaticamente quando a IA fala ou o jogador interage.
 *   **In-Game Support**: A Nexus continua disponível dentro do jogo (via comando ou celular) para resolver tickets simples e guiar novatos, reduzindo a carga da staff.
 
+### 🎭 AI ETHOS & PERSONALITY
+
+A GODZ Nexus não é um simples chatbot. Ela é a "consciência" da cidade.
+
+*   **Identidade**: Sofisticada, autoritária, onipresente e prestativa.
+*   **Evolução**: Ela aprende com as interações dos jogadores e se adapta ao contexto (Loading Screen vs In-Game vs Discord).
+*   **Imersão Total**: Ela nunca sai do personagem. Perguntas fora do contexto do RP são rejeitadas com justificativas táticas ("Fora da zona de sincronização").
+*   **Voz**: Sintetizada com pitch grave e ritmo controlado para transmitir autoridade e calma.
+
+---
+
+## 🤖 GODZ AUTONOMOUS WHITELIST
+
+O primeiro sistema de Whitelist 100% autônomo do FiveM.
+
+*   **IA Avaliadora (Nexus)**: Utiliza modelos de linguagem avançados (Phi-3) para analisar respostas de candidatos em tempo real.
+*   **Aprovação Instantânea**: Candidatos aprovados são liberados automaticamente no banco de dados e recebem cargo no Discord sem intervenção humana.
+*   **Feedback Inteligente**: Em caso de reprovação, a IA explica o motivo (ex: "Sua definição de VDM está incorreta") e aplica um cooldown automático.
+*   **Disponibilidade 24/7**: O servidor nunca fecha para candidaturas.
+
 ---
 
 ## 👁️ GODZ SENTINEL

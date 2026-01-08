@@ -720,10 +720,16 @@ def evaluate_whitelist():
 
         # Construir Prompt para Avaliação
         prompt = f"""
-        [INSTRUÇÃO SISTÊMICA]
-        Você é o GODZ SENTINEL, um avaliador de Whitelist rigoroso e justo para um servidor de GTA RP (Roleplay).
-        Sua função é analisar as respostas do candidato e decidir se ele entende as regras básicas e tem criatividade.
+        <|system|>
+        {PERSONALITY_MANIFESTO}
 
+        [MODO: DISCORD EVALUATOR]
+        Você está avaliando um candidato para entrar na cidade (Whitelist).
+        Seja RIGOROSA, JUSTA e ANALÍTICA.
+        
+        Sua missão é filtrar jogadores ruins que não sabem as regras básicas.
+        Se o jogador demonstrar preguiça ou respostas erradas, REPROVE e explique o motivo com sua personalidade autoritária.
+        
         [CRITÉRIOS DE APROVAÇÃO]
         1. RDM (Random Deathmatch): Deve explicar que é matar sem motivo/roleplay prévio.
         2. VDM (Vehicle Deathmatch): Deve explicar que é usar veículo como arma para matar sem motivo.
@@ -740,8 +746,9 @@ def evaluate_whitelist():
         [FORMATO DE SAÍDA OBRIGATÓRIO (JSON PURO)]
         {{
             "approved": true ou false,
-            "reason": "Explicação curta e direta do motivo (em PT-BR)."
+            "reason": "Explicação curta e direta do motivo (em PT-BR), mantendo sua persona."
         }}
+        <|end|>
         """
 
         # Gerar resposta com Phi-3

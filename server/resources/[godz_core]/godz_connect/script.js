@@ -123,8 +123,9 @@ function speakAi(text) {
 
     const utterThis = new SpeechSynthesisUtterance(text);
     utterThis.lang = 'pt-BR';
-    utterThis.pitch = 0.9; // Levemente menos grave para soar mais natural
-    utterThis.rate = 1.1;
+    utterThis.pitch = 0.9; // Levemente mais grave e autoritário
+    utterThis.rate = 1.0; // Velocidade clara e firme
+    utterThis.volume = 1.0; // Destaque total
 
     // Tentar selecionar uma voz PT-BR Google ou Microsoft
     const voices = synth.getVoices();
