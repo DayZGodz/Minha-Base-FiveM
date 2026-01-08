@@ -18,6 +18,9 @@ Citizen.CreateThread(function()
     RequestAnimDict("mp_facial")
     while not HasAnimDictLoaded("mp_facial") do Wait(10) end
 
+    RequestAnimDict("move_f@finesse")
+    while not HasAnimDictLoaded("move_f@finesse") do Wait(10) end
+
     -- Teleporte do Player (Segurança)
     local playerPed = PlayerPedId()
     SetEntityCoords(playerPed, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z - 10.0)
@@ -31,14 +34,46 @@ Citizen.CreateThread(function()
     SetEntityInvincible(nexusPed, true)
     SetBlockingOfNonTemporaryEvents(nexusPed, true)
     
-    -- Customização Visual (Futurista/Formal)
-    -- Ajuste conforme necessário para o visual "Nexus"
-    SetPedComponentVariation(nexusPed, 0, 0, 0, 2) -- Face
-    SetPedComponentVariation(nexusPed, 2, 2, 0, 2) -- Cabelo Preso
-    SetPedComponentVariation(nexusPed, 3, 4, 0, 2) -- Torso/Braços
-    SetPedComponentVariation(nexusPed, 4, 10, 0, 2) -- Calças
-    SetPedComponentVariation(nexusPed, 6, 6, 0, 2) -- Sapatos
-    SetPedComponentVariation(nexusPed, 11, 10, 0, 2) -- Blazer/Top
+    -- 4. ESTILIZAÇÃO PREMIUM (NEXUS ANDROID)
+    
+    -- Rosto e Pele (Impecável)
+    SetPedHeadBlendData(nexusPed, 21, 21, 0, 21, 21, 0, 0.5, 0.5, 0.0, false) -- Face Simétrica
+    
+    -- Maquiagem e Detalhes
+    SetPedHeadOverlay(nexusPed, 4, 1, 1.0) -- Maquiagem (Delineado)
+    SetPedHeadOverlayColor(nexusPed, 4, 1, 0, 0) -- Cor Preta
+    SetPedHeadOverlay(nexusPed, 0, 255, 0.0) -- Remove imperfeições (Blemishes)
+    SetPedEyeColor(nexusPed, 1) -- Azul Brilhante
+
+    -- Roupas (Branco e Dourado - Luxo)
+    SetPedComponentVariation(nexusPed, 2, 20, 0, 2) -- Cabelo: Coque Elegante
+    SetPedHairColor(nexusPed, 28, 33) -- Platinado
+
+    SetPedComponentVariation(nexusPed, 3, 15, 0, 2) -- Torso/Braços: Pele Perfeita
+    
+    -- Uniforme Futurista (Tentativa de ID Luxo - Ajuste conforme base)
+    SetPedComponentVariation(nexusPed, 11, 285, 1, 2) -- Top: Blazer Formal (Variação Branca)
+    SetPedComponentVariation(nexusPed, 8, 15, 0, 2)   -- Undershirt
+    SetPedComponentVariation(nexusPed, 4, 108, 1, 2)  -- Calça Social (Branca)
+    SetPedComponentVariation(nexusPed, 6, 29, 0, 2)   -- Sapatos: Salto Alto
+
+    -- VFX: Iluminação de Estúdio & Olhar
+    Citizen.CreateThread(function()
+        while DoesEntityExist(nexusPed) do
+            -- Luz Dourada Frontal (Key Light)
+            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 1.0, lobbyCoords.z + 1.8, 255, 223, 128, 3.0, 4.0)
+            
+            -- Luz de Contorno Azul (Rim Light - Cyber)
+            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 0, 229, 255, 2.0, 3.0)
+            
+            -- Nexus sempre olha para a câmera
+            TaskLookAtCoord(nexusPed, lobbyCoords.x, lobbyCoords.y + 1.2, lobbyCoords.z + 1.6, 2000, 2048, 3)
+            Wait(0)
+        end
+    end)
+
+    -- Animação de Postura Elegante
+    TaskPlayAnim(nexusPed, "move_f@finesse", "idle", 8.0, -8.0, -1, 1, 0, false, false, false)
     
     -- Configuração da Câmera
     nexusCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
