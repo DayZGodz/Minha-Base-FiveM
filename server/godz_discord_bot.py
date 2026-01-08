@@ -1,16 +1,13 @@
 import discord
-from discord.ui import Modal, TextInput, View, Button
+from discord.ui import View, Button
 from discord.ext import commands
 import mysql.connector
-import requests
 import json
 import os
+import random
 import asyncio
 
-# Configurações (Carregar do JSON ou Hardcoded para simplificar se necessário)
-# Idealmente carregar de ../[godz_core]/godz_tuning/GODZ_MASTER_CONFIG.json
-# Para garantir robustez, vou ler o JSON.
-
+# --- CONFIGURAÇÃO ---
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "resources", "[godz_core]", "godz_tuning", "GODZ_MASTER_CONFIG.json")
 
 def load_config():
@@ -24,22 +21,20 @@ def load_config():
 config = load_config()
 SERVER_INFO = config.get("SERVER_INFO", {})
 DATABASE = config.get("DATABASE", {})
-# Extrair token e string de conexão
+WHITELIST_CFG = config.get("WHITELIST", {})
+CHANNELS_CFG = config.get("CHANNELS", {})
+
 DISCORD_TOKEN = SERVER_INFO.get("discord_token", "")
 DB_CONN_STR = DATABASE.get("connection_string", "mysql://root@localhost/godz_database")
-# Parse simples da string de conexão (mysql://user:pass@host/db)
-# Vou usar valores padrão caso falhe o parse, ajustável conforme ambiente.
+
+# DB PARAMS (Extraídos da string ou hardcoded)
 DB_USER = "root"
 DB_PASS = ""
 DB_HOST = "localhost"
 DB_NAME = "godz_database"
 
-# Configuração da API Bridge
-AI_BRIDGE_URL = "http://127.0.0.1:5000/evaluate_wl"
-API_KEY = "godz_secret_key_123"
-
-# ID do cargo de Cidadão (Deve ser configurado pelo usuário)
-CITIZEN_ROLE_ID = 1394591451597246494 # Placeholder (ID da Guilda usado como ex, user deve mudar)
+ACCESS_CODE = WHITELIST_CFG.get("access_code", "GODZ2026")
+CITIZEN_ROLE_ID = WHITELIST_CFG.get("citizen_role_id", 1394591451597246494)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -47,212 +42,262 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-class WhitelistModal(Modal, title="Candidatura Whitelist GODZ"):
-    q1 = TextInput(
-        label="O que é RDM e VDM?",
-        placeholder="Explique com suas palavras...",
-        style=discord.TextStyle.paragraph,
-        min_length=20,
-        max_length=500
-    )
-    
-    q2 = TextInput(
-        label="Defina Meta-gaming e Power-gaming",
-        placeholder="Dê exemplos...",
-        style=discord.TextStyle.paragraph,
-        min_length=20,
-        max_length=500
-    )
-
-    q3 = TextInput(
-        label="História do Personagem (Lore)",
-        placeholder="Conte a história do seu personagem...",
-        style=discord.TextStyle.paragraph,
-        min_length=50,
-        max_length=1000
-    )
-
-    q4 = TextInput(
-        label="O que faria numa abordagem policial?",
-        placeholder="Descreva sua reação...",
-        style=discord.TextStyle.paragraph,
-        min_length=20,
-        max_length=500
-    )
-
-    async def on_submit(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-        
-        # Preparar payload para a IA
-        payload = {
-            "discord_id": str(interaction.user.id),
-            "answers": {
-                "q1": self.q1.value,
-                "q2": self.q2.value,
-                "q3": self.q3.value,
-                "q4": self.q4.value
-            }
-        }
-
-        try:
-            # Enviar para GODZ AI BRIDGE
-            headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
-            response = requests.post(AI_BRIDGE_URL, json=payload, headers=headers)
-            
-            if response.status_code == 200:
-                result = response.json()
-                approved = result.get("approved", False)
-                reason = result.get("reason", "Sem motivo especificado.")
-                
-                if approved:
-                    # 1. Atualizar Banco de Dados
-                    if update_whitelist_db(interaction.user.id):
-                        # 2. Dar Cargo no Discord
-                        try:
-                            # Tentar achar o cargo. Se CITIZEN_ROLE_ID for inválido, vai falhar (user deve ajustar)
-                            # Vou tentar pegar um cargo chamado "Cidadão" se o ID falhar, ou usar o ID configurado.
-                            guild = interaction.guild
-                            role = guild.get_role(CITIZEN_ROLE_ID)
-                            if not role:
-                                role = discord.utils.get(guild.roles, name="Cidadão")
-                            
-                            if role:
-                                await interaction.user.add_roles(role)
-                                await interaction.followup.send(f"✅ **APROVADO!** Bem-vindo à GODZ City.\nMotivo: {reason}", ephemeral=True)
-                            else:
-                                await interaction.followup.send(f"✅ **APROVADO!** (Mas não encontrei o cargo 'Cidadão' para te dar. Avise um ADM).", ephemeral=True)
-                        except Exception as e:
-                            await interaction.followup.send(f"✅ **APROVADO!** (Erro ao dar cargo: {e})", ephemeral=True)
-                    else:
-                        await interaction.followup.send("⚠️ **APROVADO PELA IA**, mas não encontrei seu ID no banco de dados. Entre no servidor uma vez para registrar seu ID e tente novamente.", ephemeral=True)
-                else:
-                    await interaction.followup.send(f"❌ **REPROVADO**\nMotivo: {reason}\n\nVocê pode tentar novamente em 2 horas.", ephemeral=True)
-            else:
-                await interaction.followup.send("⚠️ Erro de comunicação com a IA Nexus. Tente novamente mais tarde.", ephemeral=True)
-
-        except Exception as e:
-            print(f"Erro na integração: {e}")
-            await interaction.followup.send("⚠️ Erro interno no bot.", ephemeral=True)
-
-def update_whitelist_db(discord_id):
+# --- FUNÇÕES DE BANCO DE DADOS ---
+def approve_user_db(discord_id, firstname, lastname, age):
     try:
-        conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASS,
-            database=DB_NAME
-        )
+        conn = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
         cursor = conn.cursor()
         
-        # Buscar User ID baseado no Discord ID
+        # 1. Buscar User ID pelo Discord
         identifier = f"discord:{discord_id}"
-        query_find = "SELECT user_id FROM godz_user_ids WHERE identifier = %s"
-        cursor.execute(query_find, (identifier,))
+        cursor.execute("SELECT user_id FROM godz_user_ids WHERE identifier = %s", (identifier,))
         result = cursor.fetchone()
         
         if result:
             user_id = result[0]
-            # Atualizar Whitelist
-            query_update = "UPDATE godz_users SET whitelisted = 1 WHERE id = %s"
-            cursor.execute(query_update, (user_id,))
+            
+            # 2. Atualizar Whitelist na tabela godz_users
+            cursor.execute("UPDATE godz_users SET whitelisted = 1 WHERE id = %s", (user_id,))
+            
+            # 3. Inserir Identidade na tabela godz_user_identities
+            registration = f"{random.randint(10000000, 99999999)}"
+            phone = f"{random.randint(100, 999)}-{random.randint(100, 999)}"
+            
+            query_identity = """
+                INSERT IGNORE INTO godz_user_identities(user_id, registration, phone, firstname, name, age) 
+                VALUES(%s, %s, %s, %s, %s, %s)
+            """
+            cursor.execute(query_identity, (user_id, registration, phone, firstname, lastname, age))
+            
             conn.commit()
             cursor.close()
             conn.close()
-            return True
+            return True, user_id
         else:
             cursor.close()
             conn.close()
-            return False
+            return False, None
             
     except Exception as e:
         print(f"Erro MySQL: {e}")
-        return False
+        return False, None
 
-class WhitelistView(View):
+# --- VALIDAÇÃO DE TOKEN + IP ---
+def validate_token_and_approve(input_code, discord_id, firstname, lastname, age):
+    try:
+        conn = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
+        cursor = conn.cursor(dictionary=True)
+
+        # 1) Buscar token na tabela temporária
+        cursor.execute("SELECT user_id, ip, created_at FROM godz_whitelist_temp WHERE token = %s", (input_code,))
+        row = cursor.fetchone()
+        if not row:
+            cursor.close(); conn.close()
+            return False, None, "Código não encontrado"
+
+        user_id = row['user_id']
+        token_ip = row['ip']
+
+        # 2) Expiração de 30 minutos
+        cursor.execute("SELECT TIMESTAMPDIFF(MINUTE, created_at, NOW()) AS age_min FROM godz_whitelist_temp WHERE token = %s", (input_code,))
+        age_row = cursor.fetchone()
+        if age_row and age_row['age_min'] > 30:
+            cursor.close(); conn.close()
+            return False, None, "Código expirado"
+
+        # 3) Verificar IP da última conexão do usuário
+        cursor.execute("SELECT ip FROM godz_users WHERE id = %s", (user_id,))
+        urow = cursor.fetchone()
+        last_ip = urow['ip'] if urow and 'ip' in urow else None
+        if not last_ip or last_ip != token_ip:
+            cursor.close(); conn.close()
+            return False, None, "IP divergente"
+
+        # 4) Vincular discord_id ao user_id e aprovar whitelist
+        identifier = f"discord:{discord_id}"
+        cursor.execute("INSERT IGNORE INTO godz_user_ids(identifier,user_id) VALUES(%s,%s)", (identifier, user_id))
+        cursor.execute("UPDATE godz_users SET whitelisted = 1 WHERE id = %s", (user_id,))
+
+        # 5) Criar identidade se não existir
+        cursor.execute("SELECT user_id FROM godz_user_identities WHERE user_id = %s", (user_id,))
+        has_identity = cursor.fetchone()
+        if not has_identity:
+            registration = f"{random.randint(10000000, 99999999)}"
+            phone = f"{random.randint(100, 999)}-{random.randint(100, 999)}"
+            cursor.execute(
+                "INSERT IGNORE INTO godz_user_identities(user_id, registration, phone, firstname, name, age) VALUES(%s,%s,%s,%s,%s,%s)",
+                (user_id, registration, phone, firstname, lastname, age)
+            )
+
+        # 6) Remover token usado
+        cursor.execute("DELETE FROM godz_whitelist_temp WHERE token = %s", (input_code,))
+
+        conn.commit()
+        cursor.close(); conn.close()
+        return True, user_id, None
+
+    except Exception as e:
+        print(f"Erro MySQL: {e}")
+        return False, None, "Erro interno"
+
+# --- VIEWS E LÓGICA DE TICKET ---
+
+class StartWhitelistView(View):
     def __init__(self):
-        super().__init__(timeout=None) # Botão persistente
+        super().__init__(timeout=None)
 
-    @discord.ui.button(label="🔗 Iniciar Protocolo de Whitelist", style=discord.ButtonStyle.green, custom_id="start_whitelist_btn")
+    @discord.ui.button(label="📝 Iniciar Identificação", style=discord.ButtonStyle.green, custom_id="btn_start_wl")
     async def start_whitelist(self, interaction: discord.Interaction, button: Button):
-        await interaction.response.send_modal(WhitelistModal())
+        # 1. Criar Canal Privado
+        guild = interaction.guild
+        user = interaction.user
+        category_id = CHANNELS_CFG.get("whitelist_category")
+        category = guild.get_channel(category_id) if category_id else None
+        
+        # Fallback se a categoria não existir na config ou não for encontrada
+        if not category:
+            category = discord.utils.get(guild.categories, name="GODZ | TICKETS")
+            if not category:
+                category = await guild.create_category("GODZ | TICKETS")
+
+        # Verifica se já tem ticket aberto
+        existing_channel = discord.utils.get(guild.text_channels, name=f"identificacao-{user.id}")
+        if existing_channel:
+            await interaction.response.send_message(f"Você já possui um processo aberto em {existing_channel.mention}!", ephemeral=True)
+            return
+
+        # Permissões: User + Bot + Admins
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            user: discord.PermissionOverwrite(read_messages=True, send_messages=True),
+            guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+        }
+        
+        channel = await guild.create_text_channel(f"identificacao-{user.id}", category=category, overwrites=overwrites)
+        await interaction.response.send_message(f"Processo iniciado em {channel.mention}", ephemeral=True)
+        
+        # Iniciar fluxo da IA Nexus
+        asyncio.create_task(run_nexus_protocol(channel, user))
+
+async def run_nexus_protocol(channel, user):
+    def check(m):
+        return m.author == user and m.channel == channel
+
+    embed_color = 0xB8860B # Dark Gold
+
+    try:
+        # Passo 1: Nome RP
+        await channel.send(f"{user.mention}", embed=discord.Embed(
+            description="Olá, detectamos sua assinatura. Eu sou a Nexus.\nPor favor, informe seu **Nome e Sobrenome** para o registro (Ex: Bob Godz).",
+            color=embed_color
+        ))
+        
+        msg_name = await bot.wait_for('message', check=check, timeout=300)
+        full_name = msg_name.content.strip()
+        
+        # Tratamento simples do nome
+        parts = full_name.split()
+        if len(parts) < 2:
+            firstname = full_name
+            lastname = "Indigente"
+        else:
+            firstname = parts[0]
+            lastname = " ".join(parts[1:])
+
+        # Passo 2: Idade
+        await channel.send(embed=discord.Embed(
+            description=f"Entendido, **{firstname}**. Qual a sua idade?",
+            color=embed_color
+        ))
+        
+        while True:
+            msg_age = await bot.wait_for('message', check=check, timeout=300)
+            if msg_age.content.isdigit():
+                age = int(msg_age.content)
+                if 18 <= age <= 90:
+                    break
+                else:
+                    await channel.send("A idade deve ser entre 18 e 90 anos. Tente novamente.")
+            else:
+                await channel.send("Por favor, digite apenas números.")
+
+        # Passo 3: Código de Acesso (Token único exibido no jogo)
+        await channel.send(embed=discord.Embed(
+            description="Para validação biométrica final, informe o **Código de Acesso** exibido na sua tela do jogo.",
+            color=embed_color
+        ))
+        
+        msg_code = await bot.wait_for('message', check=check, timeout=300)
+        input_code = msg_code.content.strip()
+
+        # Validação cruzada (Token + IP)
+        await channel.send(embed=discord.Embed(description="🔄 Verificando código e assinatura de rede...", color=embed_color))
+        ok, user_id, err = validate_token_and_approve(input_code, user.id, firstname, lastname, age)
+
+        if ok:
+            # Dar Cargo
+            try:
+                guild = channel.guild
+                role = guild.get_role(CITIZEN_ROLE_ID) or discord.utils.get(guild.roles, name="Cidadão")
+                if role:
+                    await user.add_roles(role)
+            except Exception as e:
+                print(f"Erro cargo: {e}")
+
+            await channel.send(embed=discord.Embed(
+                title="✅ IDENTIDADE VALIDADA",
+                description=f"Bem-vindo à GODZ City, **{firstname} {lastname}**.\nVocê já pode acessar o setor.\n\n*Este canal será fechado em 10 segundos.*",
+                color=embed_color
+            ))
+            
+            await asyncio.sleep(10)
+            await channel.delete()
+        else:
+            # Anti-venda / divergência
+            msg = err or "Código inválido"
+            await channel.send(embed=discord.Embed(
+                title="❌ VALIDAÇÃO NEGADA",
+                description=f"{msg}. Caso persistir, contate a Staff.",
+                color=embed_color
+            ))
+            await asyncio.sleep(10)
+            await channel.delete()
+
+    except asyncio.TimeoutError:
+        await channel.send("Tempo esgotado. Protocolo encerrado.")
+        await asyncio.sleep(5)
+        await channel.delete()
+    except Exception as e:
+        print(f"Erro no protocolo: {e}")
+
+# --- COMANDOS ---
 
 @bot.event
 async def on_ready():
-    print(f"🤖 GODZ DISCORD BOT conectado como {bot.user}")
-    bot.add_view(WhitelistView())
-    
-    # --- AUTO-SETUP: IDENTITY SECTOR ---
-    try:
-        guild_id = SERVER_INFO.get("guild_id")
-        guild = bot.get_guild(guild_id) if guild_id else bot.guilds[0]
-        
-        if not guild:
-            print("❌ ERRO: Guilda não encontrada.")
-            return
+    print(f"🤖 GODZ NEXUS BOT conectado como {bot.user}")
+    bot.add_view(StartWhitelistView())
 
-        category_name = "🛡️ GODZ | IDENTIDADE"
-        channel_name = "📝-realizar-whitelist"
-        
-        # 1. Verificar/Criar Categoria
-        category = discord.utils.get(guild.categories, name=category_name)
-        if not category:
-            category = await guild.create_category(category_name)
-            print(f"✅ Categoria '{category_name}' criada.")
-
-        # 2. Verificar/Criar Canal
-        channel = discord.utils.get(guild.text_channels, name=channel_name, category=category)
-        if not channel:
-            # Permissões: @everyone vê mas não fala. Bot fala.
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-                guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
-            }
-            channel = await guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
-            print(f"✅ Canal '{channel_name}' criado.")
-            
-            # Enviar Embed Inicial Automaticamente
-            embed = discord.Embed(
-                title="SISTEMA DE IDENTIFICAÇÃO NEXUS",
-                description="""Saudações, candidato. Eu sou a Nexus. Detectei sua assinatura em nosso radar.
-
-Para ingressar no ecossistema GODZ, você deve passar pelo protocolo de avaliação de Roleplay. Minha inteligência analisará suas respostas em tempo real.
-
-**Requisitos:**
-• Microfone funcional.
-• Conhecimento das diretrizes de convivência.
-• Respostas claras e objetivas.""",
-                color=0xB8860B # Dark Gold
-            )
-            embed.set_footer(text="GODZ ENGINE • Secure Identification Protocol")
-            embed.set_thumbnail(url="https://i.imgur.com/YourLogoHere.png") # Placeholder, idealmente configurar no JSON
-            
-            await channel.send(embed=embed, view=WhitelistView())
-            print("✅ Mensagem de Whitelist enviada.")
-            
-    except Exception as e:
-        print(f"❌ Erro no Auto-Setup de Identidade: {e}")
-
-@bot.command()
+@bot.command(name="setup-wl")
 @commands.has_permissions(administrator=True)
 async def setup_whitelist(ctx):
-    """(Manual) Envia a mensagem com o botão de Whitelist"""
+    await ctx.message.delete()
+    
     embed = discord.Embed(
         title="SISTEMA DE IDENTIFICAÇÃO NEXUS",
-        description="""Saudações, candidato. Eu sou a Nexus. Detectei sua assinatura em nosso radar.
+        description="""Saudações, cidadão.
+        
+Para acessar a **GODZ City**, é necessário validar sua identidade biométrica e apresentar o código de acesso.
 
-Para ingressar no ecossistema GODZ, você deve passar pelo protocolo de avaliação de Roleplay. Minha inteligência analisará suas respostas em tempo real.
-
-**Requisitos:**
-• Microfone funcional.
-• Conhecimento das diretrizes de convivência.
-• Respostas claras e objetivas.""",
-        color=0xB8860B # Dark Gold
+Clique no botão abaixo para iniciar o protocolo seguro.""",
+        color=0xB8860B
     )
     embed.set_footer(text="GODZ ENGINE • Secure Identification Protocol")
-    await ctx.send(embed=embed, view=WhitelistView())
+    embed.set_image(url="https://i.imgur.com/YourBanner.png") # Placeholder
+    
+    await ctx.send(embed=embed, view=StartWhitelistView())
 
 if __name__ == "__main__":
-    if DISCORD_TOKEN and DISCORD_TOKEN != "TOKEN_REMOVIDO_POR_SEGURANCA":
+    if DISCORD_TOKEN and DISCORD_TOKEN != "COLOQUE_SEU_TOKEN_AQUI":
         bot.run(DISCORD_TOKEN)
     else:
-        print("❌ ERRO: Discord Token não configurado em GODZ_MASTER_CONFIG.json")
+        print("❌ ERRO: Configure o DISCORD_TOKEN no GODZ_MASTER_CONFIG.json")

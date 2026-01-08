@@ -70,6 +70,24 @@
 
     </div>
 
+    <!-- BLOCK CODE OVERLAY -->
+    <div id="block-code-container" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; color:#fff; font-family: Arial, Helvetica, sans-serif;">
+        <div style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <div style="font-size:2.2em; letter-spacing:1px; margin-bottom:10px; color:#ff6b6b;">ASSINATURA NÃO RECONHECIDA</div>
+            <div style="opacity:0.8; margin-bottom:25px; text-align:center; max-width:640px;">
+                Protocolo de segurança ativado. Sua assinatura neural não consta em nossos registros.<br>
+                Verifique o código de acesso abaixo e valide sua identidade em nossa central de comunicações.
+            </div>
+            <div style="border:1px solid #b8860b; padding:25px 50px; border-radius:8px; background:rgba(184,134,11,0.08); box-shadow:0 0 20px rgba(184,134,11,0.25);">
+                <div style="font-size:0.9em; color:#b8860b; text-transform:uppercase; letter-spacing:2px; text-align:center;">CÓDIGO DE ACESSO</div>
+                <div id="block-code-value" style="font-size:3em; font-weight:bold; text-align:center; margin-top:6px;">GZ-0000</div>
+            </div>
+            <div style="margin-top:30px; text-align:center;">
+                Informe este código no canal <b>#fazer-whitelist</b> do nosso Discord.
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

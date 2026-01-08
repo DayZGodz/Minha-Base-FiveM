@@ -1,4 +1,38 @@
 let playerName = "Cidadão";
+let isWhitelisted = false;
+let hasReceivedStatus = false;
+
+function startNexusProtocol() {
+    try {
+        if (window.isCreatorMode) {
+            const msg = `Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.`;
+            speakAi(msg);
+            return;
+        }
+
+        if (isWhitelisted) {
+            const msg = `Bem-vindo de volta, ${playerName}. Sincronizando seus dados... Todos os sistemas prontos.`;
+            speakAi(msg);
+        } else {
+            const msg = `Protocolo de segurança ativado. Sua assinatura neural não consta em nossos registros. Verifique o código de acesso em sua tela e valide sua identidade em nossa central de comunicações.`;
+            speakAi(msg);
+        }
+    } catch (e) { console.log(e); }
+}
+
+// FAILSAFE: Force close if stuck at 100%
+setInterval(() => {
+    if (loadingFill && loadingFill.style.width === '100%') {
+        setTimeout(() => {
+            fetch('https://godz_connect/close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            }).catch(e => {});
+        }, 15000); // 15 seconds failsafe
+    }
+}, 5000);
+
 /* ==========================================================================
    GODZ NEXUS AI INTERFACE & LOADING SYSTEM
    ========================================================================== */
@@ -176,6 +210,13 @@ function speakAi(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
         }).catch(err => {});
+
+        // [GODZ] Notify client that speech is finished
+        fetch('https://godz_connect/speechFinished', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        }).catch(err => {});
     };
 
     utterThis.onerror = function (event) {
@@ -190,6 +231,14 @@ function speakAi(text) {
 // Initial Greeting removed from onload as it is now triggered by setupIdentity
 window.onload = () => {
     try { initSpeech(); } catch (e) { console.log(e); }
+    setTimeout(() => {
+        if (!hasReceivedStatus) {
+            window.isCreatorMode = false;
+            isWhitelisted = false;
+            playerName = playerName || "Cidadão";
+            startNexusProtocol();
+        }
+    }, 5000);
 };
 
 /* ==========================================================================
@@ -227,25 +276,23 @@ const handlers = {
 };
 
 window.addEventListener('message', function (e) {
-    if (e.data.eventName === 'setCreatorMode' || e.data.action === 'setupIdentity') {
+    if (e.data.eventName === 'setCreatorMode') {
         window.isCreatorMode = e.data.isCreator;
-        if (e.data.playerName || e.data.name) {
-            try {
-                playerName = e.data.playerName || e.data.name;
-                // Trigger greeting immediately after receiving name
-                if (window.isCreatorMode) {
-                    const creatorGreeting = `Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.`;
-                    speakAi(creatorGreeting);
-                } else {
-                    const greetings = [
-                        `Sincronizando assinatura neural... Seja bem-vindo à GODZ, ${playerName}. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.`,
-                        `Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor, ${playerName}.`,
-                        `Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City, ${playerName}. Protocolos iniciais ativos.`
-                    ];
-                    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-                    speakAi(randomGreeting);
-                }
-            } catch (e) { console.log(e); }
+    }
+
+    if (e.data.eventName === 'receiveStatus') {
+        hasReceivedStatus = true;
+        playerName = e.data.playerName || "Cidadão";
+        isWhitelisted = !!e.data.isWhitelisted;
+        window.isCreatorMode = !!e.data.isCreator;
+        startNexusProtocol();
+    }
+
+    if (e.data.action === 'setupIdentity') {
+        // Legacy compatibility
+        if (!hasReceivedStatus) {
+            playerName = e.data.name || "Cidadão";
+            startNexusProtocol();
         }
     }
     
@@ -257,6 +304,25 @@ window.addEventListener('message', function (e) {
     
     if (e.data.eventName === 'onLogLine') {
         if (currentFile) currentFile.innerText = e.data.message;
+    }
+});
+
+// Show Block Code Overlay
+function showBlockCode(token) {
+    try {
+        const el = document.getElementById('block-code-container');
+        const val = document.getElementById('block-code-value');
+        if (el && val) {
+            val.innerText = token || 'GZ-0000';
+            el.style.display = 'block';
+        }
+    } catch (e) { console.log(e); }
+}
+
+// Listen for block-code signal from client
+window.addEventListener('message', function (e) {
+    if (e.data && e.data.action === 'openBlockCode') {
+        showBlockCode(e.data.token);
     }
 });
 

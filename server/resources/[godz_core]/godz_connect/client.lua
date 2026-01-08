@@ -5,6 +5,10 @@ local nexusPed = nil
 local nexusCam = nil
 local lobbyCoords = vector3(3525.5, 3704.3, 21.0) -- Humane Labs Interior
 local isCreator = false -- Variável de controle do Criador
+local speechDone = false -- [GODZ] Controle de sincronia da fala
+local isWhitelistedClient = false -- [GODZ] Status WL para gating
+
+local currentToken = nil -- [GODZ] Token de validação dinâmica
 
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
@@ -29,12 +33,15 @@ Citizen.CreateThread(function()
     FreezeEntityPosition(playerPed, true)
     SetEntityVisible(playerPed, false, false)
 
-    -- Criação do PED Nexus
+    -- 3. CRIAÇÃO DA NEXUS (ENTIDADE 0 - LOCAL)
     nexusPed = CreatePed(4, model, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z, 180.0, false, true)
     SetEntityAlpha(nexusPed, 255, false)
     FreezeEntityPosition(nexusPed, true)
     SetEntityInvincible(nexusPed, true)
     SetBlockingOfNonTemporaryEvents(nexusPed, true)
+    
+    -- Configuração de Entidade 0 (Conceitual)
+    SetEntityAsMissionEntity(nexusPed, true, true) 
     
     -- 4. ESTILIZAÇÃO PREMIUM (NEXUS ANDROID)
     
@@ -101,8 +108,8 @@ Citizen.CreateThread(function()
     Wait(1000)
     DoScreenFadeIn(2000)
     
-    -- Ativa o foco do mouse para UI
-SetNuiFocus(true, true)
+    SetNuiFocus(true, true)
+    TriggerServerEvent("godz_connect:checkPlayerStatus")
 end)
 
 -- 2. SINCRONIA LABIAL (NUI CALLBACKS)
@@ -147,6 +154,20 @@ end)
 
 -- 3. TRANSIÇÃO E LIMPEZA
 AddEventHandler('playerSpawned', function()
+    -- [GODZ] Aguarda o término da fala da Nexus (Sync Perfeito)
+    local timeout = GetGameTimer() + 20000 -- 20s failsafe
+    while not speechDone and GetGameTimer() < timeout do
+        Wait(100)
+    end
+
+    -- Se não possuir WL, mantém a Nexus e bloqueia o jogador
+    if not isWhitelistedClient then
+        SetNuiFocus(true, true)
+        -- Solicita exibição de bloqueio com token via NUI
+        SendNUIMessage({ action = 'openBlockCode', token = currentToken or 'GZ-0000' })
+        return
+    end
+
     -- Gesto de Finalização (Despedida da Nexus)
     if nexusPed and DoesEntityExist(nexusPed) then
         if isCreator then
@@ -203,15 +224,19 @@ AddEventHandler("godz_connect:releaseFocus", function()
     SetNuiFocus(false, false)
 end)
 
-RegisterNetEvent("godz_connect:setCreatorMode")
-AddEventHandler("godz_connect:setCreatorMode", function(status, name)
-    isCreator = status
+RegisterNetEvent("godz_connect:receiveStatus")
+AddEventHandler("godz_connect:receiveStatus", function(status)
+    isCreator = status.isCreator
+    isWhitelistedClient = status.isWhitelisted
+    currentToken = status.token
     SendNUIMessage({
-        eventName = 'setCreatorMode',
-        action = 'setupIdentity', -- Compatibility
-        isCreator = isCreator,
-        playerName = name,
-        name = name -- Compatibility
+        eventName = 'receiveStatus',
+        action = 'setupIdentity', -- Keeps compatibility if needed
+        isCreator = status.isCreator,
+        playerName = status.playerName,
+        isWhitelisted = status.isWhitelisted,
+        hasIdentity = status.hasIdentity,
+        token = status.token
     })
 end)
 

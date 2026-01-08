@@ -119,6 +119,13 @@ vRP.prepare("vRP/get_whitelisted","SELECT whitelisted FROM godz_users WHERE id =
 vRP.prepare("vRP/set_whitelisted","UPDATE godz_users SET whitelisted = @whitelisted WHERE id = @user_id")
 vRP.prepare("vRP/update_ip", "UPDATE godz_users SET ip = @ip WHERE id = @uid")
 vRP.prepare("vRP/update_login", "UPDATE godz_users SET last_login = @ll WHERE id = @uid")
+vRP.prepare("vRP/has_identity", "SELECT user_id FROM godz_user_identities WHERE user_id = @user_id")
+
+-- [NEXUS V8] Whitelist Token Temp Store (30 min TTL)
+vRP.prepare("godz_wl_temp_insert","INSERT INTO godz_whitelist_temp(user_id, token, ip, created_at) VALUES(@user_id, @token, @ip, NOW()) ON DUPLICATE KEY UPDATE token=@token, ip=@ip, created_at=NOW()")
+vRP.prepare("godz_wl_temp_get_by_user","SELECT token, ip, created_at FROM godz_whitelist_temp WHERE user_id = @user_id ORDER BY created_at DESC LIMIT 1")
+vRP.prepare("godz_wl_temp_get_by_token","SELECT user_id, ip, created_at FROM godz_whitelist_temp WHERE token = @token")
+vRP.prepare("godz_wl_temp_cleanup","DELETE FROM godz_whitelist_temp WHERE created_at < DATE_SUB(NOW(), INTERVAL 30 MINUTE)")
 
 local last_event_calls = {}
 function vRP.checkAntiTrigger(user_id, event_name, delay_ms)
@@ -160,6 +167,32 @@ function vRP.getUserIdByIdentifiers(ids, source)
 					local endpoint = "0.0.0.0"
 					if source then endpoint = GetPlayerEndpoint(source) or "0.0.0.0" end
 					vRP.execute("vRP/update_ip", { ip = endpoint, uid = user_id })
+
+                    -- [GODZ IDENTITY AUTO-FIX] Verifica se tem identidade, se não tiver cria uma padrão
+                    -- Isso garante que IDs antigos ou bugados não travem na loading screen
+                    exports.oxmysql:scalar("SELECT user_id FROM godz_user_identities WHERE user_id = ?", { user_id }, function(has_identity)
+                        if not has_identity then
+                            print("[GODZ] Identidade ausente para ID: "..user_id..". Criando registro padrão de emergência...")
+                            local def_name = "Indigente"
+                            local def_firstname = "Cidadão"
+                            local def_age = 21
+                            
+                            if tonumber(user_id) == 1 then
+                                def_name = "Godz"
+                                def_firstname = "Bob"
+                                def_age = 25
+                            end
+
+                            exports.oxmysql:insert("INSERT IGNORE INTO godz_user_identities(user_id,registration,phone,firstname,name,age) VALUES(?, ?, ?, ?, ?, ?)", {
+                                user_id, 
+                                "00000000", 
+                                "000-000", 
+                                def_firstname, 
+                                def_name, 
+                                def_age
+                            })
+                        end
+                    end)
 
 					return user_id
 				end
@@ -384,9 +417,17 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 					whitelisted = vRP.isWhitelisted(user_id)
 				end)
 
-				if status_wl and whitelisted then
-					if vRP.rusers[user_id] == nil then
-						deferrals.update("Carregando banco de dados.")
+                -- [GODZ] Verificação de Identidade (Whitelist Profissional)
+                -- [GODZ V7] Nexus 3D Universal: Permitimos a conexão de todos para a "Recepção".
+                -- O bloqueio de gameplay será feito no client-side (godz_identity).
+                local has_identity = false
+                local rows = vRP.query("vRP/has_identity", { user_id = user_id })
+                if #rows > 0 then has_identity = true end
+
+				-- Permitimos entrada se o sistema de WL respondeu (status_wl true), independente do resultado (whitelisted)
+                if status_wl then
+                    if vRP.rusers[user_id] == nil then
+                        deferrals.update("Carregando banco de dados.")
 						local sdata = nil
 						pcall(function()
 							sdata = vRP.getUData(user_id,"vRP:datatable")
@@ -419,9 +460,20 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 							SendWebhookMessage(webhookjoins,"```prolog\n[ID]: "..user_id.." \n[IP]: "..GetPlayerEndpoint(source).." \n[ENTROU NO SERVIDOR]: "..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S").." \r```")
 						end
 
-						print("[ENTRANDO] Jogador [",user_id,"]"..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S"))
-						deferrals.done()
-					else
+                        print("[ENTRANDO] Jogador [",user_id,"]"..os.date("\n[Data]: %d.%m.%Y [Hora]: %H:%M:%S"))
+
+                        -- [NEXUS V8] Whitelist Token & IP capture for non-whitelisted users
+                        if not whitelisted then
+                            -- Cleanup expired tokens
+                            vRP.execute("godz_wl_temp_cleanup", {})
+                            -- Generate unique token and bind latest IP
+                            local token = vRP.generateAccessToken()
+                            local ip = GetPlayerEndpoint(source) or "0.0.0.0"
+                            vRP.execute("godz_wl_temp_insert", { user_id = user_id, token = token, ip = ip })
+                            print("[GODZ WL] Token gerado para ID "..user_id..": "..token.." (IP "..ip..")")
+                        end
+                        deferrals.done()
+                    else
 						local tmpdata = vRP.getUserTmpTable(user_id)
 						tmpdata.spawns = 0
 
@@ -430,7 +482,14 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 						deferrals.done()
 					end
 				else
-					deferrals.done("Entre no nosso Discord: https://discord.gg/seulinkdiscord e peça sua wl! Passaporte:"..user_id)
+					local msg = "Entre no nosso Discord e peça sua wl! Passaporte:"..user_id
+					if not whitelisted then
+						msg = "🚫 [WHITELIST] Seu ID " .. user_id .. " não está aprovado.\nAcesse o Discord e faça o processo de identificação."
+					elseif not has_identity then
+						msg = "🆔 [IDENTIDADE] Você não possui registro civil.\nUse o comando /setup-wl no Discord para criar sua identidade."
+					end
+					
+					deferrals.done(msg)
 					TriggerEvent("queue:playerConnectingRemoveQueues",ids)
 				end
 			else
@@ -498,4 +557,20 @@ function vRP.getMinSecs(seconds)
     else
         return string.format("<b>%d Segundos</b>",seconds)
     end
+end
+
+-- [NEXUS V8] Token Generator (GZ-XXXX pattern, uniqueness enforced)
+function vRP.generateAccessToken()
+    local function make()
+        return string.format("GZ-%04d", math.random(1000,9999))
+    end
+    local token = make()
+    local tries = 0
+    while tries < 5 do
+        local rows = vRP.query("godz_wl_temp_get_by_token", { token = token })
+        if not rows or #rows == 0 then break end
+        token = make()
+        tries = tries + 1
+    end
+    return token
 end
