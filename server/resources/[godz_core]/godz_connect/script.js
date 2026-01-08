@@ -119,34 +119,40 @@ function speakAi(text) {
 
     aiStatusText.innerText = "RESPONDENDO...";
     aiAvatar.classList.add("speaking");
-    audio.volume = DUCKING_VOL; // Ducking
+    smoothDucking(true); // Ducking Ativo
 
     const utterThis = new SpeechSynthesisUtterance(text);
     utterThis.lang = 'pt-BR';
-    utterThis.pitch = 0.9; // Levemente mais grave e autoritário
-    utterThis.rate = 1.0; // Velocidade clara e firme
-    utterThis.volume = 1.0; // Destaque total
+    utterThis.pitch = 0.95; // Cadência mais natural (Human-like)
+    utterThis.rate = 0.9;   // Mais pausado e claro
+    utterThis.volume = 1.0; 
 
-    // Tentar selecionar uma voz PT-BR Google ou Microsoft
+    // Tentar selecionar uma voz Neural/Natural
     const voices = synth.getVoices();
-    // Prioridade: Microsoft Maria/Daniel (Premium) -> Google -> Default
-    const voice = voices.find(v => v.name.includes('Microsoft') && v.lang.includes('pt-BR')) || 
-                  voices.find(v => v.lang.includes('pt-BR') && v.name.includes('Google')) || 
+    
+    // Filtro de Prioridade: Microsoft Natural -> Google -> Qualquer PT-BR
+    const voice = voices.find(v => (v.name.includes('Francisca') || v.name.includes('Antonio')) && v.name.includes('Natural')) ||
+                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.includes('pt-BR')) ||
+                  voices.find(v => v.name.includes('Google') && v.lang.includes('pt-BR')) || 
+                  voices.find(v => v.lang.includes('pt-BR')) ||
                   voices[0];
                   
-    if (voice) utterThis.voice = voice;
+    if (voice) {
+        console.log("Voz selecionada: " + voice.name);
+        utterThis.voice = voice;
+    }
 
     utterThis.onend = function (event) {
         console.log('SpeechSynthesisUtterance.onend');
         aiAvatar.classList.remove("speaking");
         aiStatusText.innerText = "GODZ NEXUS: ONLINE";
-        audio.volume = AMBIENT_VOL; // Restore volume
+        smoothDucking(false); // Restore volume suavemente
     };
 
     utterThis.onerror = function (event) {
         console.error('SpeechSynthesisUtterance.onerror');
         aiAvatar.classList.remove("speaking");
-        audio.volume = AMBIENT_VOL;
+        smoothDucking(false);
     };
 
     synth.speak(utterThis);

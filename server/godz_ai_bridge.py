@@ -36,6 +36,7 @@ def after_request(response):
 # SEGURANÇA (API KEY)
 # ==================================================================================
 API_KEY = "godz_secret_key_123"
+ELEVENLABS_API_KEY = "" # Carregado do Config
 
 def require_api_key(f):
     @wraps(f)
@@ -130,6 +131,7 @@ load_analytics_data()
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
 # ==================================================================================
 DISCORD_TOKEN = str(MASTER_CONFIG.get("SERVER_INFO", {}).get("discord_token", "")).strip()
+ELEVENLABS_API_KEY = MASTER_CONFIG.get("SERVER_INFO", {}).get("elevenlabs_api_key", "")
 DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
 DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
 DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")
@@ -477,10 +479,12 @@ def loading_chat():
     2. Seja futurista, misterioso e acolhedor.
     3. Respostas CURTAS e DIRETAS (máximo 2 frases) para otimizar o tempo de voz.
     4. Não mencione regras complexas, foque na imersão.
+    5. [CADÊNCIA HUMANA] Use pontuações variadas (reticências '...', vírgulas ',') para simular pausas de respiração.
+       Exemplo: "Analisando dados... Um momento. Tudo certo."
 
     Exemplos:
-    - "A economia é dinâmica e controlada por mim. Tudo tem valor."
-    - "Use /ajuda para me acessar dentro da cidade."
+    - "A economia é dinâmica... e controlada por mim. Tudo tem valor."
+    - "Use /ajuda para me acessar... dentro da cidade."
     
     <|end|>
     <|user|>
