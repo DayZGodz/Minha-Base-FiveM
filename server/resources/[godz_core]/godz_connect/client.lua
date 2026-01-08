@@ -112,6 +112,10 @@ end)
 
 -- 3. TRANSIÇÃO E LIMPEZA
 AddEventHandler('playerSpawned', function()
+    -- Fade Out Dramático (Transição)
+    DoScreenFadeOut(1000)
+    Wait(1000)
+
     -- Fecha Loading Screen Manualmente
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
