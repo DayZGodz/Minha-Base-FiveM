@@ -707,6 +707,75 @@ def analytics_ingest():
     logger.info(f"Analytics recebido: {len(active_ids)} players, ${snapshot['economy_balance']}")
     return jsonify({"status": "received"})
 
+# ==================================================================================
+# 3. ENDPOINT DE WHITELIST (RDM/VDM/LORE)
+# ==================================================================================
+@app.route('/evaluate_wl', methods=['POST'])
+@require_api_key
+def evaluate_whitelist():
+    try:
+        data = request.json
+        discord_id = data.get("discord_id", "Unknown")
+        answers = data.get("answers", {})
+
+        # Construir Prompt para Avaliação
+        prompt = f"""
+        [INSTRUÇÃO SISTÊMICA]
+        Você é o GODZ SENTINEL, um avaliador de Whitelist rigoroso e justo para um servidor de GTA RP (Roleplay).
+        Sua função é analisar as respostas do candidato e decidir se ele entende as regras básicas e tem criatividade.
+
+        [CRITÉRIOS DE APROVAÇÃO]
+        1. RDM (Random Deathmatch): Deve explicar que é matar sem motivo/roleplay prévio.
+        2. VDM (Vehicle Deathmatch): Deve explicar que é usar veículo como arma para matar sem motivo.
+        3. Meta-gaming: Usar informações de fora do jogo (OOC) dentro do jogo (IC).
+        4. Power-gaming: Fazer ações impossíveis na vida real ou forçar situações sem dar chance de reação.
+        5. Lore (História): Deve ser criativa, coerente e não genérica. Mínimo de esforço notável.
+
+        [RESPOSTAS DO CANDIDATO]
+        1. RDM/VDM: {answers.get('q1', '')}
+        2. Meta/Power: {answers.get('q2', '')}
+        3. Lore: {answers.get('q3', '')}
+        4. Ação Policial: {answers.get('q4', '')}
+
+        [FORMATO DE SAÍDA OBRIGATÓRIO (JSON PURO)]
+        {{
+            "approved": true ou false,
+            "reason": "Explicação curta e direta do motivo (em PT-BR)."
+        }}
+        """
+
+        # Gerar resposta com Phi-3
+        print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}Avaliando Whitelist de {discord_id}...")
+        
+        # Se pipeline estiver carregado
+        if pipeline:
+            response = pipeline(prompt, max_new_tokens=200, return_full_text=False)
+            generated_text = response[0]['generated_text'].strip()
+            
+            # Tentar extrair JSON (LLMs as vezes colocam texto antes/depois)
+            try:
+                # Encontrar primeiro { e último }
+                start_idx = generated_text.find('{')
+                end_idx = generated_text.rfind('}') + 1
+                if start_idx != -1 and end_idx != -1:
+                    json_str = generated_text[start_idx:end_idx]
+                    result = json.loads(json_str)
+                else:
+                    # Fallback se não achar JSON
+                    result = {"approved": False, "reason": "Erro na formatação da resposta da IA."}
+            except:
+                 result = {"approved": False, "reason": "Erro ao processar JSON da IA."}
+        else:
+            # Mock para testes se modelo não carregar
+            result = {"approved": True, "reason": "Modo Fallback (IA Offline). Aprovado por padrão para testes."}
+
+        print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Resultado: {result}")
+        return jsonify(result)
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /evaluate_wl: {e}")
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor de Produção rodando na porta 5000...")
     serve(app, host='0.0.0.0', port=5000)
