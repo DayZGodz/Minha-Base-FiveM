@@ -1,5 +1,11 @@
 import sys
 import os
+import wave
+try:
+    from piper import PiperVoice
+except ImportError:
+    PiperVoice = None
+    print("Piper TTS library not found. Voice generation will be disabled.")
 from functools import wraps
 
 # [GODZ AI] Configuração de Cache no Disco D: (Deve vir antes dos imports do HF)
@@ -36,6 +42,13 @@ def after_request(response):
 # SEGURANÇA (API KEY)
 # ==================================================================================
 API_KEY = "godz_secret_key_123"
+
+# [GODZ AI] Piper TTS Config
+PIPER_MODELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "piper_models")
+VOICE_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "voices")
+
+if not os.path.exists(VOICE_OUTPUT_DIR):
+    os.makedirs(VOICE_OUTPUT_DIR, exist_ok=True)
 
 def require_api_key(f):
     @wraps(f)
@@ -838,6 +851,67 @@ def generate_npc():
             logger.error(f"Erro na geração de NPC: {e}")
             
     return jsonify(npc_data)
+
+# ==================================================================================
+# 5. ENDPOINT DE GERAÇÃO DE VOZ (PIPER TTS)
+# ==================================================================================
+@app.route('/generate_voice', methods=['POST'])
+@require_api_key
+def generate_voice():
+    if PiperVoice is None:
+        return jsonify({"error": "Piper TTS library not installed on server."}), 501
+
+    try:
+        data = request.json
+        text = data.get('text')
+        voice_name = data.get('voice', 'pt_BR-faber-medium.onnx')
+        
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+
+        model_path = os.path.join(PIPER_MODELS_DIR, voice_name)
+        if not os.path.exists(model_path):
+             # Tentar encontrar qualquer modelo .onnx no diretório se o solicitado não existir
+             available_models = [f for f in os.listdir(PIPER_MODELS_DIR) if f.endswith('.onnx')]
+             if available_models:
+                 model_path = os.path.join(PIPER_MODELS_DIR, available_models[0])
+                 print(f"{Fore.YELLOW}[GODZ AI] Modelo {voice_name} não encontrado. Usando fallback: {available_models[0]}")
+             else:
+                 return jsonify({"error": f"Model {voice_name} not found and no fallbacks available in {PIPER_MODELS_DIR}"}), 404
+
+        # Generate filename unique to text and voice
+        filename = f"voice_{int(time.time())}_{hash(text)}.wav"
+        output_path = os.path.join(VOICE_OUTPUT_DIR, filename)
+        
+        # Check cache (opcional, mas bom)
+        if os.path.exists(output_path):
+            url = f"http://127.0.0.1:5000/static/voices/{filename}"
+            with wave.open(output_path, 'r') as f:
+                frames = f.getnframes()
+                rate = f.getframerate()
+                duration = frames / float(rate)
+            return jsonify({"url": url, "duration": duration, "text": text, "cached": True})
+
+        voice = PiperVoice.load(model_path)
+        with wave.open(output_path, "wb") as wav_file:
+            voice.synthesize(text, wav_file)
+            
+        url = f"http://127.0.0.1:5000/static/voices/{filename}"
+        
+        with wave.open(output_path, 'r') as f:
+            frames = f.getnframes()
+            rate = f.getframerate()
+            duration = frames / float(rate)
+
+        return jsonify({
+            "url": url,
+            "duration": duration,
+            "text": text
+        })
+
+    except Exception as e:
+        logger.error(f"Error generating voice: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor de Produção rodando na porta 5000...")

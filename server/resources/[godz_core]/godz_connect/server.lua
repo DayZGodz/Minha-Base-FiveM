@@ -1,7 +1,5 @@
-local Tunnel = module("vrp", "lib/Tunnel")
 local Proxy = module("vrp", "lib/Proxy")
-
-vRP = Proxy.getInterface("vRP")
+local vRP = Proxy.getInterface("vRP")
 
 RegisterServerEvent("godz_connect:checkCreator")
 AddEventHandler("godz_connect:checkCreator", function()

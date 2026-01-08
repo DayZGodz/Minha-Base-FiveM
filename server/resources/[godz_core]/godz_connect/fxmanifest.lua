@@ -7,7 +7,10 @@ version '1.0.0'
 
 loadscreen 'index.html'
 
-server_script 'server.lua'
+server_scripts {
+    '@vrp/lib/utils.lua',
+    'server.lua'
+}
 client_script 'client.lua'
 
 files {
