@@ -113,6 +113,7 @@ AddEventHandler("vRP:playerJoin",function(user_id,source,name)
             local def_name = "Individuo"
             local def_age = 21
 
+            -- [GODZ] ID 1 Fallback Protection
             if tonumber(user_id) == 1 then
                 def_firstname = "Bob"
                 def_name = "Godz"

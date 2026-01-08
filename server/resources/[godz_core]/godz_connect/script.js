@@ -55,18 +55,17 @@ function startNexusProtocol() {
 setInterval(() => {
     if (loadingFill && loadingFill.style.width === '100%') {
         // [GODZ] Visual Cleanup at 100%
-        if (statusText) statusText.style.display = 'none';
-        if (micBtn) micBtn.style.display = 'none';
-        const protocols = document.querySelector(".protocols"); // Assuming class exists or I should hide specific elements
-        if (protocols) protocols.style.display = 'none';
-
+        document.body.style.transition = "opacity 1s ease-out";
+        document.body.style.opacity = "0";
+        
         setTimeout(() => {
+            document.body.style.display = 'none';
             fetch('https://godz_connect/close', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})
             }).catch(e => {});
-        }, 500); // 0.5 seconds failsafe
+        }, 1000);
     }
 }, 1000);
 

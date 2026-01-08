@@ -10,6 +10,18 @@ local isWhitelistedClient = false -- [GODZ] Status WL para gating
 
 local currentToken = nil -- [GODZ] Token de validação dinâmica
 
+-- [GODZ] Force Shutdown Loading Screen ASAP for Transparent Overlay
+AddEventHandler('onClientResourceStart', function(resourceName)
+    if (GetCurrentResourceName() ~= resourceName) then
+      return
+    end
+    ShutdownLoadingScreen()
+    ShutdownLoadingScreenNui()
+    DoScreenFadeOut(0)
+    Wait(100)
+    DoScreenFadeIn(1000)
+end)
+
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
     Wait(1000) -- Thread de Segurança para NUI
