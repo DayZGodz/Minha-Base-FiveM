@@ -155,6 +155,12 @@ function vRP.getUserIdByIdentifiers(ids, source)
 
 				if user_id then
 					print("[GODZ] Jogador antigo detectado. ID: "..user_id.." carregado pelo identificador: "..ids[i])
+					
+					-- [GODZ FIX] Atualiza IP imediatamente para garantir consistência antes da Whitelist
+					local endpoint = "0.0.0.0"
+					if source then endpoint = GetPlayerEndpoint(source) or "0.0.0.0" end
+					vRP.execute("vRP/update_ip", { ip = endpoint, uid = user_id })
+
 					return user_id
 				end
 			end

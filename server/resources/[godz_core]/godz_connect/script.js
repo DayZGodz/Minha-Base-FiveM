@@ -130,8 +130,9 @@ function speakAi(text) {
     // Tentar selecionar uma voz Neural/Natural
     const voices = synth.getVoices();
     
-    // Filtro de Prioridade: Natural Online -> Google -> Qualquer PT-BR
-    const voice = voices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && v.lang.includes('pt-BR')) ||
+    // Filtro de Prioridade: Francisca Online -> Natural/Online -> Google -> Qualquer PT-BR
+    const voice = voices.find(v => v.name.includes('Microsoft Francisca Online (Natural)')) ||
+                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => v.name.includes('Google') && v.lang.includes('pt-BR')) || 
                   voices.find(v => v.lang.includes('pt-BR')) ||
@@ -148,10 +149,12 @@ function speakAi(text) {
 
     if (utterThis) {
         utterThis.onend = function (event) {
-            console.log('SpeechSynthesisUtterance.onend');
-            aiAvatar.classList.remove("speaking");
-            aiStatusText.innerText = "GODZ NEXUS: ONLINE";
-            smoothDucking(false); // Restore volume suavemente
+            if (event && event.utterance) {
+                console.log('SpeechSynthesisUtterance.onend');
+                aiAvatar.classList.remove("speaking");
+                aiStatusText.innerText = "GODZ NEXUS: ONLINE";
+                smoothDucking(false); // Restore volume suavemente
+            }
         };
 
         utterThis.onerror = function (event) {
