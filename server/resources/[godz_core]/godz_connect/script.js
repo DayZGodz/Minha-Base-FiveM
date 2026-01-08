@@ -158,16 +158,16 @@ function speakAi(text) {
 
 // Initial Greeting
 window.onload = () => {
-    // Aguarda um pouco para verificar se recebe o evento de Criador
+    // Aguarda um pouco para verificar se recebe o evento de Criador e Nome
     setTimeout(() => {
         if (window.isCreatorMode) {
-            const creatorGreeting = "Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.";
+            const creatorGreeting = `Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.`;
             speakAi(creatorGreeting);
         } else {
             const greetings = [
-                "Sincronizando assinatura neural... Seja bem-vindo à GODZ. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.",
-                "Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor.",
-                "Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City. Protocolos iniciais ativos."
+                `Sincronizando assinatura neural... Seja bem-vindo à GODZ, ${playerName}. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.`,
+                `Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor, ${playerName}.`,
+                `Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City, ${playerName}. Protocolos iniciais ativos.`
             ];
             
             // Random Selection

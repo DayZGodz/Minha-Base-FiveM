@@ -4,6 +4,7 @@
 local nexusPed = nil
 local nexusCam = nil
 local lobbyCoords = vector3(3525.5, 3704.3, 21.0) -- Humane Labs Interior
+local isCreator = false -- Variável de controle do Criador
 
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
@@ -176,4 +177,14 @@ end)
 RegisterNetEvent("godz_connect:releaseFocus")
 AddEventHandler("godz_connect:releaseFocus", function()
     SetNuiFocus(false, false)
+end)
+
+RegisterNetEvent("godz_connect:setCreatorMode")
+AddEventHandler("godz_connect:setCreatorMode", function(status, name)
+    isCreator = status
+    SendNUIMessage({
+        eventName = 'setCreatorMode',
+        isCreator = isCreator,
+        playerName = name
+    })
 end)
