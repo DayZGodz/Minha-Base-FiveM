@@ -142,9 +142,9 @@ Estrutura otimizada para segurança e performance.
 
 O sistema de identificação recebeu atualizações críticas para garantir a estabilidade e a integridade dos dados desde a primeira conexão:
 
-*   **🛡️ Redundância de Identidade (Safeguard):** Implementada proteção lógica no `godz_identity`. Caso os dados de identidade retornem nulos (comum na primeira conexão antes da persistência total), o sistema agora atribui valores temporários seguros em vez de rejeitar a conexão, eliminando o erro "Problema de identificação".
-*   **💾 Persistência Forçada (OxMySQL):** O registro de `IP` e `Last Login` na tabela `godz_users` agora é forçado via `exports.oxmysql:execute` com callback de confirmação no momento exato da conexão (`playerConnecting`). Isso resolve definitivamente o problema de campos `NULL` no banco de dados.
-*   **🤖 Sincronização de IA:** Padronização completa dos headers de autenticação (`Authorization: Bearer ...`) em todos os módulos (`godz_shield`, `godz_factions`), eliminando erros 403 e garantindo comunicação fluida com o GODZ AI NEXUS.
+*   **🛡️ Prioridade de Registro de IP (Async Fix):** O sistema de conexão (`vrp/base.lua`) agora executa a gravação do IP e Last Login no banco de dados **antes** de liberar o jogador para a verificação da IA. Isso é garantido por uma execução forçada via OxMySQL e um delay estratégico de sincronização.
+*   **🔄 Sincronização de IA (Wait Check):** O módulo `godz_shield` implementa um `Wait(500)` na conexão para assegurar que a IA apenas consulte a base de dados após o registro completo do jogador, eliminando falsos negativos na whitelist.
+*   **💾 Redundância de Identidade:** O `godz_identity` agora possui um sistema de **Retry Automático** se os dados retornarem nulos na primeira tentativa, além de um fallback seguro para perfis temporários, impedindo quedas de conexão por timeouts de banco de dados.
 
 ---
 

@@ -47,6 +47,13 @@ function vRPN.Identidade()
         -- [FIX GODZ] Verificação de integridade da identidade antes do Proxy
         local identity_check = vRP.query("godz/get_identity", {user_id = user_id})
         
+        -- Retry Logic: Tenta buscar novamente se falhar na primeira (espera DB sync)
+        if not identity_check or #identity_check == 0 then
+            print("[GODZ] Identidade não encontrada, aguardando sincronização DB...")
+            Citizen.Wait(1000)
+            identity_check = vRP.query("godz/get_identity", {user_id = user_id})
+        end
+
         -- Safeguard: Se identidade não existe (primeira conexão), retorna valores temporários
         if not identity_check or #identity_check == 0 or not identity or type(identity) ~= "table" then 
             print("[GODZ SAFEGUARD] Identidade nula detectada para ID: " .. tostring(user_id) .. ". Usando perfil temporário.") 
