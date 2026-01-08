@@ -39,10 +39,10 @@ try:
     # Tenta carregar com otimizações se houver GPU
     if torch.cuda.is_available():
         print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}GPU Detectada. Ativando FP16 e Compilação...")
-        # Nota: A API do ChatTTS pode variar, mas load_models geralmente aceita device
-        chat.load_models(compile=True) 
+        # Nota: A API do ChatTTS pode variar, mas chat.load() geralmente aceita device
+        chat.load(compile=True) 
     else:
-        chat.load_models()
+        chat.load()
         
     CHATTTS_AVAILABLE = True
     print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}ChatTTS Engine initialized (Supreme Quality).")
