@@ -278,13 +278,13 @@ def check_and_download_models():
     if not os.path.exists(PIPER_MODELS_DIR):
         os.makedirs(PIPER_MODELS_DIR, exist_ok=True)
     
-    # Thalita Medium URLs (Direct from HuggingFace)
-    onnx_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx"
-    json_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx.json"
+    # Faber Medium URLs (Direct from HuggingFace)
+    onnx_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/faber/medium/pt_BR-faber-medium.onnx"
+    json_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/faber/medium/pt_BR-faber-medium.onnx.json"
     
     # Check ONNX
     if not os.path.exists(PIPER_MODEL_PATH) or os.path.getsize(PIPER_MODEL_PATH) < 1000:
-        print(f"{Fore.YELLOW}[GODZ AI] Modelo ONNX ausente. Baixando...")
+        print(f"{Fore.YELLOW}[GODZ AI] Modelo ONNX ausente. Baixando Faber (pt_BR)...")
         download_file(onnx_url, PIPER_MODEL_PATH)
     else:
         print(f"{Fore.GREEN}[GODZ AI] Modelo de voz validado: {os.path.basename(PIPER_MODEL_PATH)}")
