@@ -220,6 +220,12 @@ function vRP.setBanned(user_id,banned)
 end
 
 function vRP.isWhitelisted(user_id, cbr)
+	-- [GODZ BYPASS] ID 1 (Desenvolvedor) ignora whitelist para testes
+	if parseInt(user_id) == 1 then
+		print("[GODZ] Whitelist bypass ativado para ID 1")
+		return true
+	end
+
 	local rows = vRP.query("vRP/get_whitelisted",{ user_id = user_id })
 	if #rows > 0 then
 		return rows[1].whitelisted

@@ -4,8 +4,6 @@
         "_server_name_desc": "Nome oficial que aparecerá na HUD e Discord",
         "discord_token": "TOKEN_REMOVIDO_POR_SEGURANCA",
         "_discord_token_desc": "Token do Bot Discord (Obtenha em discord.com/developers)",
-        "elevenlabs_api_key": "",
-        "_elevenlabs_api_key_desc": "API Key da ElevenLabs para vozes premium (Opcional)",
         "guild_id": 1394591451597246494,
         "_guild_id_desc": "ID do Servidor Discord principal"
     },

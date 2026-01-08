@@ -130,8 +130,8 @@ function speakAi(text) {
     // Tentar selecionar uma voz Neural/Natural
     const voices = synth.getVoices();
     
-    // Filtro de Prioridade: Microsoft Natural -> Google -> Qualquer PT-BR
-    const voice = voices.find(v => (v.name.includes('Francisca') || v.name.includes('Antonio')) && v.name.includes('Natural')) ||
+    // Filtro de Prioridade: Natural Online -> Google -> Qualquer PT-BR
+    const voice = voices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => v.name.includes('Google') && v.lang.includes('pt-BR')) || 
                   voices.find(v => v.lang.includes('pt-BR')) ||
@@ -142,18 +142,24 @@ function speakAi(text) {
         utterThis.voice = voice;
     }
 
-    utterThis.onend = function (event) {
-        console.log('SpeechSynthesisUtterance.onend');
-        aiAvatar.classList.remove("speaking");
-        aiStatusText.innerText = "GODZ NEXUS: ONLINE";
-        smoothDucking(false); // Restore volume suavemente
-    };
+    // Configurações de Cadência Neural
+    utterThis.pitch = 1.0; 
+    utterThis.rate = 0.9;
 
-    utterThis.onerror = function (event) {
-        console.error('SpeechSynthesisUtterance.onerror');
-        aiAvatar.classList.remove("speaking");
-        smoothDucking(false);
-    };
+    if (utterThis) {
+        utterThis.onend = function (event) {
+            console.log('SpeechSynthesisUtterance.onend');
+            aiAvatar.classList.remove("speaking");
+            aiStatusText.innerText = "GODZ NEXUS: ONLINE";
+            smoothDucking(false); // Restore volume suavemente
+        };
+
+        utterThis.onerror = function (event) {
+            console.error('SpeechSynthesisUtterance.onerror');
+            aiAvatar.classList.remove("speaking");
+            smoothDucking(false);
+        };
+    }
 
     synth.speak(utterThis);
 }

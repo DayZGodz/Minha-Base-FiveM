@@ -36,7 +36,6 @@ def after_request(response):
 # SEGURANÇA (API KEY)
 # ==================================================================================
 API_KEY = "godz_secret_key_123"
-ELEVENLABS_API_KEY = "" # Carregado do Config
 
 def require_api_key(f):
     @wraps(f)
@@ -131,7 +130,6 @@ load_analytics_data()
 # CONFIGURAÇÃO DISCORD (Carregada do JSON)
 # ==================================================================================
 DISCORD_TOKEN = str(MASTER_CONFIG.get("SERVER_INFO", {}).get("discord_token", "")).strip()
-ELEVENLABS_API_KEY = MASTER_CONFIG.get("SERVER_INFO", {}).get("elevenlabs_api_key", "")
 DISCORD_WEBHOOK_AUDIT = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit", "")
 DISCORD_WEBHOOK_SENTINEL = MASTER_CONFIG.get("WEBHOOKS", {}).get("sentinel", "")
 DISCORD_WEBHOOK_NEWS = MASTER_CONFIG.get("WEBHOOKS", {}).get("news", "")

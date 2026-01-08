@@ -3,6 +3,21 @@ local Proxy = module("vrp","lib/Proxy")
 vRP = Proxy.getInterface("vRP")
 vRPNserver = Tunnel.getInterface("godz_identity")
 
+RegisterNetEvent("godz_identity:showSelection")
+AddEventHandler("godz_identity:showSelection", function()
+    local characters = vRPNserver.getCharacters()
+    SetNuiFocus(true, true)
+    SendNUIMessage({ 
+        action = "openMulticharacter",
+        characters = characters
+    })
+end)
+
+-- Trigger automático ao spawnar
+AddEventHandler("playerSpawned", function()
+    TriggerEvent("godz_identity:showSelection")
+end)
+
 --[ NUI CALLBACKS ]----------------------------------------------------------------------------------------------------------------------
 
 RegisterNUICallback("close", function(data, cb)
