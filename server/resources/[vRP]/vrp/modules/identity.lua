@@ -9,6 +9,24 @@ vRP.prepare("vRP/update_user_phone","UPDATE godz_user_identities SET phone = @ph
 vRP.prepare("vRP/update_user_first_spawn","UPDATE godz_user_identities SET firstname = @firstname, name = @name, age = @age WHERE user_id = @user_id")
 
 function vRP.getUserIdentity(user_id,cbr)
+    -- [GODZ SUPREME] BYPASS ID 1 (Diretor Bob)
+    -- Se o banco falhar ou demorar, garantimos que o ID 1 sempre tenha identidade.
+    if tonumber(user_id) == 1 then
+        local ok, rows = pcall(vRP.query, "vRP/get_user_identity",{ user_id = user_id })
+        if not ok or not rows or #rows == 0 then
+            print("[GODZ] ID 1 (Diretor Bob) Identity Bypass Activated")
+            return {
+                user_id = 1,
+                registration = "GODZ001",
+                phone = "000-000",
+                firstname = "Bob",
+                name = "Godz",
+                age = 30
+            }
+        end
+        return rows[1]
+    end
+
     local ok, rows = pcall(vRP.query, "vRP/get_user_identity",{ user_id = user_id })
     if not ok then
         print("[vRP] Error in getUserIdentity: " .. tostring(rows))

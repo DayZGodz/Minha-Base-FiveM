@@ -318,8 +318,8 @@ window.onload = () => {
     try { initSpeech(); } catch (e) { console.log(e); }
     setTimeout(() => {
         if (!hasReceivedStatus) {
-            // [GODZ SUPREME] Safety Lock: 10s Timeout
-            console.log("GODZ SAFETY: JSON Timeout (10s). Forcing UI shutdown.");
+            // [GODZ SUPREME] Safety Lock: 30s Timeout (ChatTTS Latency Adjustment)
+            console.log("GODZ SAFETY: JSON Timeout (30s). Forcing UI shutdown.");
             forceKillNexusUI();
             hideLoadingScreen();
             document.body.innerHTML = ''; // [GODZ SUPREME] Total Cleanup
@@ -331,7 +331,7 @@ window.onload = () => {
                 body: JSON.stringify({})
             }).catch(e => {});
         }
-    }, 10000);
+    }, 30000);
 };
 
 /* ==========================================================================

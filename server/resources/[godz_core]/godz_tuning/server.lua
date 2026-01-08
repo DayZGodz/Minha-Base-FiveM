@@ -99,8 +99,13 @@ Citizen.CreateThread(function()
             print("^1[GODZ Tuning] Erro fatal ao decodificar JSON: " .. result .. "^0")
             MasterConfig = nil 
         end
-    else
-        print("^1[GODZ Tuning] Arquivo GODZ_MASTER_CONFIG.json não encontrado.^0")
+    end
+end)
+
+function GetMasterConfig()
+    return MasterConfig
+end
+exports('GetMasterConfig', GetMasterConfig)        print("^1[GODZ Tuning] Arquivo GODZ_MASTER_CONFIG.json não encontrado.^0")
     end
 
     if not MasterConfig then
