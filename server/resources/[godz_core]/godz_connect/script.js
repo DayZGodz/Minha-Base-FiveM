@@ -128,6 +128,7 @@ function speakAi(text) {
     utterThis.rate = 1.0; 
 
     utterThis.onend = function (event) {
+        if (!event) return;
         aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SYSTEM: ONLINE";
     };

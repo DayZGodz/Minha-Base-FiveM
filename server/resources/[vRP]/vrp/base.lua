@@ -359,9 +359,12 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 		
 		if user_id then
 			-- [FIX GODZ] Verificação redundante de IP e Login (Caso já exista)
-			local endpoint = GetPlayerEndpoint(source) 
+			local endpoint = GetPlayerEndpoint(source) or "0.0.0.0"
+			if endpoint == nil or endpoint == "" then endpoint = "0.0.0.0" end
+			
 			local login_date = os.date("%d/%m/%Y %H:%M:%S") 
 			
+			-- Força atualização síncrona para garantir dados antes da verificação
 			exports.oxmysql:execute("UPDATE godz_users SET ip = ?, last_login = ? WHERE id = ?", { 
 				endpoint, 
 				login_date, 
