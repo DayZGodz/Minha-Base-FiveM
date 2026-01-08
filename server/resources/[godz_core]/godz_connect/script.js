@@ -80,6 +80,8 @@ window.addEventListener('message', function(event) {
         hideLoadingScreen();
         // [GODZ SUPREME] Total Cleanup
         document.body.innerHTML = '';
+    } else if (event.data.action === "toggleVoice") {
+        if (micBtn) micBtn.click();
     }
 });
 

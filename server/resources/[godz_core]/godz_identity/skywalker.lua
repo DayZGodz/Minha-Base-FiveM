@@ -105,7 +105,7 @@ function vRPN.generateLore(name, firstname, age, job)
     }
     print("[GODZ] Tentando conectar com a IA...")
 
-    PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+    PerformHttpRequest("http://127.0.0.1:5000/ai_assist", function(err, text, headers)
         if err == 200 then
             local data = json.decode(text)
             if data and data.response then

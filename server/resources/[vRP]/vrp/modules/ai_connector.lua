@@ -5,15 +5,27 @@
 local API_URL = "http://127.0.0.1:5000"
 local API_KEY = "godz_secret_key_123"
 
--- Função Global de Requisição
-function vRP.askGodzAI(endpoint, data, callback)
-    print("[GODZ] Tentando conectar com a IA...")
+-- Função Global de Requisição com Retry Automático
+function vRP.askGodzAI(endpoint, data, callback, attempt)
+    local currentAttempt = attempt or 1
+    local maxAttempts = 2
+
+    print("[GODZ] Tentando conectar com a IA (Tentativa " .. currentAttempt .. ")...")
     local headers = {
         ["Content-Type"] = "application/json",
         ["Authorization"] = "Bearer " .. API_KEY
     }
     
     PerformHttpRequest(API_URL .. endpoint, function(errorCode, resultData, resultHeaders)
+        -- Se der erro 0 (Connection Refused) e ainda tiver tentativas
+        if (errorCode == 0 or errorCode == 500) and currentAttempt < maxAttempts then
+            print("[GODZ] Erro de conexão com a IA (" .. errorCode .. "). Tentando reconectar em 5 segundos...")
+            SetTimeout(5000, function()
+                vRP.askGodzAI(endpoint, data, callback, currentAttempt + 1)
+            end)
+            return
+        end
+
         if callback then
             callback(errorCode, resultData, resultHeaders)
         end

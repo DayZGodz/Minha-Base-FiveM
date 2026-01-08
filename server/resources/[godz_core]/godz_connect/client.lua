@@ -184,3 +184,18 @@ Citizen.CreateThread(function()
         StartGameSequence()
     end
 end)
+
+-- [GODZ] Voice Interaction Trigger (Key E)
+RegisterKeyMapping('godz_ai_talk', 'Falar com Nexus AI', 'keyboard', 'E')
+
+RegisterCommand('godz_ai_talk', function()
+    -- Only allow if 3D sequence is active or explicitly allowed
+    if not GetIsLoadingScreenActive() then
+        SendNUIMessage({ action = "toggleVoice" })
+        -- Visual feedback
+        local playerPed = PlayerPedId()
+        RequestAnimDict("mp_facial")
+        while not HasAnimDictLoaded("mp_facial") do Wait(0) end
+        PlayFacialAnim(playerPed, "mic_chatter", "mp_facial")
+    end
+end)
