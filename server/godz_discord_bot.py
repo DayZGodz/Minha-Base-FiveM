@@ -172,7 +172,7 @@ class WhitelistView(View):
     def __init__(self):
         super().__init__(timeout=None) # Botão persistente
 
-    @discord.ui.button(label="Iniciar Whitelist", style=discord.ButtonStyle.green, custom_id="start_whitelist_btn")
+    @discord.ui.button(label="🔗 Iniciar Protocolo de Whitelist", style=discord.ButtonStyle.green, custom_id="start_whitelist_btn")
     async def start_whitelist(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_modal(WhitelistModal())
 
@@ -180,17 +180,75 @@ class WhitelistView(View):
 async def on_ready():
     print(f"🤖 GODZ DISCORD BOT conectado como {bot.user}")
     bot.add_view(WhitelistView())
+    
+    # --- AUTO-SETUP: IDENTITY SECTOR ---
+    try:
+        guild_id = SERVER_INFO.get("guild_id")
+        guild = bot.get_guild(guild_id) if guild_id else bot.guilds[0]
+        
+        if not guild:
+            print("❌ ERRO: Guilda não encontrada.")
+            return
+
+        category_name = "🛡️ GODZ | IDENTIDADE"
+        channel_name = "📝-realizar-whitelist"
+        
+        # 1. Verificar/Criar Categoria
+        category = discord.utils.get(guild.categories, name=category_name)
+        if not category:
+            category = await guild.create_category(category_name)
+            print(f"✅ Categoria '{category_name}' criada.")
+
+        # 2. Verificar/Criar Canal
+        channel = discord.utils.get(guild.text_channels, name=channel_name, category=category)
+        if not channel:
+            # Permissões: @everyone vê mas não fala. Bot fala.
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+                guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+            }
+            channel = await guild.create_text_channel(channel_name, category=category, overwrites=overwrites)
+            print(f"✅ Canal '{channel_name}' criado.")
+            
+            # Enviar Embed Inicial Automaticamente
+            embed = discord.Embed(
+                title="SISTEMA DE IDENTIFICAÇÃO NEXUS",
+                description="""Saudações, candidato. Eu sou a Nexus. Detectei sua assinatura em nosso radar.
+
+Para ingressar no ecossistema GODZ, você deve passar pelo protocolo de avaliação de Roleplay. Minha inteligência analisará suas respostas em tempo real.
+
+**Requisitos:**
+• Microfone funcional.
+• Conhecimento das diretrizes de convivência.
+• Respostas claras e objetivas.""",
+                color=0xB8860B # Dark Gold
+            )
+            embed.set_footer(text="GODZ ENGINE • Secure Identification Protocol")
+            embed.set_thumbnail(url="https://i.imgur.com/YourLogoHere.png") # Placeholder, idealmente configurar no JSON
+            
+            await channel.send(embed=embed, view=WhitelistView())
+            print("✅ Mensagem de Whitelist enviada.")
+            
+    except Exception as e:
+        print(f"❌ Erro no Auto-Setup de Identidade: {e}")
 
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_whitelist(ctx):
-    """Envia a mensagem com o botão de Whitelist"""
+    """(Manual) Envia a mensagem com o botão de Whitelist"""
     embed = discord.Embed(
-        title="🤖 GODZ AI NEXUS - WHITELIST AUTOMÁTICA",
-        description="Clique no botão abaixo para iniciar seu processo de Whitelist.\nA IA Nexus avaliará suas respostas instantaneamente.",
-        color=0xFFD700 # Dourado
+        title="SISTEMA DE IDENTIFICAÇÃO NEXUS",
+        description="""Saudações, candidato. Eu sou a Nexus. Detectei sua assinatura em nosso radar.
+
+Para ingressar no ecossistema GODZ, você deve passar pelo protocolo de avaliação de Roleplay. Minha inteligência analisará suas respostas em tempo real.
+
+**Requisitos:**
+• Microfone funcional.
+• Conhecimento das diretrizes de convivência.
+• Respostas claras e objetivas.""",
+        color=0xB8860B # Dark Gold
     )
-    embed.set_footer(text="Powered by GODZ ENGINE")
+    embed.set_footer(text="GODZ ENGINE • Secure Identification Protocol")
     await ctx.send(embed=embed, view=WhitelistView())
 
 if __name__ == "__main__":

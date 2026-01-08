@@ -371,6 +371,12 @@
             "online_players": 0,
             "economy_balance": 0,
             "active_jobs": []
+        },
+        {
+            "timestamp": "2026-01-08T02:19:54.909644",
+            "online_players": 0,
+            "economy_balance": 0,
+            "active_jobs": []
         }
     ],
     "player_last_seen": {}

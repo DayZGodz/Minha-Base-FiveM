@@ -42,6 +42,18 @@ O primeiro sistema de Whitelist 100% autônomo do FiveM.
 *   **Feedback Inteligente**: Em caso de reprovação, a IA explica o motivo (ex: "Sua definição de VDM está incorreta") e aplica um cooldown automático.
 *   **Disponibilidade 24/7**: O servidor nunca fecha para candidaturas.
 
+### 🏛️ DISCORD ECOSYSTEM & IDENTITY SECTOR
+
+A infraestrutura do Discord é gerenciada autonomamente pelo bot.
+
+*   **Auto-Setup**: Ao iniciar, o sistema verifica e cria automaticamente a categoria `🛡️ GODZ | IDENTIDADE` e o canal `📝-realizar-whitelist`.
+*   **Permissões Inteligentes**: O canal de whitelist é configurado para ser "Read-Only" para o público. Apenas a Nexus pode enviar mensagens.
+*   **Fluxo de Identificação**:
+    1.  Candidato acessa o canal e vê o Embed da Nexus.
+    2.  Clica em `[ 🔗 Iniciar Protocolo de Whitelist ]`.
+    3.  Responde ao questionário modal.
+    4.  A Nexus avalia e libera o acesso instantaneamente se aprovado.
+
 ---
 
 ## 👁️ GODZ SENTINEL
