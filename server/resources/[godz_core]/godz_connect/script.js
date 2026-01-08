@@ -127,10 +127,24 @@ function speakAi(text) {
     utterThis.pitch = 1.0; 
     utterThis.rate = 1.0; 
 
+    // Start Lip Sync (Client Trigger)
+    fetch('https://godz_connect/startLipSync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+    }).catch(err => {}); // Ignore errors if not in FiveM environment
+
     utterThis.onend = function (event) {
         if (!event) return;
         aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SYSTEM: ONLINE";
+        
+        // Stop Lip Sync
+        fetch('https://godz_connect/stopLipSync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        }).catch(err => {});
     };
 
     utterThis.onerror = function (event) {

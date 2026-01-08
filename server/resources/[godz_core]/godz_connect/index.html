@@ -8,17 +8,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Background Video: Data Nexus Loop -->
-    <div class="video-background">
-        <!-- Placeholder: Usuário deve substituir por 'assets/nexus_bg.webm' -->
-        <video autoplay muted loop id="bg-video">
-            <source src="assets/nexus_bg.webm" type="video/webm">
-            <source src="https://cdn.pixabay.com/video/2019/04/20/22908-331663432_large.mp4" type="video/mp4">
-        </video>
-        <div class="video-overlay"></div>
-        <div class="scanlines"></div>
-    </div>
-
     <!-- Main Interface -->
     <div class="container">
         
@@ -30,22 +19,15 @@
             <div class="sys-id">GODZ.NEXUS.V2</div>
         </div>
 
-        <!-- Central Holographic AI -->
+        <!-- Central Holographic Overlay (Framing the 3D PED) -->
         <div class="nexus-core-container">
             <div class="hologram-ring outer-ring"></div>
             <div class="hologram-ring inner-ring"></div>
             
-            <!-- AI Avatar Video Loop -->
-            <div class="ai-avatar-wrapper">
-                <video autoplay muted loop playsinline id="ai-avatar-video" class="ai-video">
-                    <!-- Placeholder: Usuário deve substituir por 'assets/avatar_loop.webm' -->
-                    <source src="assets/avatar.mp4" type="video/mp4">
-                </video>
-                <!-- Audio Visualizer Overlay -->
-                <div class="visualizer-overlay" id="visualizer">
-                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-                </div>
+            <!-- Audio Visualizer Overlay -->
+            <div class="visualizer-overlay" id="visualizer">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
 
             <div class="ai-status-display">
