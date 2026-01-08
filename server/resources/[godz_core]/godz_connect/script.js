@@ -1,6 +1,8 @@
 let playerName = "Cidadão";
 let isWhitelisted = false;
 let hasReceivedStatus = false;
+let isStaff = false;
+let userGroup = "cidadao";
 
 function startNexusProtocol() {
     try {
@@ -10,11 +12,36 @@ function startNexusProtocol() {
             return;
         }
 
+        // [GODZ UNIFIED] Role-Based Greetings
+        if (isStaff) {
+            if (userGroup === "ceos") {
+                const msg = `Assinatura de comando mestre detectada. Bem-vindo, Diretor. Todos os protocolos de segurança foram suspensos para seu acesso.`;
+                window.shouldAutoCloseAfterElite = true;
+                speakAi(msg);
+                return;
+            } else if (userGroup === "staff") {
+                const msg = `Credenciais de administrador validadas. Bem-vindo, ${playerName}. Painel de monitoramento pronto.`;
+                window.shouldAutoCloseAfterElite = true;
+                speakAi(msg);
+                return;
+            }
+        }
+        
+        if (userGroup === "policia") {
+             const msg = `Assinatura de autoridade detectada. Bem-vindo, Oficial. Os sistemas da cidade estão à sua disposição.`;
+             speakAi(msg);
+             return;
+        } else if (userGroup === "faccao") {
+             const msg = `Perfil identificado nos registros de segurança. Tenha cuidado nas ruas, a vigilância está ativa.`;
+             speakAi(msg);
+             return;
+        }
+
         if (isWhitelisted) {
             const msg = `Bem-vindo de volta, ${playerName}. Sincronizando seus dados... Todos os sistemas prontos.`;
             speakAi(msg);
         } else {
-            const msg = `Protocolo de segurança ativado. Sua assinatura neural não consta em nossos registros. Verifique o código de acesso em sua tela e valide sua identidade em nossa central de comunicações.`;
+            const msg = `Bem-vindo à GODZ. Valide sua identidade no Discord.`;
             speakAi(msg);
         }
     } catch (e) { console.log(e); }
@@ -87,15 +114,15 @@ if ('webkitSpeechRecognition' in window) {
 
     recognition.onstart = function() {
         isListening = true;
-        micBtn.classList.add("active");
-        aiAvatarWrapper.classList.add("listening"); // Optional: Add specific listening anim
+        if (micBtn) micBtn.classList.add("active");
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.add("listening");
         if (statusText) statusText.innerText = "OUVINDO...";
     };
 
     recognition.onend = function() {
         isListening = false;
-        micBtn.classList.remove("active");
-        aiAvatarWrapper.classList.remove("listening");
+        if (micBtn) micBtn.classList.remove("active");
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("listening");
         if (!synth.speaking && statusText) {
             statusText.innerText = "SYSTEM: ONLINE";
         }
@@ -165,7 +192,7 @@ function speakAi(text) {
     if (synth.speaking) return;
 
     if (statusText) statusText.innerText = "TRANSMITINDO...";
-    aiAvatarWrapper.classList.add("speaking"); // Triggers visualizer overlay
+    if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
 
     const utterThis = new SpeechSynthesisUtterance(text);
     utterThis.lang = 'pt-BR';
@@ -201,7 +228,7 @@ function speakAi(text) {
 
     utterThis.onend = function (event) {
         if (!event) return;
-        aiAvatarWrapper.classList.remove("speaking");
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SYSTEM: ONLINE";
         
         // Stop Lip Sync
@@ -217,11 +244,23 @@ function speakAi(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
         }).catch(err => {});
+
+        // Auto-close loading screen para Staff após saudação de elite
+        try {
+            if (window.shouldAutoCloseAfterElite) {
+                window.shouldAutoCloseAfterElite = false;
+                fetch('https://godz_connect/close', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                }).catch(() => {});
+            }
+        } catch (e) { }
     };
 
     utterThis.onerror = function (event) {
         console.error('TTS Error');
-        aiAvatarWrapper.classList.remove("speaking");
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "ERRO: SÍNTESE DE VOZ";
     };
 
@@ -285,6 +324,11 @@ window.addEventListener('message', function (e) {
         playerName = e.data.playerName || "Cidadão";
         isWhitelisted = !!e.data.isWhitelisted;
         window.isCreatorMode = !!e.data.isCreator;
+        
+        // [GODZ UNIFIED]
+        isStaff = !!e.data.isStaff;
+        userGroup = e.data.group || "cidadao";
+        
         startNexusProtocol();
     }
 

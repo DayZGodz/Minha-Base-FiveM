@@ -105,6 +105,26 @@ CREATE TABLE IF NOT EXISTS `godz_benefits` (
   CONSTRAINT `fk_benefits_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- godz_user_groups (persistência de cargos)
+CREATE TABLE IF NOT EXISTS `godz_user_groups` (
+  `user_id` int(11) NOT NULL,
+  `group_name` varchar(50) NOT NULL,
+  `group_grade` int(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`user_id`, `group_name`),
+  CONSTRAINT `fk_user_groups_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- godz_whitelist_temp (Token + IP binding)
+CREATE TABLE IF NOT EXISTS `godz_whitelist_temp` (
+  `user_id` int(11) NOT NULL,
+  `token` varchar(16) NOT NULL,
+  `ip` varchar(50) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`user_id`),
+  KEY `idx_token` (`token`),
+  CONSTRAINT `fk_wltemp_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 -- PHONE TABLES
 -- --------------------------------------------------------
@@ -197,3 +217,10 @@ CREATE TABLE IF NOT EXISTS `renzu_customs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- Seed: Registro ID 0 (NEXUS)
+SET @OLD_SQL_MODE=@@SQL_MODE;
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+INSERT IGNORE INTO `godz_users` (`id`, `last_login`, `ip`, `whitelisted`, `banned`, `pet`, `moedas`, `garagem`) VALUES (0, 'SYSTEM', '127.0.0.1', 1, 0, NULL, 0, 2);
+INSERT IGNORE INTO `godz_user_identities` (`user_id`, `registration`, `phone`, `firstname`, `name`, `age`, `foragido`, `foto`) VALUES (0, '00000000', '000-000', 'NEXUS', 'SISTEMA', 0, 0, NULL);
+SET SQL_MODE=@OLD_SQL_MODE;

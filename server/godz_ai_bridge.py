@@ -302,7 +302,7 @@ def run_discord_bot():
             return
         
         # 1. Criar Categoria
-        category_name = "GODZ | SISTEMAS"
+        category_name = "GODZ | WHITELIST"
         category = discord.utils.get(guild.categories, name=category_name)
         if not category:
             category = await guild.create_category(category_name)
