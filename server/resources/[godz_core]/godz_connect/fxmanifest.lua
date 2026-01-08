@@ -6,6 +6,7 @@ author 'GODZ Dev'
 version '1.0.0'
 
 loadscreen 'index.html'
+ui_page 'index.html'
 
 server_scripts {
     '@vrp/lib/utils.lua',

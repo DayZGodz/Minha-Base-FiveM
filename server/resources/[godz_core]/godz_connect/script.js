@@ -90,15 +90,50 @@ window.addEventListener('message', function(event) {
         const introHud = document.querySelector('.intro-hud');
         if (introHud) introHud.style.opacity = '1';
         
-        let msg = `Olá ${playerName}. Eu sou a Nexus. Bem-vindo de volta à GODZ.`;
-        if (isCreator || (playerName && playerName.toLowerCase().includes('bob'))) {
-             msg = "Olá Diretor Bob, eu sou a Nexus. Bem-vindo de volta.";
-        }
-        
-        // Call AI Speech with Intro Flag
-        speakAi(msg, true);
+        // [GODZ] Play Pre-Generated Nexus Voice
+        playNexusIntro();
     }
 });
+
+function playNexusIntro() {
+    const loadingSector = document.querySelector(".loading-sector");
+    if (loadingSector) loadingSector.style.display = 'none';
+
+    if (statusText) statusText.innerText = "TRANSMITINDO...";
+    if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
+
+    const audioUrl = `./sounds/nexus_voice.wav?t=${new Date().getTime()}`;
+    const audio = new Audio(audioUrl);
+    audio.volume = 0.8;
+
+    // Start LipSync
+    fetch(`https://godz_connect/startLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
+
+    audio.play().then(() => {
+        console.log("Nexus Intro Playing...");
+    }).catch(e => {
+        console.error("Audio Play Error:", e);
+        // If file not found, try TTS fallback
+        speakAi("Olá Diretor Bob. Eu sou a Nexus. Sincronizando sistemas.");
+    });
+
+    audio.onended = () => {
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
+        if (statusText) statusText.innerText = "SYSTEM: ONLINE";
+        fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
+        
+        // Notify Client to Unlock
+        fetch('https://godz_connect/introFinished', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+        
+        const introHud = document.querySelector('.intro-hud');
+        if (introHud) introHud.style.opacity = '0';
+    };
+
+    audio.onerror = () => {
+        console.error("Audio Load Error: nexus_voice.wav not found.");
+        speakAi("Olá Diretor Bob. Eu sou a Nexus. Sincronizando sistemas.");
+    };
+}
 
 function forceKillNexusUI() {
     const ids = ["protocols-list", "system-status", "mic-container"];
