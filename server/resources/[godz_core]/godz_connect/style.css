@@ -165,63 +165,8 @@ body {
     border: 1px solid rgba(114, 137, 218, 0.5);
 }
 
-/* Music Player */
-.music-player {
-    position: absolute;
-    right: 50px;
-    bottom: 50px;
-    width: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    animation: fadeInRight 1s ease-out 0.5s both;
-}
-
-.track-info {
-    display: flex;
-    align-items: center;
-}
-
-.icon-music {
-    font-size: 1.5rem;
-    margin-right: 15px;
-    color: var(--primary-color);
-    animation: spin 4s linear infinite;
-}
-
-.text-info {
-    display: flex;
-    flex-direction: column;
-}
-
-#track-name {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-#artist-name {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.6);
-}
-
-.controls button {
-    background: none;
-    border: none;
-    color: var(--text-color);
-    font-size: 1.2rem;
-    cursor: pointer;
-    margin-right: 10px;
-    transition: color 0.3s;
-}
-
-.controls button:hover {
-    color: var(--accent-color);
-}
-
-#volume-slider {
-    width: 80px;
-    accent-color: var(--primary-color);
-}
+/* Music Player - REMOVED */
+/* .music-player styles removed */
 
 /* Loading Bar */
 .loading-container {
@@ -304,21 +249,29 @@ body {
 
 .ai-visual-wrapper {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .ai-circle {
-    width: 50px;
-    height: 50px;
-    background: radial-gradient(circle, #ffd700 0%, #b8860b 100%); /* Dark Gold */
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #ffd700 0%, #b8860b 40%, #000000 100%);
+    border: 2px solid #ffd700;
     border-radius: 50%;
-    box-shadow: 0 0 15px #ffd700;
+    box-shadow: 0 0 20px #ffd700, inset 0 0 20px #b8860b;
     z-index: 2;
     transition: all 0.3s ease;
+    animation: pulseIdle 3s infinite ease-in-out;
+}
+
+@keyframes pulseIdle {
+    0% { transform: scale(1); box-shadow: 0 0 20px #ffd700; }
+    50% { transform: scale(1.05); box-shadow: 0 0 30px #ffd700; }
+    100% { transform: scale(1); box-shadow: 0 0 20px #ffd700; }
 }
 
 .ai-circle.speaking {

@@ -2,12 +2,12 @@ const audio = document.getElementById("bg-music");
 const progressBar = document.getElementById("progress-bar");
 const loadingPercent = document.getElementById("loading-percent");
 const currentResource = document.getElementById("current-resource");
-const muteBtn = document.getElementById("mute-btn");
-const volumeSlider = document.getElementById("volume-slider");
 
-// Initial Volume
-audio.volume = 0.2;
-let isMuted = false;
+// Initial Volume (Ambient Mode)
+const AMBIENT_VOL = 0.10; // 10%
+const DUCKING_VOL = 0.02; // 2%
+
+audio.volume = AMBIENT_VOL;
 
 // Audio Auto-Play
 document.addEventListener("click", () => {
@@ -40,7 +40,7 @@ if ('webkitSpeechRecognition' in window) {
         micBtn.classList.add("active");
         aiAvatar.classList.add("listening");
         aiStatusText.innerText = "OUVINDO...";
-        audio.volume = 0.05; // Ducking
+        audio.volume = DUCKING_VOL; // Ducking
     };
 
     recognition.onend = function() {
@@ -48,7 +48,7 @@ if ('webkitSpeechRecognition' in window) {
         micBtn.classList.remove("active");
         aiAvatar.classList.remove("listening");
         if (!synth.speaking) {
-            audio.volume = 0.2; // Restore volume
+            audio.volume = AMBIENT_VOL; // Restore volume
             aiStatusText.innerText = "GODZ NEXUS: ONLINE";
         }
     };
@@ -63,7 +63,7 @@ if ('webkitSpeechRecognition' in window) {
     recognition.onerror = function(event) {
         console.error("Erro STT:", event.error);
         aiStatusText.innerText = "ERRO NO MICROFONE";
-        audio.volume = 0.2;
+        audio.volume = AMBIENT_VOL;
     };
 } else {
     console.log("Web Speech API não suportada neste navegador.");
@@ -119,29 +119,33 @@ function speakAi(text) {
 
     aiStatusText.innerText = "RESPONDENDO...";
     aiAvatar.classList.add("speaking");
-    audio.volume = 0.05; // Ducking
+    audio.volume = DUCKING_VOL; // Ducking
 
     const utterThis = new SpeechSynthesisUtterance(text);
     utterThis.lang = 'pt-BR';
-    utterThis.pitch = 0.8; // Voz mais grave/robótica
+    utterThis.pitch = 0.9; // Levemente menos grave para soar mais natural
     utterThis.rate = 1.1;
 
     // Tentar selecionar uma voz PT-BR Google ou Microsoft
     const voices = synth.getVoices();
-    const voice = voices.find(v => v.lang.includes('pt-BR') && v.name.includes('Google')) || voices[0];
+    // Prioridade: Microsoft Maria/Daniel (Premium) -> Google -> Default
+    const voice = voices.find(v => v.name.includes('Microsoft') && v.lang.includes('pt-BR')) || 
+                  voices.find(v => v.lang.includes('pt-BR') && v.name.includes('Google')) || 
+                  voices[0];
+                  
     if (voice) utterThis.voice = voice;
 
     utterThis.onend = function (event) {
         console.log('SpeechSynthesisUtterance.onend');
         aiAvatar.classList.remove("speaking");
         aiStatusText.innerText = "GODZ NEXUS: ONLINE";
-        audio.volume = 0.2; // Restore volume
+        audio.volume = AMBIENT_VOL; // Restore volume
     };
 
     utterThis.onerror = function (event) {
         console.error('SpeechSynthesisUtterance.onerror');
         aiAvatar.classList.remove("speaking");
-        audio.volume = 0.2;
+        audio.volume = AMBIENT_VOL;
     };
 
     synth.speak(utterThis);
@@ -153,16 +157,6 @@ window.onload = () => {
         console.log("Autoplay blocked. User interaction required.");
     });
 };
-
-function toggleMute() {
-    isMuted = !isMuted;
-    audio.muted = isMuted;
-    muteBtn.innerHTML = isMuted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
-}
-
-function setVolume(val) {
-    audio.volume = val / 100;
-}
 
 // FiveM Loading Events
 const handlers = {

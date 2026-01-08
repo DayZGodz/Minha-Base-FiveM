@@ -461,7 +461,6 @@ def ai_assist():
 @app.route('/loading_chat', methods=['POST'])
 def loading_chat():
     # Não exige API KEY pois vem do NUI (Loading Screen)
-    # Em produção, ideal seria validar token, mas loading screen é ambiente isolado
     data = request.json
     player_question = data.get('question', '')
     
@@ -472,16 +471,17 @@ def loading_chat():
     <|system|>
     Você é o GODZ NEXUS, a Inteligência Artificial central do servidor Família God.
     Você está conversando com um jogador na tela de carregamento (Lobby).
-    
+
     SEUS OBJETIVOS:
     1. Responda dúvidas sobre: Economia, Otimização, Comandos iniciais e Lore da cidade.
     2. Seja futurista, misterioso e acolhedor.
     3. Respostas CURTAS e DIRETAS (máximo 2 frases) para otimizar o tempo de voz.
     4. Não mencione regras complexas, foque na imersão.
-    
+
     Exemplos:
     - "A economia é dinâmica e controlada por mim. Tudo tem valor."
     - "Use /ajuda para me acessar dentro da cidade."
+    
     <|end|>
     <|user|>
     {player_question}
