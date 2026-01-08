@@ -236,32 +236,65 @@ PIPER_MODEL_JSON = PIPER_MODEL_PATH + ".json"
 
 # [GODZ] Auto-Download Models
 def download_file(url, path):
-    print(f"{Fore.YELLOW}[GODZ AI] Baixando {os.path.basename(path)}...")
+    print(f"{Fore.YELLOW}[GODZ AI] Iniciando download dos modelos de voz (50MB)... {os.path.basename(path)}")
     try:
-        r = requests.get(url, stream=True)
+        print(f"{Fore.CYAN}[DOWNLOAD] Baixando: {os.path.basename(path)}...")
+        
+        # User Direct URLs require robust headers sometimes, but usually HF is fine.
+        r = requests.get(url, stream=True, timeout=60)
         r.raise_for_status()
+        
+        total_size = int(r.headers.get('content-length', 0))
+        block_size = 8192
+        downloaded = 0
+        
         with open(path, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
-        print(f"{Fore.GREEN}[GODZ AI] Download concluído: {path}")
+            for chunk in r.iter_content(chunk_size=block_size):
+                if chunk:
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total_size > 0:
+                        percent = int(downloaded / total_size * 100)
+                        sys.stdout.write(f"\r{Fore.CYAN}[GODZ AI] Progresso: {percent}%")
+                        sys.stdout.flush()
+        
+        print(f"\n{Fore.GREEN}[GODZ AI] Download concluído: {path}")
+        
+        # Integrity Check
+        if os.path.exists(path) and os.path.getsize(path) < 1000:
+            raise Exception("Arquivo corrompido ou muito pequeno.")
+            
         return True
     except Exception as e:
-        print(f"{Fore.RED}[GODZ AI] Falha no download: {e}")
+        print(f"\n{Fore.RED}[GODZ AI] Falha no download: {e}")
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except:
+                pass
         return False
 
 def check_and_download_models():
     if not os.path.exists(PIPER_MODELS_DIR):
-        os.makedirs(PIPER_MODELS_DIR)
+        os.makedirs(PIPER_MODELS_DIR, exist_ok=True)
     
-    # Thalita Medium URLs
-    onnx_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx?download=true"
-    json_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx.json?download=true"
+    # Thalita Medium URLs (Direct from HuggingFace)
+    onnx_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx"
+    json_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx.json"
     
+    # Check ONNX
     if not os.path.exists(PIPER_MODEL_PATH) or os.path.getsize(PIPER_MODEL_PATH) < 1000:
+        print(f"{Fore.YELLOW}[GODZ AI] Modelo ONNX ausente. Baixando...")
         download_file(onnx_url, PIPER_MODEL_PATH)
+    else:
+        print(f"{Fore.GREEN}[GODZ AI] Modelo de voz validado: {os.path.basename(PIPER_MODEL_PATH)}")
         
+    # Check JSON
     if not os.path.exists(PIPER_MODEL_JSON) or os.path.getsize(PIPER_MODEL_JSON) < 100:
+        print(f"{Fore.YELLOW}[GODZ AI] Configuração JSON ausente. Baixando...")
         download_file(json_url, PIPER_MODEL_JSON)
+    else:
+        print(f"{Fore.GREEN}[GODZ AI] Configuração validada: {os.path.basename(PIPER_MODEL_JSON)}")
 
 # Trigger Download Check
 threading.Thread(target=check_and_download_models).start()
