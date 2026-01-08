@@ -14,12 +14,16 @@ function startNexusProtocol() {
 
         // [GODZ UNIFIED] Role-Based Greetings
         if (isStaff) {
-            if (userGroup === "ceos") {
-                const msg = `Assinatura de comando mestre detectada. Bem-vindo, Diretor. Todos os protocolos de segurança foram suspensos para seu acesso.`;
+            if (userGroup === "ceo" || userGroup === "ceos") {
+                const msg = `Protocolo de comando mestre detectado. Bem-vindo, Diretor. Todos os protocolos de segurança foram suspensos para seu acesso.`;
                 window.shouldAutoCloseAfterElite = true;
                 speakAi(msg);
                 return;
-            } else if (userGroup === "staff") {
+            } else if (userGroup === "bot") {
+                 const msg = `NEXUS SYSTEM: Sincronização neural completa.`;
+                 speakAi(msg);
+                 return;
+            } else if (userGroup === "staff" || userGroup === "admin") {
                 const msg = `Credenciais de administrador validadas. Bem-vindo, ${playerName}. Painel de monitoramento pronto.`;
                 window.shouldAutoCloseAfterElite = true;
                 speakAi(msg);

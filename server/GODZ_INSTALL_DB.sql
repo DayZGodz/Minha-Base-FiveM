@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `godz_benefits` (
 CREATE TABLE IF NOT EXISTS `godz_user_groups` (
   `user_id` int(11) NOT NULL,
   `group_name` varchar(50) NOT NULL,
-  `group_grade` int(11) NOT NULL DEFAULT 1,
+  `group_grade` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`user_id`, `group_name`),
   CONSTRAINT `fk_user_groups_users` FOREIGN KEY (`user_id`) REFERENCES `godz_users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -223,4 +223,10 @@ SET @OLD_SQL_MODE=@@SQL_MODE;
 SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
 INSERT IGNORE INTO `godz_users` (`id`, `last_login`, `ip`, `whitelisted`, `banned`, `pet`, `moedas`, `garagem`) VALUES (0, 'SYSTEM', '127.0.0.1', 1, 0, NULL, 0, 2);
 INSERT IGNORE INTO `godz_user_identities` (`user_id`, `registration`, `phone`, `firstname`, `name`, `age`, `foragido`, `foto`) VALUES (0, '00000000', '000-000', 'NEXUS', 'SISTEMA', 0, 0, NULL);
+INSERT IGNORE INTO `godz_user_groups` (`user_id`, `group_name`, `group_grade`) VALUES (0, 'bot', 0);
+
+-- Seed: Staff Base (ID 1 & 2)
+INSERT IGNORE INTO `godz_user_groups` (`user_id`, `group_name`, `group_grade`) VALUES (1, 'ceo', 0);
+INSERT IGNORE INTO `godz_user_groups` (`user_id`, `group_name`, `group_grade`) VALUES (2, 'ceo', 0);
+
 SET SQL_MODE=@OLD_SQL_MODE;
