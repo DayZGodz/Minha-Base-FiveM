@@ -56,6 +56,17 @@ A infraestrutura do Discord é gerenciada autonomamente pelo bot.
 
 ---
 
+## 🧬 GODZ POPULATION ENGINE
+
+A vida na cidade não é mais estática. O sistema de população inteligente gera NPCs com histórias e personalidades únicas.
+
+*   **Geração Procedural**: Cada NPC importante (Recepcionistas, Mecânicos, Policiais em balcão) é gerado pela IA no momento do spawn.
+*   **Identidade Única**: A IA cria nomes, passados misteriosos e diálogos contextuais baseados na localização e profissão do NPC.
+*   **Imersão Dark Gold**: Os NPCs seguem a temática do servidor, com personalidades mais densas, realistas e, por vezes, sombrias.
+*   **Interação Dinâmica**: Jogadores podem interagir com esses NPCs para descobrir suas histórias, recebendo respostas geradas em tempo real.
+
+---
+
 ## 👁️ GODZ SENTINEL
 
 Proteção ativa 24/7.

@@ -783,6 +783,60 @@ def evaluate_whitelist():
         logger.error(f"Erro no endpoint /evaluate_wl: {e}")
         return jsonify({"error": str(e)}), 500
 
+# ==================================================================================
+# 4. ENDPOINT DE GERAÇÃO DE NPC (POPULATION ENGINE)
+# ==================================================================================
+@app.route('/generate_npc', methods=['POST'])
+@require_api_key
+def generate_npc():
+    data = request.json
+    location = data.get('location', 'Unknown')
+    job = data.get('job', 'Citizen')
+    
+    # Prompt para o Phi-3
+    prompt = f"""
+    <|system|>
+    {PERSONALITY_MANIFESTO if 'PERSONALITY_MANIFESTO' in globals() else "Você é o GODZ CREATOR."}
+    
+    [MODO: NPC GENERATOR]
+    Gere um NPC único para o servidor GODZ Roleplay.
+    Localização: {location}
+    Trabalho: {job}
+    
+    Crie uma persona sombria, realista e marcante.
+    O formato DEVE ser estritamente JSON.
+    
+    {{
+        "name": "Nome Sobrenome",
+        "backstory": "Duas frases sobre o passado misterioso.",
+        "dialog": "Uma frase de efeito curta e impactante para dizer ao jogador."
+    }}
+    <|end|>
+    """
+    
+    npc_data = {
+        "name": "Unknown Drifter",
+        "backstory": "Um andarilho sem memória.",
+        "dialog": "..."
+    }
+
+    if pipeline:
+        try:
+            output = pipeline(prompt, max_new_tokens=150, return_full_text=False)
+            response_text = output[0]['generated_text'].strip()
+            
+            import re
+            match = re.search(r'\{.*\}', response_text, re.DOTALL)
+            if match:
+                json_str = match.group(0)
+                npc_data = json.loads(json_str)
+            else:
+                logger.warning("Falha ao parsear JSON do NPC. Usando fallback.")
+        except Exception as e:
+            logger.error(f"Erro na geração de NPC: {e}")
+            
+    return jsonify(npc_data)
+
 if __name__ == '__main__':
     print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor de Produção rodando na porta 5000...")
     serve(app, host='0.0.0.0', port=5000)
