@@ -18,6 +18,11 @@ let count = 0;
 let thisCount = 0;
 let playerName = "Cidadão"; // Default fallback
 
+// Ensure voices are loaded
+window.speechSynthesis.onvoiceschanged = () => {
+    // Voices loaded
+};
+
 /* ==========================================================================
    WEB SPEECH API (STT) - VOICE RECOGNITION
    ========================================================================== */
@@ -163,25 +168,9 @@ function speakAi(text) {
     synth.speak(utterThis);
 }
 
-// Initial Greeting
+// Initial Greeting removed from onload as it is now triggered by setupIdentity
 window.onload = () => {
-    // Aguarda um pouco para verificar se recebe o evento de Criador e Nome
-    setTimeout(() => {
-        if (window.isCreatorMode) {
-            const creatorGreeting = `Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.`;
-            speakAi(creatorGreeting);
-        } else {
-            const greetings = [
-                `Sincronizando assinatura neural... Seja bem-vindo à GODZ, ${playerName}. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.`,
-                `Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor, ${playerName}.`,
-                `Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City, ${playerName}. Protocolos iniciais ativos.`
-            ];
-            
-            // Random Selection
-            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-            speakAi(randomGreeting);
-        }
-    }, 2000);
+    // Optional: Pre-load voices or other assets
 };
 
 /* ==========================================================================
@@ -223,6 +212,20 @@ window.addEventListener('message', function (e) {
         window.isCreatorMode = e.data.isCreator;
         if (e.data.playerName || e.data.name) {
             playerName = e.data.playerName || e.data.name;
+            
+            // Trigger greeting immediately after receiving name
+            if (window.isCreatorMode) {
+                const creatorGreeting = `Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.`;
+                speakAi(creatorGreeting);
+            } else {
+                const greetings = [
+                    `Sincronizando assinatura neural... Seja bem-vindo à GODZ, ${playerName}. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.`,
+                    `Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor, ${playerName}.`,
+                    `Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City, ${playerName}. Protocolos iniciais ativos.`
+                ];
+                const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+                speakAi(randomGreeting);
+            }
         }
     }
     

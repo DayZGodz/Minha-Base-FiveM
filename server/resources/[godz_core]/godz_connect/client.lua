@@ -8,6 +8,7 @@ local isCreator = false -- Variável de controle do Criador
 
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
+    Wait(1000) -- Thread de Segurança para NUI
     DoScreenFadeOut(0)
     Wait(500)
     
