@@ -102,7 +102,7 @@ Citizen.CreateThread(function()
     DoScreenFadeIn(2000)
     
     -- Ativa o foco do mouse para UI
-    SetNuiFocus(true, true)
+SetNuiFocus(true, true)
 end)
 
 -- 2. SINCRONIA LABIAL (NUI CALLBACKS)
@@ -213,4 +213,14 @@ AddEventHandler("godz_connect:setCreatorMode", function(status, name)
         playerName = name,
         name = name -- Compatibility
     })
+end)
+
+-- Fallback: Força entrada do ID 1 após 10s se ainda na Loading Screen
+Citizen.CreateThread(function()
+    Wait(10000)
+    if isCreator then
+        SendNUIMessage({ action = "close" })
+        SetNuiFocus(false, false)
+        TriggerEvent("godz_identity:showSelection")
+    end
 end)

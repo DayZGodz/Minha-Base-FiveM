@@ -2,8 +2,7 @@
     "SERVER_INFO": {
         "server_name": "Família God",
         "_server_name_desc": "Nome oficial que aparecerá na HUD e Discord",
-        "discord_token": "TOKEN_REMOVIDO_POR_SEGURANCA",
-        "_discord_token_desc": "Token do Bot Discord (Obtenha em discord.com/developers)",
+        
         "guild_id": 1394591451597246494,
         "_guild_id_desc": "ID do Servidor Discord principal"
     },

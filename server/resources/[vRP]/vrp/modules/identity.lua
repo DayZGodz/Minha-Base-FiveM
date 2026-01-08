@@ -80,18 +80,29 @@ function vRP.generatePhoneNumber(cbr)
 end
 
 AddEventHandler("vRP:playerJoin",function(user_id,source,name)
-	if not vRP.getUserIdentity(user_id) then
-		local registration = vRP.generateRegistrationNumber()
-		local phone = vRP.generatePhoneNumber()
-		vRP.execute("vRP/init_user_identity",{
-			user_id = user_id,
-			registration = registration,
-			phone = phone,
-			firstname = "Indigente",
-			name = "Individuo",
-			age = 21
-		})
-	end
+    if not vRP.getUserIdentity(user_id) then
+        local registration = vRP.generateRegistrationNumber()
+        local phone = vRP.generatePhoneNumber()
+        if tonumber(user_id) == 1 then
+            vRP.execute("vRP/init_user_identity",{
+                user_id = user_id,
+                registration = registration,
+                phone = phone,
+                firstname = "Bob",
+                name = "Godz",
+                age = 25
+            })
+        else
+            vRP.execute("vRP/init_user_identity",{
+                user_id = user_id,
+                registration = registration,
+                phone = phone,
+                firstname = "Indigente",
+                name = "Individuo",
+                age = 21
+            })
+        end
+    end
 end)
 
 AddEventHandler("vRP:playerSpawn",function(user_id, source, first_spawn)

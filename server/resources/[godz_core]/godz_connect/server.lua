@@ -14,11 +14,11 @@ AddEventHandler("godz_connect:checkCreator", function()
     end
 
     if user_id == 1 then
-        SetTimeout(2000, function()
+        SetTimeout(1500, function()
             TriggerClientEvent("godz_connect:setCreatorMode", source, true, "Senhor")
         end)
     else
-        SetTimeout(2000, function()
+        SetTimeout(1500, function()
             TriggerClientEvent("godz_connect:setCreatorMode", source, false, playerName)
         end)
     end
