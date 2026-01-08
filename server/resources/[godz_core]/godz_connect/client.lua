@@ -75,8 +75,11 @@ Citizen.CreateThread(function()
     -- Animação de Postura Elegante
     TaskPlayAnim(nexusPed, "move_f@finesse", "idle", 8.0, -8.0, -1, 1, 0, false, false, false)
     
-    -- Configuração da Câmera
-    nexusCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+    -- Pré-carrega animação de despedida
+    RequestAnimDict("anim@mp_player_intcelebrationfemale@bow")
+    while not HasAnimDictLoaded("anim@mp_player_intcelebrationfemale@bow") do Wait(10) end
+    
+    -- Configuração da Câmera (Retrato 35mm)   nexusCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
     -- Posiciona a câmera focada no rosto/busto
     SetCamCoord(nexusCam, lobbyCoords.x, lobbyCoords.y + 1.2, lobbyCoords.z + 1.6) 
     PointCamAtPedBone(nexusCam, nexusPed, 31086, 0.0, 0.0, 0.0) -- Foca na Cabeça (Bone 31086)

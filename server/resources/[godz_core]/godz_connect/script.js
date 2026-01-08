@@ -159,10 +159,15 @@ function speakAi(text) {
 // Initial Greeting
 window.onload = () => {
     setTimeout(() => {
-        const introText = "Bem-vindo à GODZ City. Sistemas operacionais em inicialização. " +
-                          "Protocolos de segurança ativos. " +
-                          "Estou pronta para responder suas dúvidas enquanto configuramos sua conexão.";
-        speakAi(introText);
+        const greetings = [
+            "Sincronizando assinatura neural... Seja bem-vindo à GODZ. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.",
+            "Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor.",
+            "Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City. Protocolos iniciais ativos."
+        ];
+        
+        // Random Selection
+        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+        speakAi(randomGreeting);
     }, 2000);
 };
 
