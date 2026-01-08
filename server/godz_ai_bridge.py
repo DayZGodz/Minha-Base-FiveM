@@ -234,6 +234,50 @@ PIPER_MODEL_NAME = "pt_BR-thalita-medium.onnx"
 PIPER_MODEL_PATH = os.path.join(PIPER_MODELS_DIR, PIPER_MODEL_NAME)
 PIPER_MODEL_JSON = PIPER_MODEL_PATH + ".json"
 
+# [GODZ] Auto-Download Models
+def download_file(url, path):
+    print(f"{Fore.YELLOW}[GODZ AI] Baixando {os.path.basename(path)}...")
+    try:
+        r = requests.get(url, stream=True)
+        r.raise_for_status()
+        with open(path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+        print(f"{Fore.GREEN}[GODZ AI] Download concluído: {path}")
+        return True
+    except Exception as e:
+        print(f"{Fore.RED}[GODZ AI] Falha no download: {e}")
+        return False
+
+def check_and_download_models():
+    if not os.path.exists(PIPER_MODELS_DIR):
+        os.makedirs(PIPER_MODELS_DIR)
+    
+    # Thalita Medium URLs
+    onnx_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx?download=true"
+    json_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/thalita/medium/pt_BR-thalita-medium.onnx.json?download=true"
+    
+    if not os.path.exists(PIPER_MODEL_PATH) or os.path.getsize(PIPER_MODEL_PATH) < 1000:
+        download_file(onnx_url, PIPER_MODEL_PATH)
+        
+    if not os.path.exists(PIPER_MODEL_JSON) or os.path.getsize(PIPER_MODEL_JSON) < 100:
+        download_file(json_url, PIPER_MODEL_JSON)
+
+# Trigger Download Check
+threading.Thread(target=check_and_download_models).start()
+
+# [GODZ] GPU/ONNX Runtime Check
+try:
+    import onnxruntime as ort
+    providers = ort.get_available_providers()
+    print(f"{Fore.CYAN}[GODZ AI] ONNX Runtime Providers: {providers}")
+    if 'CUDAExecutionProvider' in providers:
+        print(f"{Fore.GREEN}[GODZ AI] Aceleração GPU (CUDA) Ativa para Piper!")
+    else:
+        print(f"{Fore.YELLOW}[GODZ AI] Rodando em CPU. Instale onnxruntime-gpu para maior performance.")
+except ImportError:
+    pass
+
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
