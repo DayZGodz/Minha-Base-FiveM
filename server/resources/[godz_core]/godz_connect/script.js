@@ -16,6 +16,137 @@ document.addEventListener("click", () => {
     }
 });
 
+/* ==========================================================================
+   GODZ NEXUS AI INTERACTION (Loading Screen)
+   ========================================================================== */
+
+const aiAvatar = document.getElementById("ai-avatar");
+const aiStatusText = document.getElementById("ai-status-text");
+const micBtn = document.getElementById("mic-btn");
+
+let isListening = false;
+let recognition;
+let synth = window.speechSynthesis;
+
+// 1. Configurar Web Speech API (STT)
+if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+
+    recognition.onstart = function() {
+        isListening = true;
+        micBtn.classList.add("active");
+        aiAvatar.classList.add("listening");
+        aiStatusText.innerText = "OUVINDO...";
+        audio.volume = 0.05; // Ducking
+    };
+
+    recognition.onend = function() {
+        isListening = false;
+        micBtn.classList.remove("active");
+        aiAvatar.classList.remove("listening");
+        if (!synth.speaking) {
+            audio.volume = 0.2; // Restore volume
+            aiStatusText.innerText = "GODZ NEXUS: ONLINE";
+        }
+    };
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        console.log("Player disse: " + transcript);
+        aiStatusText.innerText = "PROCESSANDO...";
+        sendToGodzAi(transcript);
+    };
+
+    recognition.onerror = function(event) {
+        console.error("Erro STT:", event.error);
+        aiStatusText.innerText = "ERRO NO MICROFONE";
+        audio.volume = 0.2;
+    };
+} else {
+    console.log("Web Speech API não suportada neste navegador.");
+    if (micBtn) micBtn.style.display = "none";
+    if (aiStatusText) aiStatusText.innerText = "IA: RECURSO NÃO SUPORTADO";
+}
+
+function toggleMic() {
+    if (isListening) {
+        recognition.stop();
+    } else {
+        // Tenta iniciar (requer HTTPS ou localhost)
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error(e);
+            aiStatusText.innerText = "ERRO AO INICIAR MIC";
+        }
+    }
+}
+
+// 2. Enviar para Python Bridge
+async function sendToGodzAi(text) {
+    try {
+        // NOTA: Em produção, substitua 127.0.0.1 pelo IP Real do Servidor se acessado remotamente.
+        // Como é Loading Screen, 127.0.0.1 assume que o servidor roda na máquina local (Dev Mode).
+        const response = await fetch('http://127.0.0.1:5000/loading_chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ question: text })
+        });
+
+        const data = await response.json();
+        if (data.response) {
+            speakAi(data.response);
+        } else {
+            speakAi("Não consegui processar sua solicitação.");
+        }
+    } catch (error) {
+        console.error("Erro ao conectar com GODZ AI:", error);
+        speakAi("Falha na conexão neural com o servidor.");
+    }
+}
+
+// 3. Texto para Fala (TTS)
+function speakAi(text) {
+    if (synth.speaking) {
+        console.error('speechSynthesis.speaking');
+        return;
+    }
+
+    aiStatusText.innerText = "RESPONDENDO...";
+    aiAvatar.classList.add("speaking");
+    audio.volume = 0.05; // Ducking
+
+    const utterThis = new SpeechSynthesisUtterance(text);
+    utterThis.lang = 'pt-BR';
+    utterThis.pitch = 0.8; // Voz mais grave/robótica
+    utterThis.rate = 1.1;
+
+    // Tentar selecionar uma voz PT-BR Google ou Microsoft
+    const voices = synth.getVoices();
+    const voice = voices.find(v => v.lang.includes('pt-BR') && v.name.includes('Google')) || voices[0];
+    if (voice) utterThis.voice = voice;
+
+    utterThis.onend = function (event) {
+        console.log('SpeechSynthesisUtterance.onend');
+        aiAvatar.classList.remove("speaking");
+        aiStatusText.innerText = "GODZ NEXUS: ONLINE";
+        audio.volume = 0.2; // Restore volume
+    };
+
+    utterThis.onerror = function (event) {
+        console.error('SpeechSynthesisUtterance.onerror');
+        aiAvatar.classList.remove("speaking");
+        audio.volume = 0.2;
+    };
+
+    synth.speak(utterThis);
+}
+
 // Try auto-play immediately (browsers might block)
 window.onload = () => {
     audio.play().catch(e => {

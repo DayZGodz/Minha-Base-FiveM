@@ -18,6 +18,13 @@ Esqueça os tickets de suporte repetitivos. O comando `/ajuda` conecta o jogador
 *   **Resolução de Dúvidas:** "Como compro um carro?", "Onde fica a prefeitura?". A IA responde com base na Wiki do servidor.
 *   **Filtragem de Tickets:** Reduz em 90% a carga da staff, permitindo foco em problemas reais.
 
+### 🎭 GODZ INTERACTIVE LOBBY
+**Tela de Carregamento Viva com IA**
+A primeira impressão é a que fica. O servidor implementa uma experiência de carregamento revolucionária.
+*   **Avatar GODZ NEXUS:** Uma interface visual que reage à voz do jogador enquanto os recursos são baixados.
+*   **Interação em Tempo Real:** O jogador pode tirar dúvidas sobre economia, lore ou comandos antes mesmo de spawnar.
+*   **Tecnologia NUI + Python:** Utiliza Web Speech API para captura de voz e SpeechSynthesis para respostas, processadas pelo `godz_ai_bridge` via CORS.
+
 ---
 
 ## 📦 GODZ CORE (Módulos Essenciais)
