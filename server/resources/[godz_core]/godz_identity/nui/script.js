@@ -8,6 +8,19 @@ document.addEventListener('keydown', function(event) {
 
 window.addEventListener('message', function(event) {
     let data = event.data;
+
+    // [GODZ FIX] Iniciar Kill-Switch ao abrir qualquer menu
+    if (data.action == 'openRG' || data.action == 'openMulticharacter') {
+        if (typeof safetyTimeout !== 'undefined' && safetyTimeout) clearTimeout(safetyTimeout);
+        safetyTimeout = setTimeout(function() {
+            if (document.body.style.display !== 'none') {
+                console.log("[GODZ IDENTITY] Kill-Switch ativado: Timeout de 10s atingido.");
+                document.body.style.display = 'none'; // Força visual
+                closeAll();
+            }
+        }, 10000);
+    }
+
     if (data.action == 'openRG') {
         document.body.style.display = 'flex';
         document.getElementById('rg-container').style.display = 'block';
@@ -28,10 +41,12 @@ window.addEventListener('message', function(event) {
         renderCharacters(data.characters || []);
     }
     else if (data.action == 'hide') {
+        if (safetyTimeout) clearTimeout(safetyTimeout);
         closeAll();
     }
 });
 
+// [GODZ FIX] Removed global timeout in favor of event-based timeout
 function renderCharacters(characters) {
     const container = document.getElementById('char-slots');
     container.innerHTML = '';

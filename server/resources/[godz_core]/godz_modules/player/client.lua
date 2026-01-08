@@ -199,6 +199,52 @@ Citizen.CreateThread(function()
 	end
 end)
 
+-- NEXUS ALERTS (Combustível & Sobrevivência)
+local hunger = 0
+local thirst = 0
+
+RegisterNetEvent("statusFome")
+AddEventHandler("statusFome",function(h,t)
+	hunger = h
+	thirst = t
+end)
+
+RegisterNetEvent("statusSede")
+AddEventHandler("statusSede",function(h,t)
+	hunger = h
+	thirst = t
+end)
+
+local alertCooldown = 0
+Citizen.CreateThread(function()
+	while true do
+		Citizen.Wait(5000) -- Check every 5 seconds
+		if alertCooldown > 0 then
+			alertCooldown = alertCooldown - 5
+		else
+			local ped = PlayerPedId()
+			
+			-- Combustível
+			if IsPedInAnyVehicle(ped) then
+				local vehicle = GetVehiclePedIsUsing(ped)
+				local fuel = GetVehicleFuelLevel(vehicle)
+				if fuel < 15 then
+					TriggerEvent("godz_interface:Notify","ia_tip","NEXUS","Níveis de combustível em reserva crítica. Localize uma unidade de abastecimento.",8000)
+					alertCooldown = 60 -- 1 min cooldown
+				end
+			end
+
+			-- Fome e Sede
+			if alertCooldown <= 0 then
+				if hunger > 90 or thirst > 90 then
+					TriggerEvent("godz_interface:Notify","ia_tip","NEXUS","Atenção: Status vital crítico. Procure suprimentos imediatamente.",8000)
+					alertCooldown = 60
+				end
+			end
+		end
+	end
+end)
+
 RegisterNetEvent("SyncDoorsEveryone")
 AddEventHandler("SyncDoorsEveryone",function(veh,doors)
 	SetVehicleDoorsLocked(veh,doors)
@@ -216,6 +262,152 @@ AddEventHandler('energeticos',function(status)
 	else
 		SetRunSprintMultiplierForPlayer(PlayerId(),1.0)
 	end
+end)
+
+-- Lojas de Conveniência
+local Shops = {
+    { x = 25.7, y = -1347.3, z = 29.5 },
+    { x = -48.5, y = -1757.8, z = 29.4 },
+    { x = 1135.8, y = -982.2, z = 46.4 },
+    { x = 1163.3, y = -323.8, z = 69.2 },
+    { x = -707.5, y = -913.9, z = 19.2 },
+    { x = -1222.9, y = -907.1, z = 12.3 },
+}
+
+local ShopItems = {
+    { item = "agua", name = "Água", price = 150 },
+    { item = "pao", name = "Pão", price = 120 },
+    { item = "mochila", name = "Mochila", price = 2500 },
+    { item = "radio", name = "Rádio", price = 5000 }
+}
+
+Citizen.CreateThread(function()
+    while true do
+        local idle = 1000
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        for _,loc in pairs(Shops) do
+            local dist = #(coords - vector3(loc.x, loc.y, loc.z))
+            if dist < 10.0 then
+                idle = 0
+                DrawMarker(36, loc.x, loc.y, loc.z, 0, 0, 0, 0, 0, 0, 1.0, 1.0, 1.0, 55, 175, 212, 150, 0, 1, 0, 1)
+                if dist < 2.0 then
+                    if IsControlJustPressed(0, 38) then
+                        TriggerEvent("godz_shops:open", ShopItems)
+                    end
+                end
+            end
+        end
+        Citizen.Wait(idle)
+    end
+end)
+
+-- Sistema de Combustível
+local GasStations = {
+    { x = 49.4187, y = 2778.793, z = 58.043 },
+    { x = 263.894, y = 2606.463, z = 44.985 },
+    { x = 1039.958, y = 2671.134, z = 39.550 },
+    { x = 1207.26, y = 2660.175, z = 37.899 },
+    { x = 2539.685, y = 2594.192, z = 38.084 },
+    { x = 2679.858, y = 3263.946, z = 55.240 },
+    { x = 2005.054, y = 3773.883, z = 32.403 },
+    { x = 1687.156, y = 4929.392, z = 42.078 },
+    { x = 1701.314, y = 6416.028, z = 32.763 },
+    { x = 179.857, y = 6602.839, z = 31.868 },
+    { x = -94.4619, y = 6419.594, z = 31.489 },
+    { x = -2554.996, y = 2334.40, z = 33.078 },
+    { x = -1800.375, y = 803.661, z = 138.651 },
+    { x = -1437.622, y = -276.747, z = 46.207 },
+    { x = -2096.243, y = -320.286, z = 13.168 },
+    { x = -724.619, y = -935.1631, z = 19.213 },
+    { x = -526.019, y = -1211.003, z = 18.184 },
+    { x = -70.2148, y = -1761.792, z = 29.534 },
+    { x = 265.648, y = -1261.309, z = 29.292 },
+    { x = 819.653, y = -1028.845, z = 26.403 },
+    { x = 1208.951, y = -1402.567, z = 35.224 },
+    { x = 1181.381, y = -330.847, z = 69.316 },
+    { x = 620.843, y = 269.100, z = 103.089 },
+    { x = -1319.954, y = -390.123, z = 36.693 },
+    { x = -1487.553, y = -504.657, z = 32.803 },
+    { x = -188.971, y = -1193.429, z = 29.289 },
+    { x = -273.286, y = -339.023, z = 29.655 },
+    { x = -1672.097, y = -1080.647, z = 13.152 },
+    { x = -170.0, y = -1638.0, z = 33.0 }
+}
+
+Citizen.CreateThread(function()
+    for _,loc in pairs(GasStations) do
+        local blip = AddBlipForCoord(loc.x, loc.y, loc.z)
+        SetBlipSprite(blip, 361)
+        SetBlipScale(blip, 0.6)
+        SetBlipColour(blip, 1)
+        SetBlipAsShortRange(blip, true)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString("Posto de Gasolina")
+        EndTextCommandSetBlipName(blip)
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        local idle = 1000
+        local ped = PlayerPedId()
+        if IsPedInAnyVehicle(ped) then
+            local veh = GetVehiclePedIsUsing(ped)
+            local speed = GetEntitySpeed(veh) * 3.6
+            if speed > 1.0 and GetIsVehicleEngineRunning(veh) then
+                idle = 500
+                local fuel = GetVehicleFuelLevel(veh)
+                local consumption = (speed / 220.0) * 0.05
+                fuel = fuel - consumption
+                if fuel < 0 then fuel = 0 end
+                SetVehicleFuelLevel(veh, fuel)
+            end
+        end
+        Citizen.Wait(idle)
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        local idle = 1000
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        for _,loc in pairs(GasStations) do
+            local dist = #(coords - vector3(loc.x, loc.y, loc.z))
+            if dist < 10.0 then
+                idle = 0
+                DrawMarker(1, loc.x, loc.y, loc.z, 0, 0, 0, 0, 0, 0, 1.5, 1.5, 1.0, 255, 200, 0, 150, 0, 1, 0, 0)
+                if dist < 2.5 and IsPedInAnyVehicle(ped) then
+                    if IsControlJustPressed(0, 38) then
+                        local veh = GetVehiclePedIsUsing(ped)
+                        local cur = GetVehicleFuelLevel(veh)
+                        local need = 100.0 - cur
+                        if need <= 0.5 then
+                            TriggerEvent("Notify","aviso","Seu tanque já está cheio.")
+                        else
+                            local pricePerUnit = 7 -- $/litro
+                            local cost = math.floor(need * pricePerUnit)
+                            TriggerServerEvent("godz_fuel:refuel", cost)
+                        end
+                    end
+                end
+            end
+        end
+        Citizen.Wait(idle)
+    end
+end)
+
+RegisterNetEvent("godz_fuel:refueled")
+AddEventHandler("godz_fuel:refueled", function()
+    local ped = PlayerPedId()
+    local veh = GetVehiclePedIsUsing(ped)
+    if veh and veh ~= 0 then
+        TriggerEvent("progress", source, 8000, "abastecendo")
+        Citizen.Wait(8000)
+        SetVehicleFuelLevel(veh, 100.0)
+        TriggerEvent("Notify","sucesso","Tanque cheio.")
+    end
 end)
 
 Citizen.CreateThread(function()

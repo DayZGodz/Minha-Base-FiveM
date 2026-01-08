@@ -208,6 +208,24 @@ cfg.groups = {
 	["mochila"] = { -- Não mexer deletar ou remover
 		"mochila.permissao"
 	},
+
+	["policia"] = {
+		_config = { title = "Polícia", gtype = "job" },
+		"policia.permissao",
+		"cpolicia.permissao"
+	},
+	["paisana_policia"] = {
+		_config = { title = "Polícia Paisana", gtype = "job" },
+		"policia.paisana"
+	},
+	["paramedico"] = {
+		_config = { title = "Paramédico", gtype = "job" },
+		"paramedico.permissao"
+	},
+	["paisana_paramedico"] = {
+		_config = { title = "Paramédico Paisana", gtype = "job" },
+		"paramedico.paisana"
+	},
 		
 }
 

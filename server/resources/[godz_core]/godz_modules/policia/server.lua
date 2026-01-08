@@ -266,22 +266,7 @@ end)
 -- EMS
  ----------------------------------------------------------------------------------------------------------------------------------------
 RegisterCommand('ems', function(source,args,rawCommand)
- 	local user_id = vRP.getUserId(source)
- 	local player = vRP.getUserSource(user_id)
- 	local oficiais = vRP.getUsersByPermission("paramedico.permissao")
- 	local paramedicos = 0
- 	local paramedicos_nomes = ""
- 	if user_id then
- 		for k,v in ipairs(oficiais) do
- 			local identity = vRP.getUserIdentity(parseInt(v))
- 			paramedicos_nomes = paramedicos_nomes .. "<b>" .. v .. "</b>: " .. identity.name .. " " .. identity.firstname .. "<br>"
- 			paramedicos = paramedicos + 1
- 		end
- 		TriggerClientEvent("Notify",source,"importante", "Atualmente <b>"..paramedicos.." Paramédicos</b> em serviço.")
- 		if parseInt(paramedicos) > 0 then
-	 		TriggerClientEvent("Notify",source,"importante", paramedicos_nomes)
-	 	end
- 	end
+    toggleServico(source,"ems")
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- MECS
@@ -366,23 +351,58 @@ end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- PD
 -----------------------------------------------------------------------------------------------------------------------------------------
+local function toggleServico(source, job)
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+
+    if job == "pd" then
+        if vRP.hasPermission(user_id,"policia.permissao") then
+            local on = vRP.hasPermission(user_id,"cpolicia.permissao") or vRP.hasGroup(user_id,"policia")
+            if on then
+                vRP.removeUserGroup(user_id,"policia")
+                vRP.addUserGroup(user_id,"paisana_policia")
+                TriggerClientEvent("Notify",source,"aviso","Você saiu de serviço.",8000)
+            else
+                vRP.removeUserGroup(user_id,"paisana_policia")
+                vRP.addUserGroup(user_id,"policia")
+                vRP.giveInventoryItem(user_id,"colete",1)
+                local identity = vRP.getUserIdentity(user_id)
+                local oficiais = vRP.getUsersByPermission("cpolicia.permissao")
+                for _,uid in ipairs(oficiais) do
+                    local ps = vRP.getUserSource(parseInt(uid))
+                    if ps then
+                        TriggerClientEvent("godz_interface:Notify",ps,"ia_tip","NEXUS","[NEXUS]: Oficial "..identity.name.." "..identity.firstname.." agora está em patrulhamento.",8000)
+                    end
+                end
+                TriggerClientEvent("Notify",source,"sucesso","Você entrou de serviço.",8000)
+            end
+        end
+    elseif job == "ems" then
+        if vRP.hasPermission(user_id,"paramedico.permissao") then
+            local inservice = vRP.hasGroup(user_id,"paramedico")
+            if inservice then
+                vRP.removeUserGroup(user_id,"paramedico")
+                vRP.addUserGroup(user_id,"paisana_paramedico")
+                TriggerClientEvent("Notify",source,"aviso","Você saiu de serviço.",8000)
+            else
+                vRP.removeUserGroup(user_id,"paisana_paramedico")
+                vRP.addUserGroup(user_id,"paramedico")
+                local identity = vRP.getUserIdentity(user_id)
+                local membros = vRP.getUsersByPermission("paramedico.permissao")
+                for _,uid in ipairs(membros) do
+                    local ps = vRP.getUserSource(parseInt(uid))
+                    if ps then
+                        TriggerClientEvent("godz_interface:Notify",ps,"ia_tip","NEXUS","[NEXUS]: Paramédico "..identity.name.." "..identity.firstname.." agora está em serviço.",8000)
+                    end
+                end
+                TriggerClientEvent("Notify",source,"sucesso","Você entrou de serviço.",8000)
+            end
+        end
+    end
+end
+
 RegisterCommand('pd',function(source,args,rawCommand)
-	if args[1] then
-		local user_id = vRP.getUserId(source)
-		local identity = vRP.getUserIdentity(user_id)
-		local permission = "cpolicia.permissao"
-		if vRP.hasPermission(user_id,permission) then
-			local soldado = vRP.getUsersByPermission(permission)
-			for l,w in pairs(soldado) do
-				local player = vRP.getUserSource(parseInt(w))
-				if player then
-					async(function()
-						TriggerClientEvent('chatMessage',player,identity.name.." "..identity.firstname,{64,179,255},rawCommand:sub(3))
-					end)
-				end
-			end
-		end
-	end
+    toggleServico(source,"pd")
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- 112
@@ -397,6 +417,13 @@ RegisterCommand('112',function(source,args,rawCommand)
 			end
 		end
 	end
+end)
+
+RegisterCommand('servico',function(source,args,rawCommand)
+    if not args[1] then return end
+    if args[1] == "pd" or args[1] == "ems" then
+        toggleServico(source,args[1])
+    end
 end)
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- PR

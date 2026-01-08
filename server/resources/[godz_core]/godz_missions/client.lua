@@ -1,99 +1,131 @@
-local currentMission = nil
-local missionBlip = nil
+local activeNetId = nil
+local isHacking = false
+local hackProgress = 0
+local deliveryBlip = nil
+local policeBlip = nil
+
+RegisterNetEvent("godz_missions:syncMission")
+AddEventHandler("godz_missions:syncMission", function(netId)
+    activeNetId = netId
+end)
 
 Citizen.CreateThread(function()
-    -- Spawnar NPCs
-    for _, npc in pairs(Config.NPCs) do
-        RequestModel(GetHashKey(npc.model))
-        while not HasModelLoaded(GetHashKey(npc.model)) do
-            Citizen.Wait(1)
-        end
-        
-        local ped = CreatePed(4, GetHashKey(npc.model), npc.coords.x, npc.coords.y, npc.coords.z, npc.coords.w, false, true)
-        SetEntityInvincible(ped, true)
-        FreezeEntityPosition(ped, true)
-        SetBlockingOfNonTemporaryEvents(ped, true)
-        if npc.anim then
-            TaskStartScenarioInPlace(ped, npc.anim, 0, true)
-        end
-        
-        -- Adicionar Target
-        if exports.godz_target then
-            exports.godz_target:AddTargetEntity(ped, {
-                options = {
-                    {
-                        event = "godz_missions:ask",
-                        icon = "fas fa-tasks",
-                        label = "Solicitar Missão"
-                    }
-                },
-                distance = 2.0
-            })
+    while true do
+        Citizen.Wait(1000)
+        if activeNetId and not isHacking then
+            local ped = PlayerPedId()
+            if IsPedInAnyVehicle(ped) then
+                local vehicle = GetVehiclePedIsUsing(ped)
+                local netId = NetworkGetNetworkIdFromEntity(vehicle)
+                local plate = GetVehicleNumberPlateText(vehicle)
+                
+                if netId == activeNetId or plate == "GODZ-IA" or plate == "GODZ IA" then
+                    StartHackingGame(vehicle)
+                end
+            end
         end
     end
 end)
 
-RegisterNetEvent('godz_missions:ask')
-AddEventHandler('godz_missions:ask', function()
-    if currentMission then
-        TriggerEvent("Notify", "negado", "Você já possui uma missão ativa.")
-        return
-    end
-    TriggerServerEvent('godz_missions:requestMission')
-end)
-
-RegisterNetEvent('godz_missions:receiveMission')
-AddEventHandler('godz_missions:receiveMission', function(mission)
-    currentMission = mission
+function StartHackingGame(vehicle)
+    isHacking = true
+    hackProgress = 0
+    
+    TriggerEvent("godz_interface:Notify", "ia_tip", "NEXUS", "Protocolo de Desbloqueio iniciado. Mantenha velocidade acima de 80km/h.", 8000)
+    
+    -- Efeitos Visuais
+    StartScreenEffect("Rampage", 0, true)
     
     -- Abrir NUI
-    SetNuiFocus(true, true)
-    SendNUIMessage({
-        action = "open",
-        mission = mission
-    })
+    SendNUIMessage({ action = "showHack", show = true })
     
-    -- Criar Blip (Simulação de local aleatório próximo para teste, na real usaria coordenadas do backend)
-    -- Como o backend só mandou o nome do local, vamos simular uma coordenada para o blip
-    -- Num sistema real, o backend mandaria x,y,z
-    local targetCoords = vector3(100.0, 100.0, 100.0) -- Placeholder
-    
-    missionBlip = AddBlipForCoord(targetCoords)
-    SetBlipSprite(missionBlip, 1)
-    SetBlipColour(missionBlip, 5)
-    SetBlipRoute(missionBlip, true)
-    
-    TriggerEvent("Notify", "sucesso", "Missão recebida! Verifique o GPS.")
-end)
-
-RegisterNUICallback('accept', function(data, cb)
-    SetNuiFocus(false, false)
-    cb('ok')
-    -- Iniciar contador de tempo, threads de verificação de distância, etc.
-    StartMissionThread()
-end)
-
-RegisterNUICallback('close', function(data, cb)
-    SetNuiFocus(false, false)
-    currentMission = nil
-    if missionBlip then RemoveBlip(missionBlip) end
-    cb('ok')
-end)
-
-function StartMissionThread()
     Citizen.CreateThread(function()
-        while currentMission do
-            Citizen.Wait(1000)
-            -- Lógica simplificada de conclusão (ex: chegar no blip)
-            local plyCoords = GetEntityCoords(PlayerPedId())
-            local dist = #(plyCoords - vector3(100.0, 100.0, 100.0)) -- Placeholder coords
+        while isHacking do
+            Citizen.Wait(100)
+            local speed = GetEntitySpeed(vehicle) * 3.6 -- km/h
             
-            if dist < 10.0 then
-                TriggerServerEvent('godz_missions:completeMission', currentMission)
-                if missionBlip then RemoveBlip(missionBlip) end
-                currentMission = nil
+            if speed > 80 then
+                hackProgress = hackProgress + 0.5
+                ShakeGameplayCam("SKY_DIVING_SHAKE", 0.5)
+            else
+                hackProgress = hackProgress - 1.0
+                ShakeGameplayCam("SMALL_EXPLOSION_SHAKE", 0.2)
+                TriggerEvent("godz_interface:Notify", "aviso", "NEXUS", "Velocidade insuficiente! O hack está falhando!", 1000)
+            end
+            
+            if hackProgress < 0 then hackProgress = 0 end
+            if hackProgress > 100 then hackProgress = 100 end
+            
+            -- Atualizar NUI
+            SendNUIMessage({ action = "updateHack", progress = hackProgress })
+            
+            -- 50% - Alerta Polícia
+            if hackProgress >= 50 and hackProgress < 51 then
+                local coords = GetEntityCoords(vehicle)
+                TriggerServerEvent("godz_missions:alertPolice", coords)
+            end
+            
+            -- 100% - Sucesso
+            if hackProgress >= 100 then
+                FinishHacking(true, vehicle)
+                break
+            end
+            
+            -- Falha se sair do veículo
+            if not IsPedInVehicle(PlayerPedId(), vehicle, false) then
+                FinishHacking(false, vehicle)
                 break
             end
         end
     end)
 end
+
+function FinishHacking(success, vehicle)
+    isHacking = false
+    StopScreenEffect("Rampage")
+    StopGameplayCamShaking(true)
+    SendNUIMessage({ action = "showHack", show = false })
+    
+    if success then
+        TriggerEvent("godz_interface:Notify", "sucesso", "NEXUS", "Acesso concedido. Destino enviado para o GPS.", 8000)
+        
+        -- Pegar destino do config (simulado aqui pois o client não leu o config file)
+        -- Na prática, o server deveria mandar o destino. Vamos simplificar e pedir pro server mandar ou hardcode um random aqui.
+        -- Melhor: Server já tem 'activeMission.delivery'. Vamos pedir pro server o destino.
+        -- Mas para agilizar, vou pegar um destino fixo ou aleatório daqui mesmo, ou melhor, esperar o server.
+        
+        -- Workaround: Setar um destino fixo para teste ou usar o evento de sync se tivesse enviado.
+        SetNewWaypoint(1547.21, 2164.32) -- Exemplo
+        
+        -- Monitorar entrega
+        Citizen.CreateThread(function()
+            while true do
+                Citizen.Wait(1000)
+                local dist = #(GetEntityCoords(PlayerPedId()) - vector3(1547.21, 2164.32, 78.54))
+                if dist < 10.0 then
+                    TriggerServerEvent("godz_missions:finish")
+                    break
+                end
+            end
+        end)
+    else
+        TriggerEvent("godz_interface:Notify", "erro", "NEXUS", "Conexão perdida. Hack falhou.", 5000)
+    end
+end
+
+RegisterNetEvent("godz_missions:policeBlip")
+AddEventHandler("godz_missions:policeBlip", function(coords)
+    if policeBlip then RemoveBlip(policeBlip) end
+    policeBlip = AddBlipForCoord(coords)
+    SetBlipSprite(policeBlip, 161)
+    SetBlipColour(policeBlip, 1)
+    SetBlipScale(policeBlip, 1.2)
+    SetBlipFlashes(policeBlip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentString("Veículo Hackeado")
+    EndTextCommandSetBlipName(policeBlip)
+    
+    Citizen.SetTimeout(60000, function()
+        if policeBlip then RemoveBlip(policeBlip) end
+    end)
+end)

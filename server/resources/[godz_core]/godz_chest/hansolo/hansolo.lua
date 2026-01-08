@@ -12,6 +12,7 @@ vSERVER = Tunnel.getInterface("godz_chest")
 
 local chestTimer = 0
 local chestOpen = ""
+local chestMode = "default"
 
 --[ STARTFOCUS ]-------------------------------------------------------------------------------------------------------------------------
 
@@ -25,18 +26,27 @@ RegisterNUICallback("chestClose",function(data)
 	TransitionFromBlurred(1000)
 	SetNuiFocus(false,false)
 	SendNUIMessage({ action = "hideMenu" })
+    chestMode = "default"
 end)
 
 --[ TAKEITEM ]---------------------------------------------------------------------------------------------------------------------------
 
 RegisterNUICallback("takeItem",function(data)
-	vSERVER.takeItem(tostring(chestOpen),data.item,data.amount)
+	if chestMode == "faction" then
+		vSERVER.takeFactionItem(tostring(chestOpen),data.item,data.amount)
+	else
+		vSERVER.takeItem(tostring(chestOpen),data.item,data.amount)
+	end
 end)
 
 --[ STOREITEM ]--------------------------------------------------------------------------------------------------------------------------
 
 RegisterNUICallback("storeItem",function(data)
-	vSERVER.storeItem(tostring(chestOpen),data.item,data.amount)
+	if chestMode == "faction" then
+		vSERVER.storeFactionItem(tostring(chestOpen),data.item,data.amount)
+	else
+		vSERVER.storeItem(tostring(chestOpen),data.item,data.amount)
+	end
 end)
 
 --[ AUTO-UPDATE ]------------------------------------------------------------------------------------------------------------------------
@@ -49,7 +59,12 @@ end)
 --[ REQUESTCHEST ]-----------------------------------------------------------------------------------------------------------------------
 
 RegisterNUICallback("requestChest",function(data,cb)
-	local inventario,inventario2,peso,maxpeso,peso2,maxpeso2 = vSERVER.openChest(tostring(chestOpen))
+	local inventario,inventario2,peso,maxpeso,peso2,maxpeso2
+	if chestMode == "faction" then
+		inventario,inventario2,peso,maxpeso,peso2,maxpeso2 = vSERVER.openFactionChest(tostring(chestOpen))
+	else
+		inventario,inventario2,peso,maxpeso,peso2,maxpeso2 = vSERVER.openChest(tostring(chestOpen))
+	end
 	if inventario then
 		cb({ inventario = inventario, inventario2 = inventario2, peso = peso, maxpeso = maxpeso, peso2 = peso2, maxpeso2 = maxpeso2 })
 	end
@@ -119,4 +134,14 @@ Citizen.CreateThread(function()
 		end
 		Citizen.Wait(idle)
 	end
+end)
+
+RegisterNetEvent("godz_chest:openFactionChest")
+AddEventHandler("godz_chest:openFactionChest",function(name)
+    local ped = PlayerPedId()
+    chestMode = "faction"
+    TransitionToBlurred(1000)
+    SetNuiFocus(true,true)
+    SendNUIMessage({ action = "showMenu" })
+    chestOpen = tostring(name)
 end)

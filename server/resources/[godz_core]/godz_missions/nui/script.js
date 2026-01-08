@@ -1,29 +1,23 @@
 window.addEventListener('message', function(event) {
-    if (event.data.action === "open") {
-        const mission = event.data.mission;
+    const data = event.data;
+    
+    if (data.action === "showHack") {
+        if (data.show) {
+            document.getElementById("hack-container").style.display = "block";
+        } else {
+            document.getElementById("hack-container").style.display = "none";
+        }
+    } else if (data.action === "updateHack") {
+        const bar = document.getElementById("hack-bar-fill");
+        bar.style.width = data.progress + "%";
         
-        $('#missionTitle').text(mission.title);
-        $('#missionDesc').text(mission.description);
-        $('#missionReward').text("$" + mission.reward.toLocaleString());
-        $('#missionTime').text(Math.floor(mission.time / 60) + " min");
-        $('#missionLoc').text(mission.location);
-        
-        $('#app').fadeIn(200).css('display', 'flex');
+        // Mudar cor se estiver crítico
+        if (data.progress > 90) {
+            bar.style.backgroundColor = "#00ff00";
+        } else if (data.progress > 50) {
+            bar.style.backgroundColor = "#ffff00";
+        } else {
+            bar.style.backgroundColor = "#ff0000";
+        }
     }
 });
-
-document.onkeyup = function(data) {
-    if (data.which == 27) {
-        closeUI();
-    }
-};
-
-function acceptMission() {
-    $.post('https://godz_missions/accept', JSON.stringify({}));
-    $('#app').fadeOut(200);
-}
-
-function closeUI() {
-    $.post('https://godz_missions/close', JSON.stringify({}));
-    $('#app').fadeOut(200);
-}

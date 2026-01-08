@@ -4,6 +4,8 @@ game "gta5"
 
 description "GODZ Ecosystem - Core Modules"
 
+dependency 'godz_tuning'
+
 client_scripts {
 	"@vrp/lib/utils.lua",
 	"/**/client.lua",

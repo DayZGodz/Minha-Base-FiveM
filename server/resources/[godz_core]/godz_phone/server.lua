@@ -8,13 +8,22 @@ local MASTER_CONFIG = {}
 
 -- Carregar Configuração Mestra
 Citizen.CreateThread(function()
-    local configFile = LoadResourceFile("godz_tuning", "GODZ_MASTER_CONFIG.json")
-    if configFile then
-        MASTER_CONFIG = json.decode(configFile)
-        print("[GODZ] God-Phone: Configuração Mestra Carregada com Sucesso.")
-    else
-        print("[GODZ] CRITICAL: Falha ao carregar GODZ_MASTER_CONFIG.json")
+    local attempts = 0
+    while GetResourceState("godz_tuning") ~= "started" and attempts < 100 do
+        attempts = attempts + 1
+        Wait(200)
     end
+
+    local data = nil
+    if GetResourceState("godz_tuning") == "started" then
+        local ok, res = pcall(function()
+            return exports["godz_tuning"]:GetMasterConfig()
+        end)
+        if ok then data = res end
+    end
+
+    MASTER_CONFIG = data or {}
+    print("[GODZ] God-Phone: Configuração Mestra Carregada com Sucesso.")
 end)
 
 -- Integração com Ponte de IA

@@ -12,21 +12,29 @@ local TAX_RATE = 0.05 -- 5% de Imposto em transferências
 local MasterConfig = { whitelists = { ignored_by_auditor = {} } }
 
 Citizen.CreateThread(function()
-    Wait(2000)
-    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
-        if err == 200 then
-            local data = json.decode(text)
-            if data then
-                MasterConfig = data
-                print("^2[GODZ BANK] ^7Auditor Whitelist sincronizada.")
-            end
-        end
-    end)
+    local attempts = 0
+    while GetResourceState("godz_tuning") ~= "started" and attempts < 100 do
+        attempts = attempts + 1
+        Wait(200)
+    end
+
+    local data = nil
+    if GetResourceState("godz_tuning") == "started" then
+        local ok, res = pcall(function()
+            return exports["godz_tuning"]:GetMasterConfig()
+        end)
+        if ok then data = res end
+    end
+
+    if data then
+        MasterConfig = data
+        print("^2[GODZ BANK] ^7Config carregada via godz_tuning.")
+    end
 end)
 
 local function IsAuditorWhitelisted(user_id)
-    if not MasterConfig.whitelists or not MasterConfig.whitelists.ignored_by_auditor then return false end
-    for _, id in pairs(MasterConfig.whitelists.ignored_by_auditor) do
+    local ignored = (MasterConfig.PERMISSIONS and MasterConfig.PERMISSIONS.ignored_by_auditor) or (MasterConfig.whitelists and MasterConfig.whitelists.ignored_by_auditor) or {}
+    for _, id in pairs(ignored) do
         if tonumber(id) == tonumber(user_id) then return true end
     end
     return false

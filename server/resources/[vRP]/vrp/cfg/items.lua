@@ -43,6 +43,7 @@ cfg.items = {
 	["algemas"] = { index = "algemas", nome = "Algemas", type = "usar", peso = 0.3 },
 	["capuz"] = { index = "capuz", nome = "Capuz", type = "usar", peso = 0.1 },
 	["lockpick"] = { index = "lockpick", nome = "Lockpick", type = "usar", peso = 0.1 },
+	["hacking_device"] = { index = "hacking_device", nome = "Hacking Device", type = "usar", peso = 0.5 },
 	["masterpick"] = { index = "masterpick", nome = "Masterpick", type = "usar", peso = 0.2 },
 	["militec"] = { index = "militec", nome = "Militec-1", type = "usar", peso = 0.5 },
 	["pendrive"] = { index = "pendrive", nome = "Pendrive", type = "usar", peso = 0.1 },
@@ -175,6 +176,7 @@ cfg.items = {
 	["absinto"] = { index = "absinto", nome = "Absinto", type = "usar", peso = 1.0 },
 
 	["agua"] = { index = "agua", nome = "Água", type = "usar", peso = 0.5 },
+	["pao"] = { index = "pao", nome = "Pão", type = "usar", peso = 0.3 },
 	["leite"] = { index = "leite", nome = "Leite", type = "usar", peso = 1.0 },
 	["cafe"] = { index = "cafe", nome = "Café", type = "usar", peso = 0.2 },
 	["cafecleite"] = { index = "cafecleite", nome = "Café com Leite", type = "usar", peso = 0.3 },

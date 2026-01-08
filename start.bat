@@ -1,7 +1,6 @@
 @echo off
-cd /d "%~dp0"
-echo ==================================================
-echo       GODZ - SUPER BASE UNIFIED (2026)
-echo ==================================================
-artifacts\FXServer.exe +set serverProfile "default" +set serverDataPath "server" +exec config/config.cfg
-pause
+echo [GODZ] Iniciando NEXUS SUPREME AI...
+start "NEXUS_AI" cmd /k "python server/godz_ai_bridge.py"
+timeout /t 10
+echo [GODZ] Iniciando Servidor FiveM...
+artifacts\FXServer.exe +exec server.cfg

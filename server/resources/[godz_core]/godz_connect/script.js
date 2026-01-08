@@ -54,19 +54,61 @@ function startNexusProtocol() {
 // FAILSAFE: Force close if stuck at 100%
 setInterval(() => {
     if (loadingFill && loadingFill.style.width === '100%') {
+        // [GODZ] Visual Cleanup at 100%
+        if (statusText) statusText.style.display = 'none';
+        if (micBtn) micBtn.style.display = 'none';
+        const protocols = document.querySelector(".protocols"); // Assuming class exists or I should hide specific elements
+        if (protocols) protocols.style.display = 'none';
+
         setTimeout(() => {
             fetch('https://godz_connect/close', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})
             }).catch(e => {});
-        }, 15000); // 15 seconds failsafe
+        }, 500); // 0.5 seconds failsafe
     }
-}, 5000);
+}, 1000);
 
 /* ==========================================================================
    GODZ NEXUS AI INTERFACE & LOADING SYSTEM
    ========================================================================== */
+
+// Message Handler for NUI Actions
+window.addEventListener('message', function(event) {
+    if (event.data.action === "hide") {
+        forceKillNexusUI();
+        hideLoadingScreen();
+        // [GODZ SUPREME] Total Cleanup
+        document.body.innerHTML = '';
+    }
+});
+
+function forceKillNexusUI() {
+    const ids = ["protocols-list", "system-status", "mic-container"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.setProperty("display", "none", "important");
+            el.style.setProperty("opacity", "0", "important");
+        }
+    });
+    
+    // Also hide class based elements if needed
+    const protocols = document.querySelector(".protocols");
+    if (protocols) {
+        protocols.style.setProperty("display", "none", "important");
+        protocols.style.setProperty("opacity", "0", "important");
+    }
+}
+
+function hideLoadingScreen() {
+    document.body.style.setProperty("display", "none", "important");
+    const overlays = document.querySelectorAll(".overlay, .protocols, .mic-container");
+    overlays.forEach(el => el.style.setProperty("display", "none", "important"));
+    
+    if (recognition) recognition.stop();
+}
 
 // DOM Elements
 const aiAvatarWrapper = document.querySelector(".ai-avatar-wrapper");
@@ -193,82 +235,83 @@ async function sendToGodzAi(text) {
    TEXT TO SPEECH (TTS) - NEXUS VOICE
    ========================================================================== */
 function speakAi(text) {
-    if (synth.speaking) return;
+    // Stop any existing speech
+    if (synth.speaking) synth.cancel();
 
     if (statusText) statusText.innerText = "TRANSMITINDO...";
     if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
 
-    const utterThis = new SpeechSynthesisUtterance(text);
-    utterThis.lang = 'pt-BR';
-    utterThis.volume = 1.0;
+    // [GODZ] Edge TTS Integration / Piper Local
+    // Uses local bridge.
+    // Flow: JS -> Python (Generate) -> Python (OK) -> JS (Play local file)
+    
+    // 1. Request Generation
+    fetch(`http://127.0.0.1:5000/tts?text=${encodeURIComponent(text)}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "ok") {
+             const fileName = data.file || 'nexus_voice.wav';
+             const audioUrl = `./sounds/${fileName}?t=${new Date().getTime()}`;
+             const audio = new Audio(audioUrl);
+             
+             // Lip Sync Triggers
+             fetch(`https://godz_connect/startLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
 
-    // Voice Selection Logic (Prioritizing Natural/Neural voices)
-    const voices = synth.getVoices();
-    const voice = voices.find(v => v.name.includes('Microsoft Francisca Online (Natural)')) ||
-                  voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && (v.name.includes('Female') || v.name.includes('Feminina')) && v.lang.includes('pt-BR')) ||
-                  voices.find(v => (v.name.includes('Female') || v.name.includes('Feminina')) && v.lang.includes('pt-BR')) ||
-                  voices.find(v => v.lang.includes('pt-BR')) ||
-                  voices[0];
-                  
-    if (voice) utterThis.voice = voice;
+             audio.play().catch(e => {
+                console.error("Audio Play Error:", e);
+                fallbackSpeak(text);
+             });
 
-    // Android/AI Cadence
-    utterThis.pitch = 1.0; 
-    utterThis.rate = 0.9; 
+             audio.onended = () => {
+                if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
+                if (statusText) statusText.innerText = "SYSTEM: ONLINE";
+                fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
+                
+                // [GODZ SUPREME] Auto-Close after AI speaks (Elite UX)
+                if (window.shouldAutoCloseAfterElite) {
+                     console.log("GODZ ELITE: Closing Interface after AI Speech.");
+                     setTimeout(() => {
+                        forceKillNexusUI();
+                        hideLoadingScreen();
+                        document.body.innerHTML = '';
+                        fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+                     }, 1000);
+                }
+             };
 
-    // Start Lip Sync (Client Trigger)
-    fetch('https://godz_connect/startLipSync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-    }).catch(err => {});
+             audio.onerror = () => {
+                console.error("Audio Load Error");
+                fallbackSpeak(text);
+             };
+        } else {
+            console.error("TTS Generation Failed:", data.error);
+            fallbackSpeak(text);
+        }
+    })
+    .catch(e => {
+        console.error("Bridge Connection Error:", e);
+        fallbackSpeak(text);
+    });
+}
 
-    // Start Bio Scan (Client Trigger)
-    fetch('https://godz_connect/startBioScan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-    }).catch(err => {}); // Ignore errors if not in FiveM environment
+function fallbackSpeak(text) {
+    if (synth.speaking) return;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    
+    // Find a female voice if possible
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(v => v.lang.includes('pt-BR') && (v.name.includes('Google') || v.name.includes('Luciana') || v.name.includes('Maria')));
+    if (femaleVoice) utterance.voice = femaleVoice;
 
-    utterThis.onend = function (event) {
-        if (!event) return;
+    utterance.onend = () => {
         if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SYSTEM: ONLINE";
-        
-        // Stop Lip Sync
-        fetch('https://godz_connect/stopLipSync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        }).catch(err => {});
-
-        // [GODZ] Notify client that speech is finished
-        fetch('https://godz_connect/speechFinished', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        }).catch(err => {});
-
-        // Auto-close loading screen para Staff após saudação de elite
-        try {
-            if (window.shouldAutoCloseAfterElite) {
-                window.shouldAutoCloseAfterElite = false;
-                fetch('https://godz_connect/close', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})
-                }).catch(() => {});
-            }
-        } catch (e) { }
+        fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
     };
 
-    utterThis.onerror = function (event) {
-        console.error('TTS Error');
-        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
-        if (statusText) statusText.innerText = "ERRO: SÍNTESE DE VOZ";
-    };
-
-    synth.speak(utterThis);
+    synth.speak(utterance);
 }
 
 // Initial Greeting removed from onload as it is now triggered by setupIdentity
@@ -276,12 +319,20 @@ window.onload = () => {
     try { initSpeech(); } catch (e) { console.log(e); }
     setTimeout(() => {
         if (!hasReceivedStatus) {
-            window.isCreatorMode = false;
-            isWhitelisted = false;
-            playerName = playerName || "Cidadão";
-            startNexusProtocol();
+            // [GODZ SUPREME] Safety Lock: 10s Timeout
+            console.log("GODZ SAFETY: JSON Timeout (10s). Forcing UI shutdown.");
+            forceKillNexusUI();
+            hideLoadingScreen();
+            document.body.innerHTML = ''; // [GODZ SUPREME] Total Cleanup
+            
+            // Notify client to kill NUI focus
+            fetch('https://godz_connect/close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            }).catch(e => {});
         }
-    }, 5000);
+    }, 10000);
 };
 
 /* ==========================================================================

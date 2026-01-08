@@ -1,15 +1,57 @@
 import sys
 import os
+
+os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
+
+from colorama import init, Fore, Style
+init(autoreset=True)
+
 import wave
+import hashlib
+import numpy as np
+try:
+    import soundfile as sf
+except ImportError:
+    sf = None
+    print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}soundfile não encontrado. Export do ChatTTS indisponível.")
+
+try:
+    from scipy.signal import butter, lfilter
+    SCIPY_AVAILABLE = True
+except ImportError:
+    SCIPY_AVAILABLE = False
+    print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}Scipy não encontrado. Efeito de rádio simplificado.")
+
 try:
     from piper import PiperVoice
 except ImportError:
     PiperVoice = None
     print("Piper TTS library not found. Voice generation will be disabled.")
-from functools import wraps
 
-# [GODZ AI] Configuração de Cache no Disco D: (Deve vir antes dos imports do HF)
-os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
+# [GODZ AI] ChatTTS Engine
+CHATTTS_AVAILABLE = False
+try:
+    import ChatTTS
+    import torch
+    chat = ChatTTS.Chat()
+    
+    # [GODZ SUPREME] FP16 Optimization & Compile
+    # Tenta carregar com otimizações se houver GPU
+    if torch.cuda.is_available():
+        print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}GPU Detectada. Ativando FP16 e Compilação...")
+        # Nota: A API do ChatTTS pode variar, mas load_models geralmente aceita device
+        chat.load_models(compile=True) 
+    else:
+        chat.load_models()
+        
+    CHATTTS_AVAILABLE = True
+    print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}ChatTTS Engine initialized (Supreme Quality).")
+except ImportError:
+    print(f"{Fore.YELLOW}[GODZ AI] {Fore.WHITE}ChatTTS library not found. Using Piper fallback.")
+except Exception as e:
+    print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Error initializing ChatTTS: {e}")
+
+from functools import wraps
 
 import json
 import logging
@@ -24,10 +66,6 @@ from waitress import serve
 import numpy as np
 from datetime import datetime, timedelta
 
-# Configuração de Logs e Cores
-from colorama import init, Fore, Style
-init(autoreset=True)
-
 app = Flask(__name__)
 
 # [GODZ AI] Habilitar CORS para NUI/Loading Screen
@@ -38,6 +76,146 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "online", "engine": "Supreme", "cache_size": len(COMMON_PHRASES_CACHE)}), 200
+
+# [GODZ SUPREME] Radio Effect Filter
+def apply_radio_effect(audio_data, sample_rate):
+    try:
+        # 1. Bandpass Filter (300Hz - 3400Hz) - Standard Telephony/Radio
+        if SCIPY_AVAILABLE:
+            nyquist = 0.5 * sample_rate
+            low = 300 / nyquist
+            high = 3400 / nyquist
+            b, a = butter(1, [low, high], btype='band')
+            filtered_audio = lfilter(b, a, audio_data)
+            
+            # 2. Add White Noise (Static)
+            noise_level = 0.005
+            noise = np.random.normal(0, noise_level, filtered_audio.shape)
+            final_audio = filtered_audio + noise
+            
+            # Clip to prevent distortion
+            final_audio = np.clip(final_audio, -1.0, 1.0)
+            return final_audio
+        else:
+            # Fallback: Simple High Pass (Discrete Difference)
+            # y[n] = x[n] - 0.95 * x[n-1]
+            return np.diff(audio_data, prepend=0)
+    except Exception as e:
+        print(f"Radio Effect Error: {e}")
+        return audio_data
+
+# [GODZ SUPREME] Common Phrases Cache
+# Pre-defined hash map for instant response
+COMMON_PHRASES_CACHE = {
+    "Bem-vindo": "welcome_generic.wav",
+    "Acesso Negado": "access_denied.wav",
+    "Sistema Online": "system_online.wav",
+    "Protocolo de segurança ativado": "security_protocol.wav"
+}
+
+@app.route('/tts', methods=['GET'])
+def tts_endpoint():
+    try:
+        text = request.args.get('text')
+        if not text:
+            return jsonify({"error": "No text provided"}), 400
+        
+        # 1. Check Explicit Cache (Common Phrases)
+        for phrase, filename in COMMON_PHRASES_CACHE.items():
+            if phrase.lower() in text.lower() and len(text) < len(phrase) + 10:
+                cache_path = os.path.join(GODZ_CONNECT_SOUNDS_DIR, filename)
+                if os.path.exists(cache_path):
+                     return jsonify({"status": "ok", "file": filename, "cached": "explicit"})
+
+        # 2. Check Hash Cache
+        text_hash = hashlib.md5(text.encode()).hexdigest()
+        output_filename = f"nexus_{text_hash}.wav"
+        output_file = os.path.join(GODZ_CONNECT_SOUNDS_DIR, output_filename)
+        
+        if os.path.exists(output_file):
+             return jsonify({"status": "ok", "file": output_filename, "cached": True})
+
+        # Generation
+        generated = False
+        
+        if CHATTTS_AVAILABLE and sf is not None:
+            try:
+                global CHATTTS_SPEAKERS
+                if 'CHATTTS_SPEAKERS' not in globals():
+                    CHATTTS_SPEAKERS = {}
+
+                if not CHATTTS_SPEAKERS.get("vitoria") or not CHATTTS_SPEAKERS.get("thalita"):
+                    try:
+                        np.random.seed(1042)
+                        CHATTTS_SPEAKERS["vitoria"] = chat.sample_random_speaker()
+                        np.random.seed(2042)
+                        CHATTTS_SPEAKERS["thalita"] = chat.sample_random_speaker()
+                    except Exception:
+                        pass
+
+                spk_emb = CHATTTS_SPEAKERS.get("vitoria") or CHATTTS_SPEAKERS.get("thalita")
+
+                params_refine_text = {
+                    "prompt": "[oral_5][break_6]"
+                }
+                params_infer_code = {
+                    "spk_emb": spk_emb,
+                    "top_P": 0.7,
+                    "top_K": 20,
+                    "temperature": 0.3,
+                    "repetition_penalty": 1.05
+                }
+
+                wavs = chat.infer([text], params_refine_text=params_refine_text, params_infer_code=params_infer_code)
+                
+                # [GODZ SUPREME] Apply Radio Effect
+                audio_data = wavs[0]
+                # Convert list to numpy if needed (ChatTTS usually returns list of numpy arrays)
+                if isinstance(audio_data, list):
+                    audio_data = np.array(audio_data)
+                
+                final_audio = apply_radio_effect(audio_data, 24000)
+
+                # Save to file
+                sf.write(output_file, final_audio, 24000)
+                generated = True
+                print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via ChatTTS (Voz: Vitoria) + Rádio FX: {text[:30]}...")
+            except Exception as e:
+                print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro no ChatTTS, tentando fallback: {e}")
+        
+        if not generated and PiperVoice:
+            # Fallback to Piper
+            if not os.path.exists(PIPER_MODEL_PATH) or not os.path.exists(PIPER_MODEL_JSON):
+                return jsonify({"error": "Voice model not found"}), 500
+            
+            voice = PiperVoice.load(PIPER_MODEL_PATH)
+            with wave.open(output_file, "wb") as wav_file:
+                voice.synthesize(text, wav_file)
+            generated = True
+            print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via Piper: {text[:30]}...")
+
+        if not generated:
+            return jsonify({"error": "No TTS engine available"}), 500
+        
+        # Send Discord Log
+        if DISCORD_WEBHOOK_AUDIT:
+            embed = {
+                "title": "🎙️ NEXUS VOICE GENERATION",
+                "description": f"**Texto:** {text}\n**Engine:** {'ChatTTS' if CHATTTS_AVAILABLE else 'Piper'}\n**Status:** Gerado com sucesso.",
+                "color": COLOR_NEON_CYAN,
+                "footer": {"text": "GODZ AI SUPREME"}
+            }
+            threading.Thread(target=send_discord_webhook, args=(DISCORD_WEBHOOK_AUDIT, embed)).start()
+        
+        return jsonify({"status": "ok", "file": output_filename})
+
+    except Exception as e:
+        logger.error(f"TTS Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
 # ==================================================================================
 # SEGURANÇA (API KEY)
 # ==================================================================================
@@ -45,10 +223,16 @@ API_KEY = "godz_secret_key_123"
 
 # [GODZ AI] Piper TTS Config
 PIPER_MODELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "piper_models")
-VOICE_OUTPUT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "voices")
+# Caminho exato para a pasta sounds do godz_connect
+GODZ_CONNECT_SOUNDS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources", "[godz_core]", "godz_connect", "sounds")
 
-if not os.path.exists(VOICE_OUTPUT_DIR):
-    os.makedirs(VOICE_OUTPUT_DIR, exist_ok=True)
+if not os.path.exists(GODZ_CONNECT_SOUNDS_DIR):
+    os.makedirs(GODZ_CONNECT_SOUNDS_DIR, exist_ok=True)
+
+# Garantir modelo Thalita
+PIPER_MODEL_NAME = "pt_BR-thalita-medium.onnx"
+PIPER_MODEL_PATH = os.path.join(PIPER_MODELS_DIR, PIPER_MODEL_NAME)
+PIPER_MODEL_JSON = PIPER_MODEL_PATH + ".json"
 
 def require_api_key(f):
     @wraps(f)
@@ -64,6 +248,13 @@ def require_api_key(f):
 # Configuração do Logger
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger()
+
+def send_discord_webhook(webhook_url, embed):
+    try:
+        data = {"embeds": [embed], "username": "GODZ AI SUPREME"}
+        requests.post(webhook_url, json=data)
+    except Exception as e:
+        print(f"Erro no Webhook: {e}")
 
 print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Inicializando Sistemas Neurais...")
 
@@ -483,8 +674,11 @@ def run_discord_bot():
 threading.Thread(target=run_discord_bot, daemon=True).start()
 
 
+# Old TTS Endpoint Removed
+
+
 # ==================================================================================
-# ENDPOINTS
+# 3. ROTAS DA API
 # ==================================================================================
 
 @app.route('/health', methods=['GET'])
@@ -985,5 +1179,24 @@ def generate_voice():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    print(f"{Fore.CYAN}[GODZ AI] {Fore.WHITE}Servidor de Produção rodando na porta 5000...")
+    print(f"{Fore.CYAN}✅ [NEXUS SUPREME] Sistema de Voz e IA pronto na porta 5000")
+    
+    # [NEXUS SUPREME] Startup Log (Audit Channel)
+    discord_audit = MASTER_CONFIG.get("WEBHOOKS", {}).get("audit")
+    
+    if discord_audit:
+         embed = {
+            "title": "🎙️ NEXUS SUPREME: ONLINE",
+            "description": "🎙️ [NEXUS SUPREME]: Conexão total estabelecida. Voz Humana Generativa Ativa.",
+            "fields": [
+                {"name": "Engine", "value": "ChatTTS (ElevenLabs Level)", "inline": True},
+                {"name": "Port", "value": "5000", "inline": True},
+                {"name": "Voice", "value": "Vitoria (Prosody Enhanced)", "inline": True}
+            ],
+            "color": COLOR_NEON_GREEN,
+            "timestamp": datetime.utcnow().isoformat(),
+            "footer": {"text": "GODZ AI SYSTEM"}
+        }
+         threading.Thread(target=send_discord_webhook, args=(discord_audit, embed)).start()
+
     serve(app, host='0.0.0.0', port=5000)

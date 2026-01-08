@@ -18,9 +18,15 @@ window.addEventListener('message', function(event) {
     else if (data.action === 'notify') {
         createNotify(data.type, data.title, data.message, data.duration);
     }
-    else if (data.action === 'toggleHUD') {
-        document.getElementById('hud-container').style.opacity = data.show ? '1' : '0';
-    }
+  else if (data.action === 'toggleHUD') {
+      document.getElementById('hud-container').style.opacity = data.show ? '1' : '0';
+  }
+  else if (data.action === 'openShop') {
+      openShop(data.items || []);
+  }
+  else if (data.action === 'closeShop') {
+      closeShop();
+  }
 });
 
 function updateCircle(type, percent) {
@@ -76,3 +82,40 @@ function createNotify(type, title, message, duration = 5000) {
         }, 500);
     }, duration);
 }
+
+function openShop(items) {
+    const modal = document.getElementById('shop-modal');
+    const container = document.getElementById('shop-items');
+    container.innerHTML = '';
+    items.forEach(it => {
+        const el = document.createElement('div');
+        el.className = 'shop-item';
+        el.innerHTML = `
+            <div class="shop-item-image">
+                <img src="images/items/${it.item}.png" alt="${it.name}" onerror="this.style.display='none'">
+            </div>
+            <div class="shop-item-name">${it.name}</div>
+            <div class="shop-item-price">$${it.price}</div>
+            <button class="shop-item-buy">Comprar</button>
+        `;
+        el.querySelector('.shop-item-buy').addEventListener('click', () => {
+            fetch(`https://${GetParentResourceName()}/shopBuy`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                body: JSON.stringify({ item: it.item, price: it.price })
+            });
+        });
+        container.appendChild(el);
+    });
+    modal.style.display = 'block';
+}
+
+function closeShop() {
+    const modal = document.getElementById('shop-modal');
+    modal.style.display = 'none';
+}
+
+document.getElementById('shop-close').addEventListener('click', () => {
+    fetch(`https://${GetParentResourceName()}/shopClose`, { method: 'POST' });
+    closeShop();
+});

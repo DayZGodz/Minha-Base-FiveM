@@ -9,23 +9,35 @@ vRP.prepare("vRP/update_user_phone","UPDATE godz_user_identities SET phone = @ph
 vRP.prepare("vRP/update_user_first_spawn","UPDATE godz_user_identities SET firstname = @firstname, name = @name, age = @age WHERE user_id = @user_id")
 
 function vRP.getUserIdentity(user_id,cbr)
-	local rows = vRP.query("vRP/get_user_identity",{ user_id = user_id })
-	return rows[1]
+    local ok, rows = pcall(vRP.query, "vRP/get_user_identity",{ user_id = user_id })
+    if not ok then
+        print("[vRP] Error in getUserIdentity: " .. tostring(rows))
+        if Nexus and Nexus.Log then
+             Nexus:Log("ERRO DE SISTEMA", "Falha ao buscar identidade do ID " .. tostring(user_id) .. ": " .. tostring(rows), 15158332)
+        end
+        return nil
+    end
+    if rows and #rows > 0 then
+        return rows[1]
+    end
 end
 
 function vRP.getUserByRegistration(registration, cbr)
 	local registration2 = ""
-	for i=1,#registration do
-		if string.sub(registration,i,i) ~= " " then
-			registration2 = string.sub(registration,i)
-			break
-		end
-	end
+    if registration then
+        for i=1,#registration do
+            if string.sub(registration,i,i) ~= " " then
+                registration2 = string.sub(registration,i)
+                break
+            end
+        end
+    end
 
-	local rows = vRP.query("vRP/get_userbyreg",{ registration = registration2 or "" })
-	if #rows > 0 then
+    local ok, rows = pcall(vRP.query, "vRP/get_userbyreg",{ registration = registration2 or "" })
+	if ok and rows and type(rows) == "table" and #rows > 0 then
 		return rows[1].user_id
 	end
+    if not ok then print("[vRP] Error in getUserByRegistration: " .. tostring(rows)) end
 end
 
 function vRP.setUserRegistration(user_id,registration,cbr)
@@ -33,10 +45,13 @@ function vRP.setUserRegistration(user_id,registration,cbr)
 end
 
 function vRP.getUserByPhone(phone, cbr)
-	local rows = vRP.query("vRP/get_userbyphone",{ phone = phone or "" })
-	if #rows > 0 then
+    -- [GODZ FIX] Null check and pcall
+    if not phone then return nil end
+	local ok, rows = pcall(vRP.query, "vRP/get_userbyphone",{ phone = phone })
+	if ok and rows and type(rows) == "table" and #rows > 0 then
 		return rows[1].user_id
 	end
+    if not ok then print("[vRP] Error in getUserByPhone: " .. tostring(rows)) end
 end
 
 function vRP.setUserPhone(user_id,phone,cbr)
@@ -83,24 +98,42 @@ AddEventHandler("vRP:playerJoin",function(user_id,source,name)
     if not vRP.getUserIdentity(user_id) then
         local registration = vRP.generateRegistrationNumber()
         local phone = vRP.generatePhoneNumber()
-        if tonumber(user_id) == 1 then
+        
+        local ok, err = pcall(function()
+            -- [GODZ FIX] Garantir que dados não sejam nulos (Proteção Anti-Crash 3%)
+            -- Verifica se vRP.generate... retornou nil
+            if registration == nil then registration = "" end
+            if phone == nil then phone = "" end
+            
+            -- Se vazios, tenta gerar novamente ou define fallback seguro
+            if registration == "" then registration = vRP.generateRegistrationNumber() or "AA000AAA" end
+            if phone == "" then phone = vRP.generatePhoneNumber() or "000-000" end
+            
+            local def_firstname = "Indigente"
+            local def_name = "Individuo"
+            local def_age = 21
+
+            if tonumber(user_id) == 1 then
+                def_firstname = "Bob"
+                def_name = "Godz"
+                def_age = 25
+            end
+
             vRP.execute("vRP/init_user_identity",{
                 user_id = user_id,
                 registration = registration,
                 phone = phone,
-                firstname = "Bob",
-                name = "Godz",
-                age = 25
+                firstname = def_firstname,
+                name = def_name,
+                age = def_age
             })
-        else
-            vRP.execute("vRP/init_user_identity",{
-                user_id = user_id,
-                registration = registration,
-                phone = phone,
-                firstname = "Indigente",
-                name = "Individuo",
-                age = 21
-            })
+        end)
+
+        if not ok then
+            print("[vRP] Error in init_user_identity: " .. tostring(err))
+             if Nexus and Nexus.Log then
+                 Nexus:Log("ERRO DE SISTEMA", "Falha ao sincronizar identidade do ID " .. tostring(user_id) .. ". Verifique a tabela godz_user_identities. Erro: " .. tostring(err), 15158332)
+            end
         end
     end
 end)

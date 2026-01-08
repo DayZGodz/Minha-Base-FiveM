@@ -122,3 +122,20 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+RegisterNetEvent("godz_shops:open")
+AddEventHandler("godz_shops:open", function(items)
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = "openShop", items = items })
+end)
+
+RegisterNUICallback("shopBuy", function(data, cb)
+    cb("ok")
+    TriggerServerEvent("godz_shops:purchase", data.item, parseInt(data.price))
+end)
+
+RegisterNUICallback("shopClose", function(data, cb)
+    cb("ok")
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = "closeShop" })
+end)

@@ -6,20 +6,27 @@ vRP = Proxy.getInterface("vRP")
 local MasterConfig = { webhooks = {} }
 
 Citizen.CreateThread(function()
-    Wait(2000)
-    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
-        if err == 200 then
-            local data = json.decode(text)
-            if data then
-                MasterConfig = data
-                -- Atualiza webhook se disponível
-                if MasterConfig.webhooks and MasterConfig.webhooks.support and MasterConfig.webhooks.support ~= "" then
-                    Config.Webhooks.Tickets = MasterConfig.webhooks.support
-                    print("^2[GODZ SUPPORT] ^7Webhook sincronizado com IA: " .. MasterConfig.webhooks.support)
-                end
-            end
+    local attempts = 0
+    while GetResourceState("godz_tuning") ~= "started" and attempts < 100 do
+        attempts = attempts + 1
+        Wait(200)
+    end
+
+    local data = nil
+    if GetResourceState("godz_tuning") == "started" then
+        local ok, res = pcall(function()
+            return exports["godz_tuning"]:GetMasterConfig()
+        end)
+        if ok then data = res end
+    end
+
+    if data then
+        MasterConfig = data
+        if MasterConfig.WEBHOOKS and MasterConfig.WEBHOOKS.support and MasterConfig.WEBHOOKS.support ~= "" then
+            Config.Webhooks.Tickets = MasterConfig.WEBHOOKS.support
+            print("^2[GODZ SUPPORT] ^7Webhook carregado via godz_tuning: " .. MasterConfig.WEBHOOKS.support)
         end
-    end)
+    end
 end)
 
 local temp_tickets = {}

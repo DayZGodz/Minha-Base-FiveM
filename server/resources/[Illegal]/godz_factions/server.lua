@@ -6,20 +6,68 @@ vRPclient = Tunnel.getInterface("vRP")
 local MasterConfig = { groups = {} }
 local API_KEY = "godz_secret_key_123"
 
+local function PerformHttpRequestWithRetry(url, cb, method, data, headers, max_retries)
+    local retries = 0
+    local success = false
+    
+    Citizen.CreateThread(function()
+        while retries < (max_retries or 10) and not success do
+            local finished = false
+            local function finish(err, text, resp_headers)
+                if finished then return end
+                finished = true
+                if err == 0 or err == nil then
+                    if retries > 3 then
+                        print("^3[GODZ FACTIONS] Falha na conexão com IA (Erro " .. tostring(err) .. "). Tentativa " .. (retries + 1) .. "...^0")
+                    end
+                else
+                    success = true
+                    if cb then cb(err, text, resp_headers) end
+                end
+            end
+
+            PerformHttpRequest(url, function(err, text, resp_headers)
+                finish(err, text, resp_headers)
+            end, method, data, headers)
+
+            SetTimeout(10000, function()
+                finish(0, nil, nil)
+            end)
+
+            while not finished do
+                Wait(25)
+            end
+
+            if not success then
+                retries = retries + 1
+                Wait(3000)
+            end
+        end
+    end)
+end
+
 -- 1. Sincronização Master Config
 Citizen.CreateThread(function()
-    Wait(2000)
-    PerformHttpRequest("http://127.0.0.1:5000/config", function(err, text, headers)
-        if err == 200 then
-            local data = json.decode(text)
-            if data then
-                MasterConfig = data
-                print("^2[GODZ FACTIONS] ^7Configurações sincronizadas com IA.")
-            end
-        else
-            print("^1[GODZ FACTIONS] ^7Erro ao sincronizar config: " .. tostring(err))
-        end
-    end, 'GET', "", { ["Authorization"] = "Bearer " .. API_KEY })
+    local attempts = 0
+    while GetResourceState("godz_tuning") ~= "started" and attempts < 100 do
+        attempts = attempts + 1
+        Wait(200)
+    end
+
+    local data = nil
+    if GetResourceState("godz_tuning") == "started" then
+        local ok, res = pcall(function()
+            return exports["godz_tuning"]:GetMasterConfig()
+        end)
+        if ok then data = res end
+    end
+
+    if data then
+        MasterConfig = data
+        print("^2[GODZ FACTIONS] ^7Config carregada via godz_tuning.")
+    else
+        print("^1[GODZ FACTIONS] ^7Erro ao carregar config via godz_tuning")
+    end
 end)
 
 -- Helper: Get Player Faction
@@ -113,9 +161,7 @@ AddEventHandler("godz_factions:openChest", function()
     local faction, _ = GetPlayerFaction(user_id)
     
     if faction then
-        -- Abre baú (integração com inventário existente ou chest proprietário)
-        -- Aqui simularemos um log para a IA
-        TriggerClientEvent("godz_inventory:openChest", source, "chest:"..faction)
+        TriggerClientEvent("godz_chest:openFactionChest", source, "faction:"..faction)
     end
 end)
 
@@ -127,7 +173,7 @@ end)
 function LogChestActivity(user_id, faction, item, amount, type)
     -- type: "withdraw" ou "deposit"
     if type == "withdraw" then
-        PerformHttpRequest("http://127.0.0.1:5000/analyze_chest_activity", function(err, text, headers)
+        PerformHttpRequestWithRetry("http://127.0.0.1:5000/analyze_chest_activity", function(err, text, headers)
             if err == 200 then
                 local res = json.decode(text)
                 if res and res.alert then
@@ -145,7 +191,7 @@ function LogChestActivity(user_id, faction, item, amount, type)
             faction = faction,
             item = item,
             amount = amount
-        }), { ["Content-Type"] = "application/json", ["Authorization"] = "Bearer " .. API_KEY })
+        }), { ["Content-Type"] = "application/json", ["Authorization"] = "Bearer " .. API_KEY }, 10)
     end
 end
 

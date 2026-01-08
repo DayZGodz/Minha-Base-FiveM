@@ -35,13 +35,56 @@ function CheckEconomy()
     end)
 end
 
+local API_KEY = "godz_secret_key_123" -- Garantindo chave
+
+local function PerformHttpRequestWithRetry(url, cb, method, data, headers, max_retries)
+    local retries = 0
+    local success = false
+    
+    Citizen.CreateThread(function()
+        while retries < (max_retries or 10) and not success do
+            local finished = false
+            local function finish(err, text, resp_headers)
+                if finished then return end
+                finished = true
+                if err == 0 or err == nil then
+                    if retries > 3 then
+                        print("^3[GODZ ECONOMY] Falha na conexão com IA (Erro " .. tostring(err) .. "). Tentativa " .. (retries + 1) .. "...^0")
+                    end
+                else
+                    success = true
+                    if cb then cb(err, text, resp_headers) end
+                end
+            end
+
+            PerformHttpRequest(url, function(err, text, resp_headers)
+                finish(err, text, resp_headers)
+            end, method, data, headers)
+
+            SetTimeout(10000, function()
+                finish(0, nil, nil)
+            end)
+
+            while not finished do
+                Wait(25)
+            end
+
+            if not success then
+                retries = retries + 1
+                Wait(3000)
+            end
+        end
+    end)
+end
+
 function ConsultAI(item, total, average)
-    -- Chama o módulo de IA via Proxy vRP
-    vRP.askGodzAI("/ai_economy_simulation", {
-        item = item,
-        total_circulating = total,
-        average_balance = average
-    }, function(code, res, headers)
+    -- Chama o módulo de IA diretamente com Retry
+    local headers = { 
+       ["Authorization"] = "Bearer " .. API_KEY,
+       ["Content-Type"] = "application/json"
+    }
+    
+    PerformHttpRequestWithRetry("http://127.0.0.1:5000/ai_economy_simulation", function(code, res, headers)
         if code == 200 then
             local body = json.decode(res)
             if body and body.multiplier then
@@ -51,7 +94,11 @@ function ConsultAI(item, total, average)
         else
             print("[GODZ ECONOMY] Erro ao contatar IA: " .. tostring(code))
         end
-    end)
+    end, 'POST', json.encode({
+        item = item,
+        total_circulating = total,
+        average_balance = average
+    }), headers, 10)
 end
 
 function UpdatePrices(category, multiplier)

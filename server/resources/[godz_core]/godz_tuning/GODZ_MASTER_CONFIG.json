@@ -1,31 +1,25 @@
 {
     "SERVER_INFO": {
-        "server_name": "Família God",
-        "_server_name_desc": "Nome oficial que aparecerá na HUD e Discord",
-        
-        "guild_id": 1394591451597246494,
-        "_guild_id_desc": "ID do Servidor Discord principal"
+        "server_name": "GODZ",
+        "discord_token": "",
+        "guild_id": 1394591451597246494
     },
     "DATABASE": {
-        "connection_string": "mysql://root@localhost/godz_database?multipleStatements=true",
-        "_connection_string_desc": "String de conex\u00e3o do banco de dados unificado"
+        "connection_string": "mysql://root@localhost/godz_database?multipleStatements=true"
     },
     "PERMISSIONS": {
         "ceos": [
             1,
             2
         ],
-        "_ceos_desc": "Donos/Fundadores (Acesso total)",
         "admins": [
             3,
             4
         ],
-        "_admins_desc": "Administradores (Gerenciamento geral)",
         "moderators": [
             5,
             6
-        ],
-        "_moderators_desc": "Moderadores (Suporte b\u00e1sico)"
+        ]
     },
     "ECONOMY": {
         "tuning_prices": {
@@ -35,8 +29,7 @@
             "transmission_base": 3000,
             "suspension_base": 2500,
             "armor_base": 10000
-        },
-        "_tuning_prices_desc": "Pre\u00e7os base para customiza\u00e7\u00e3o de ve\u00edculos (godz_tuning)"
+        }
     },
     "SECURITY": {
         "ignored_by_sentinel": [
@@ -45,29 +38,128 @@
             3,
             4
         ],
-        "_ignored_by_sentinel_desc": "IDs ignorados pelo Anti-Cheat",
         "ignored_by_auditor": [
             1,
             2
-        ],
-        "_ignored_by_auditor_desc": "IDs ignorados pela IA de Economia"
+        ]
     },
     "WEBHOOKS": {
-        "audit": "https://discord.com/api/webhooks/1458221642391228569/DuExYvz5iCHII9uT8ld5FV90gchEWcwjXZv1bfALWjGk0CFmJemcgt7Te_OQhiSxanxB",
-        "_audit_desc": "Log de Auditoria Econ\u00f4mica",
+        "audit": "https://discord.com/api/webhooks/1458773373097218078/HIJQgPJ_IFO9djEU7zAY01RrtquUCWyHrpCszRNKBpNgnlrjY5myb3ZultiTPQrX8Jaz",
         "sentinel": "https://discord.com/api/webhooks/1458221652046250044/ercvfHRBg58IHJiHV8eoboDUq8igFHW_x8M-hV1IYO-0CObhjZ9eNq0RoJuk3HxBXBD-",
-        "_sentinel_desc": "Log do Anti-Cheat",
         "bank": "https://discord.com/api/webhooks/1458221658723582057/_RYQ4tvETWgSBZcI26P_DDEb5K0nCdcZvG5ZWgx1yS869HyChMY-tpio0BXtnRptVHTf",
-        "_bank_desc": "Log de Transa\u00e7\u00f5es Banc\u00e1rias",
         "support": "https://discord.com/api/webhooks/1458221667493871838/YSGTONfsBXGFbcbQXh3xVIkW5bNhnl4DmyImCkJUfeoEzunN3HG2fd1vbzkukN3-Be23",
-        "_support_desc": "Log de Tickets de Suporte",
         "staff": "https://discord.com/api/webhooks/1458221676184469504/PFK2PVXWYTeX_NCFD_UEA1QCacxTY1h2YTkeNKPIcdfQdB8dVyEwo3ARF50m5KWmfBS9",
-        "_staff_desc": "Log de A\u00e7\u00f5es da Staff",
-        "news": "https://discord.com/api/webhooks/1458221684455772311/_jB34LtZOWagKlbDl_78cAuaD3zcKx4ouTxB1167BNXw1PL1-lBV3rTnNjFtLy4SKxdy",
-        "_news_desc": "Canal de Not\u00edcias Autom\u00e1ticas"
+        "news": "https://discord.com/api/webhooks/1458773380294770708/kyNHjopdRDTEoGMv_mMvkM2NaA3UP5R_t-FtdWL0nAxU6ktmXfLhhKnqqG9l15QwMyy3"
     },
     "PHONE": {
-        "apps": ["god_ai", "contacts"],
+        "apps": [
+            "god_ai",
+            "contacts"
+        ],
         "ai_bridge_url": "http://127.0.0.1:5000/ai_chat"
+    },
+    "MISSIONS": {
+        "spawns": [
+            {
+                "x": 215.76,
+                "y": -791.35,
+                "z": 30.82,
+                "h": 250.0
+            },
+            {
+                "x": -1026.34,
+                "y": -2736.21,
+                "z": 13.76,
+                "h": 330.0
+            },
+            {
+                "x": 1182.12,
+                "y": 2658.32,
+                "z": 37.89,
+                "h": 180.0
+            },
+            {
+                "x": -3052.12,
+                "y": 598.21,
+                "z": 7.54,
+                "h": 90.0
+            }
+        ],
+        "deliveries": [
+            {
+                "x": 1547.21,
+                "y": 2164.32,
+                "z": 78.54
+            },
+            {
+                "x": -2189.12,
+                "y": 4278.43,
+                "z": 48.12
+            },
+            {
+                "x": 2534.12,
+                "y": 4832.12,
+                "z": 34.12
+            }
+        ],
+        "vehicles": [
+            "adder",
+            "stockade",
+            "zentorno",
+            "t20"
+        ],
+        "hacking_speed": 80
+    },
+    "LAUNDRY": {
+        "commission_rate": 0.2,
+        "police_radius": 50.0,
+        "location": {
+            "x": 1136.0,
+            "y": -992.0,
+            "z": 46.0
+        }
+    },
+    "BLACK_MARKET": {
+        "open_hour": 21,
+        "close_hour": 5,
+        "locations": [
+            {
+                "x": 707.0,
+                "y": -966.0,
+                "z": 30.4
+            },
+            {
+                "x": -56.0,
+                "y": -1752.0,
+                "z": 29.4
+            },
+            {
+                "x": 116.0,
+                "y": -1953.0,
+                "z": 21.3
+            }
+        ],
+        "items": [
+            {
+                "item": "lockpick",
+                "price": 5000
+            },
+            {
+                "item": "hacking_device",
+                "price": 15000
+            },
+            {
+                "item": "wbodyWEAPON_ASSAULTRIFLE",
+                "price": 50000
+            },
+            {
+                "item": "wbodyWEAPON_GUSENBERG",
+                "price": 75000
+            },
+            {
+                "item": "c4",
+                "price": 20000
+            }
+        ]
     }
 }

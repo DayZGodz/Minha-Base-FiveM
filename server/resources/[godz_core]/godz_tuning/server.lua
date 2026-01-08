@@ -6,6 +6,14 @@ vRPclient = Tunnel.getInterface("vRP")
 
 local MasterConfig = {}
 
+local function sanitize_json(content)
+    if not content then return nil end
+    content = content:gsub("^\239\187\191", "")
+    content = content:gsub("\r", "")
+    content = content:gsub("%z", "")
+    return content
+end
+
 -- Create Table for Mods and Report
 Citizen.CreateThread(function()
     Wait(1000)
@@ -80,19 +88,70 @@ end
 -- Load Master Config
 Citizen.CreateThread(function()
     local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
+    config = sanitize_json(config)
     
     if config then
-        MasterConfig = json.decode(config)
-        if MasterConfig then
+        local status, result = pcall(json.decode, config)
+        if status then
+            MasterConfig = result
             print("^2[GODZ Tuning] Master Config carregado com sucesso.^0")
         else
-            print("^1[GODZ Tuning] Erro de sintaxe no JSON. Usando valores padrão.^0")
-            MasterConfig = { ECONOMY = { tuning_prices = { engine_base = 5000, turbo_base = 15000, brakes_base = 2000, transmission_base = 3000, suspension_base = 2500, armor_base = 10000 } } }
+            print("^1[GODZ Tuning] Erro fatal ao decodificar JSON: " .. result .. "^0")
+            MasterConfig = nil 
         end
     else
-        MasterConfig = { ECONOMY = { tuning_prices = { engine_base = 5000, turbo_base = 15000, brakes_base = 2000, transmission_base = 3000, suspension_base = 2500, armor_base = 10000 } } }
+        print("^1[GODZ Tuning] Arquivo GODZ_MASTER_CONFIG.json não encontrado.^0")
+    end
+
+    if not MasterConfig then
+        MasterConfig = { 
+            SERVER_INFO = { server_name = "GODZ", discord_token = "YOUR_DISCORD_TOKEN_HERE" },
+            ECONOMY = { tuning_prices = { engine_base = 5000, turbo_base = 15000, brakes_base = 2000, transmission_base = 3000, suspension_base = 2500, armor_base = 10000 } } 
+        }
     end
 end)
+
+exports("GetMasterConfig", function()
+    if not MasterConfig then return nil end
+    local ok, cloned = pcall(function()
+        return json.decode(json.encode(MasterConfig))
+    end)
+    if ok then return cloned end
+    return MasterConfig
+end)
+
+exports("ReloadMasterConfig", function()
+    local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
+    config = sanitize_json(config)
+    if not config then return false end
+    local status, result = pcall(json.decode, config)
+    if not status then return false end
+    MasterConfig = result
+    return true
+end)
+
+-- [GODZ] Safe Config Save (Merge Strategy)
+function src.saveConfig()
+    local current_content = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
+    local current_data = {}
+    if current_content then
+        current_data = json.decode(current_content) or {}
+    end
+
+    -- Merge Memory Config into File Config
+    for k,v in pairs(MasterConfig) do
+        current_data[k] = v
+    end
+    
+    -- Ensure Token Persistence
+    if not current_data.SERVER_INFO then current_data.SERVER_INFO = {} end
+    if not current_data.SERVER_INFO.discord_token or current_data.SERVER_INFO.discord_token == "" then
+        -- Restore from hardcoded backup if missing
+        current_data.SERVER_INFO.discord_token = "YOUR_DISCORD_TOKEN_HERE"
+    end
+    
+    SaveResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json", json.encode(current_data, {indent = true}), -1)
+end
 
 RegisterNetEvent("godz_tuning:requestConfig")
 AddEventHandler("godz_tuning:requestConfig", function()

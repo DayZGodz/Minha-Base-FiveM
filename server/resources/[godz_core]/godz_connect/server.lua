@@ -24,7 +24,14 @@ AddEventHandler("godz_connect:checkPlayerStatus", function()
             playerName = string.gsub(playerName, "[^a-zA-Z0-9 ]", "")
         end
 
-        if not isWhitelisted then
+        if isWhitelisted then
+            local role = (user_id == 1) and "CEO" or "Cidadão"
+            local msg = "Protocolo de Autoridade: " .. role .. " " .. playerName .. " (ID " .. user_id .. ") estabeleceu conexão."
+            exports.godz_modules:Log("Login", msg, 3066993)
+        else
+            local msg = "Acesso Negado: Jogador " .. playerName .. " [" .. user_id .. "] bloqueado por falta de assinatura (WL)."
+            exports.godz_modules:Log("Whitelist", msg, 15158332)
+            
             local tokrows = vRP.query("godz_wl_temp_get_by_user", { user_id = user_id })
             if tokrows and #tokrows > 0 then
                 wlToken = tokrows[1].token

@@ -23,6 +23,51 @@ local webhookchat = ""
 local webhookilegal = ""
 local webhookCobrar = ""
 
+local function GetMasterConfigSafe()
+    if GetResourceState("godz_tuning") ~= "started" then return nil end
+    local ok, cfg = pcall(function()
+        return exports["godz_tuning"]:GetMasterConfig()
+    end)
+    if ok then return cfg end
+    return nil
+end
+
+-- [NEXUS LOGS]
+Nexus = {}
+function Nexus:Log(title, message, color)
+    -- Carrega o Webhook dinamicamente do GODZ_MASTER_CONFIG
+    local webhook_url = ""
+
+    local config = GetMasterConfigSafe()
+    if config and config.WEBHOOKS and config.WEBHOOKS.audit then
+        webhook_url = config.WEBHOOKS.audit
+    end
+
+    if webhook_url == "" then 
+        print("[NEXUS LOG] Erro: Webhook de Auditoria não configurado.")
+        return 
+    end
+
+    local embed = {
+        {
+            ["color"] = color or 3066993,
+            ["title"] = "**" .. title .. "**",
+            ["description"] = message,
+            ["footer"] = {
+                ["text"] = "GODZ NEXUS SYSTEM • " .. os.date("%d/%m/%Y %H:%M:%S"),
+            },
+        }
+    }
+
+    PerformHttpRequest(webhook_url, function(err, text, headers) end, 'POST', json.encode({username = "Nexus AI", embeds = embed}), { ['Content-Type'] = 'application/json' })
+end
+
+exports("Log", function(title, message, color)
+    if Nexus and Nexus.Log then
+        Nexus:Log(title, message, color)
+    end
+end)
+
 function SendWebhookMessage(webhook,message)
 	if webhook ~= nil and webhook ~= "" then
 		PerformHttpRequest(webhook, function(err, text, headers) end, 'POST', json.encode({content = message}), { ['Content-Type'] = 'application/json' })
@@ -226,8 +271,6 @@ local salarios = {
 	{ ['permissao'] = "premium.permissao", ['nome'] = "PRATA", ['payment'] = 5000 },
 	{ ['permissao'] = "elite.permissao", ['nome'] = "OURO", ['payment'] = 8000 },
 	{ ['permissao'] = "ultimate.permissao", ['nome'] = "PLATINA", ['payment'] = 12000 },
-
-	--
 }
 
 RegisterServerEvent('salario:pagamento')
@@ -235,12 +278,43 @@ AddEventHandler('salario:pagamento',function()
 	local source = source
 	local user_id = vRP.getUserId(source)
 	if user_id then
+		-- Pagamento VIP
 		for k,v in pairs(salarios) do
 			if vRP.hasPermission(user_id,v.permissao) then
 				TriggerClientEvent("vrp_sound:source",source,'coins',0.5)
 				TriggerClientEvent("Notify",source,"importante","Obrigado por colaborar com a cidade, seu salario de <b>$"..vRP.format(parseInt(v.payment)).." dólares</b> foi depositado.")
 				vRP.giveBankMoney(user_id,parseInt(v.payment))
 			end
+		end
+
+		-- Pagamento Servicos Publicos (Dinamico)
+		local payment = 0
+		local job_title = ""
+
+		-- Policia
+		if vRP.hasGroup(user_id,"policia") then
+			payment = 5000
+			job_title = "Oficial (Em Serviço)"
+		elseif vRP.hasGroup(user_id,"paisana_policia") then
+			payment = 1500
+			job_title = "Oficial (Paisana)"
+		end
+
+		-- Paramedico (se nao for policia, ou prioridade)
+		if payment == 0 then
+			if vRP.hasGroup(user_id,"paramedico") then
+				payment = 5000
+				job_title = "Médico (Em Serviço)"
+			elseif vRP.hasGroup(user_id,"paisana_paramedico") then
+				payment = 1500
+				job_title = "Médico (Paisana)"
+			end
+		end
+
+		if payment > 0 then
+			TriggerClientEvent("vrp_sound:source",source,'coins',0.5)
+			TriggerClientEvent("Notify",source,"importante","Salário recebido como <b>"..job_title.."</b>: <b>$"..vRP.format(parseInt(payment)).."</b>.")
+			vRP.giveBankMoney(user_id,parseInt(payment))
 		end
 	end
 end)
@@ -842,4 +916,139 @@ RegisterCommand('olx', function(source, args, rawCommand)
 		TriggerClientEvent('chatMessage', -1, "[OLX] ".. GetPlayerName(source) .." ("..user_id..") ", {180, 0, 150}, rawCommand:sub(4))
 		CancelEvent()
 	end
+end)
+
+-- LOJAS DE CONVENIÊNCIA
+local shopPrices = {
+    agua = 150,
+    pao = 120,
+    mochila = 2500,
+    radio = 5000
+}
+
+RegisterNetEvent("godz_shops:purchase")
+AddEventHandler("godz_shops:purchase", function(item, price)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+
+    item = tostring(item or "")
+    local configured = shopPrices[item]
+    if not configured then
+        TriggerClientEvent("Notify",source,"negado","Item inválido.")
+        return
+    end
+
+    local value = parseInt(price)
+    if value ~= configured then
+        value = configured
+    end
+
+    if vRP.tryBankPayment(user_id, value) then
+        vRP.giveInventoryItem(user_id, item, 1, true)
+        local identity = vRP.getUserIdentity(user_id)
+        local msg = "**Jogador:** "..identity.name.." "..identity.firstname.." ["..user_id.."]\n**Compra:** "..vRP.itemNameList(item).."\n**Valor:** $"..vRP.format(value)
+        TriggerEvent("godz_logs:send","Bank","Compra na Loja de Conveniência",msg,3447003,source)
+        TriggerClientEvent("Notify",source,"sucesso","Compra realizada por $"..vRP.format(value)..".")
+    else
+        TriggerClientEvent("Notify",source,"negado","Saldo bancário insuficiente.")
+    end
+end)
+
+RegisterNetEvent("godz_fuel:refuel")
+AddEventHandler("godz_fuel:refuel", function(cost)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if not user_id then return end
+    local price = parseInt(cost)
+    if price < 0 then price = 0 end
+    if vRP.tryBankPayment(user_id, price) then
+        local identity = vRP.getUserIdentity(user_id)
+        local msg = "**Jogador:** "..identity.name.." "..identity.firstname.." ["..user_id.."]\n**Abastecimento:** Tanque cheio\n**Valor:** $"..vRP.format(price)
+        TriggerEvent("godz_logs:send","Bank","Abastecimento em Posto",msg,3066993,source)
+        TriggerClientEvent("godz_fuel:refueled", source)
+    else
+        TriggerClientEvent("Notify",source,"negado","Saldo insuficiente para abastecer.")
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(1800000)
+        for user_id,src in pairs(vRP.getUsers()) do
+            for k,v in pairs(salarios) do
+                if vRP.hasPermission(user_id,v.permissao) then
+                    vRP.giveBankMoney(user_id,parseInt(v.payment))
+                    local s = vRP.getUserSource(user_id)
+                    if s then
+                        TriggerClientEvent("vrp_sound:source",s,'coins',0.5)
+                        TriggerClientEvent("Notify",s,"importante","Salário de $"..vRP.format(parseInt(v.payment)).." depositado.",8000)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- [GODZ] SYNC PERMISSIONS FROM CONFIG
+vRP.prepare("godz_player/add_group", "INSERT IGNORE INTO godz_user_groups(user_id, group_name, group_grade) VALUES(@user_id, @group_name, 0)")
+vRP.prepare("godz_player/init_identity", "INSERT IGNORE INTO godz_user_identities(user_id,registration,phone,firstname,name,age) VALUES(@user_id,@registration,@phone,@firstname,@name,@age)")
+
+Citizen.CreateThread(function()
+    Wait(5000)
+
+    local attempts = 0
+    while GetResourceState("godz_tuning") ~= "started" and attempts < 100 do
+        attempts = attempts + 1
+        Wait(200)
+    end
+
+    local cfg = GetMasterConfigSafe()
+    if cfg and cfg.PERMISSIONS then
+        print("^2[GODZ Player] Sincronizando grupos administrativos...^0")
+        
+        if cfg.PERMISSIONS.ceos then
+            for _, id in pairs(cfg.PERMISSIONS.ceos) do
+                vRP.execute("godz_player/add_group", {user_id = id, group_name = "ceo"})
+            end
+        end
+        
+        if cfg.PERMISSIONS.admins then
+            for _, id in pairs(cfg.PERMISSIONS.admins) do
+                vRP.execute("godz_player/add_group", {user_id = id, group_name = "admin"})
+            end
+        end
+        
+        if cfg.PERMISSIONS.moderators then
+            for _, id in pairs(cfg.PERMISSIONS.moderators) do
+                vRP.execute("godz_player/add_group", {user_id = id, group_name = "mod"})
+            end
+        end
+        
+        -- [GODZ] SYNC IDENTITIES
+        print("^2[GODZ Player] Verificando identidades base...^0")
+        -- ID 0: NEXUS IA
+        vRP.execute("godz_player/init_identity", {
+            user_id = 0,
+            registration = "00000000",
+            phone = "000-000",
+            firstname = "NEXUS",
+            name = "IA",
+            age = 100
+        })
+        
+        -- ID 1: Bob Godz
+        vRP.execute("godz_player/init_identity", {
+            user_id = 1,
+            registration = "00000001",
+            phone = "123-456",
+            firstname = "Bob",
+            name = "Godz",
+            age = 30
+        })
+        
+        print("^2[GODZ Player] Sincronia completa (Grupos + Identidades).^0")
+    else
+        print("^1[GODZ Player] Erro ao ler MasterConfig via godz_tuning^0")
+    end
 end)

@@ -20,6 +20,8 @@ server_scripts {
     'server.lua'
 }
 
+server_export 'GetMasterConfig'
+
 ui_page 'nui/index.html'
 
 files {

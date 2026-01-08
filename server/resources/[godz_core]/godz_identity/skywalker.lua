@@ -18,6 +18,7 @@ end
 -- Verificação da coluna 'biography' na tabela 'godz_user_identities'
 Citizen.CreateThread(function()
     vRP.execute("vRP/add_biography_column", {})
+    vRP.execute("vRP/add_ip_column", {})
 end)
 
 --[ FUNÇÕES ]----------------------------------------------------------------------------------------------------------------------------
@@ -130,10 +131,12 @@ end
 -- Prepare Queries
 vRP.prepare("vRP/update_biography", "UPDATE godz_user_identities SET biography = @biography WHERE user_id = @user_id")
 vRP.prepare("vRP/add_biography_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS biography TEXT")
+vRP.prepare("vRP/add_ip_column", "ALTER TABLE godz_user_identities ADD COLUMN IF NOT EXISTS ip VARCHAR(50)")
 vRP.prepare("vRP/get_user_by_identifier", "SELECT user_id FROM godz_user_ids WHERE identifier = @identifier")
 vRP.prepare("vRP/create_user", "INSERT INTO godz_users(whitelisted,banned) VALUES(0,0)")
 vRP.prepare("vRP/add_identifier", "INSERT INTO godz_user_ids(identifier,user_id) VALUES(@identifier,@user_id)")
-vRP.prepare("vRP/init_user_identity", "INSERT INTO godz_user_identities(user_id,registration,phone,firstname,name,age,biography) VALUES(@user_id,@registration,@phone,@firstname,@name,@age,@biography)")
+vRP.prepare("vRP/init_user_identity", "INSERT INTO godz_user_identities(user_id,registration,phone,firstname,name,age,biography,slot) VALUES(@user_id,@registration,@phone,@firstname,@name,@age,@biography,@slot)")
+vRP.prepare("vRP/update_identity_ip", "UPDATE godz_user_identities SET ip = @ip WHERE user_id = @user_id")
 
 function vRPN.getSteam(source)
     local identifiers = GetPlayerIdentifiers(source)
@@ -145,13 +148,43 @@ function vRPN.getSteam(source)
     return nil
 end
 
+local function getMaxSlotsInternal(user_id)
+    local max = 2
+    local user_groups = vRP.getUserGroups(user_id) or {}
+    for k,_ in pairs(user_groups) do
+        local name = string.lower(k)
+        if string.find(name,"ceo") or string.find(name,"admin") then
+            return 10
+        end
+    end
+    for k,_ in pairs(user_groups) do
+        local name = string.lower(k)
+        if string.find(name,"vip") and (string.find(name,"ouro") or string.find(name,"platina")) then
+            return 5
+        end
+    end
+    return max
+end
+
+function vRPN.getMaxSlots()
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if not user_id then return 2 end
+    return getMaxSlotsInternal(user_id)
+end
+
 function vRPN.getCharacters()
     local source = source
     local steam = vRPN.getSteam(source)
     if not steam then return {} end
+    local user_id = vRP.getUserId(source)
+    local maxSlots = getMaxSlotsInternal(user_id)
 
     local characters = {}
-    local identifiers = { steam, steam..":2", steam..":3" }
+    local identifiers = {}
+    for i=1,maxSlots do
+        if i == 1 then table.insert(identifiers, steam) else table.insert(identifiers, steam..":"..i) end
+    end
 
     for i, id in ipairs(identifiers) do
         local rows = vRP.query("vRP/get_user_by_identifier", { identifier = id })
@@ -161,7 +194,7 @@ function vRPN.getCharacters()
             if identity then
                 local job = vRPN.getUserGroupByType(user_id, "job") or "Desempregado"
                 table.insert(characters, {
-                    slot = i,
+                    slot = identity.slot or i,
                     user_id = user_id,
                     name = identity.name,
                     firstname = identity.firstname,
@@ -180,6 +213,9 @@ function vRPN.createCharacter(name, firstname, age, job, bio, slot)
     local source = source
     local steam = vRPN.getSteam(source)
     if not steam then return false, "Steam não encontrada." end
+    local user_id_src = vRP.getUserId(source)
+    local maxSlots = getMaxSlotsInternal(user_id_src)
+    if slot > maxSlots then return false, "Limite de identidades atingido. Torne-se VIP para desbloquear mais slots." end
     
     local identifier = steam
     if slot > 1 then identifier = steam .. ":" .. slot end
@@ -191,6 +227,13 @@ function vRPN.createCharacter(name, firstname, age, job, bio, slot)
         return false, "Erro interno de banco de dados."
     end
     if #rows > 0 then return false, "Personagem já existe neste slot!" end
+    local count = 0
+    for i=1,maxSlots do
+        local idn = (i==1) and steam or (steam..":"..i)
+        local r = vRP.query("vRP/get_user_by_identifier", { identifier = idn })
+        if r and #r > 0 then count = count + 1 end
+    end
+    if count >= maxSlots then return false, "Limite de identidades atingido. Torne-se VIP para desbloquear mais slots." end
 
     -- Create User
     vRP.execute("vRP/create_user", {})
@@ -221,13 +264,44 @@ function vRPN.createCharacter(name, firstname, age, job, bio, slot)
         firstname = firstname,
         name = name,
         age = age,
-        biography = bio
+        biography = bio,
+        slot = slot
     })
+
+    -- [GODZ] Initialize Datatable to prevent JS crash (Slot 1 Force Init)
+    local default_datatable = {
+        inventory = {},
+        weapons = {},
+        groups = {},
+        customization = {} -- Empty to force creator or default
+    }
+    vRP.setUData(user_id, "vRP:datatable", json.encode(default_datatable))
     
+    -- [NEXUS LOG]
+    local msg = "Novo Registro: ID " .. user_id .. " iniciou o protocolo de criação de personagem."
+    exports.godz_modules:Log("Criação", msg, 3447003)
+
     return true, "Personagem criado com sucesso!"
 end
 
 vRP.prepare("vRP/get_max_user_id", "SELECT MAX(id) as id FROM godz_users")
+
+function vRPN.selectCharacter(target_user_id)
+    local source = source
+    local ip = GetPlayerEndpoint(source) or "0.0.0.0"
+    
+    -- [GODZ FIX] Verificação de Criação Obrigatória
+    local datatable = vRP.getUData(target_user_id, "vRP:datatable")
+    local data = json.decode(datatable) or {}
+
+    if not data.customization or type(data.customization) ~= "table" or not next(data.customization) then
+        print("[GODZ IDENTITY] Bloqueio de Login: ID " .. tostring(target_user_id) .. " sem skin definida.")
+        return false -- Bloqueia a seleção e força a interface a reagir
+    end
+
+    vRP.execute("vRP/update_identity_ip", { user_id = target_user_id, ip = ip })
+    return true
+end
 
 function vRPN.checkIdentity()
 	local source = source

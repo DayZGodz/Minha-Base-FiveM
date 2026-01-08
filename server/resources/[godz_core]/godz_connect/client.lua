@@ -27,6 +27,16 @@ Citizen.CreateThread(function()
     RequestAnimDict("move_f@finesse")
     while not HasAnimDictLoaded("move_f@finesse") do Wait(10) end
 
+    -- [GODZ] Carrega Dicionários de Animação Extras
+    RequestAnimDict("amb@world_human_hanging_out@female_a@idle_a")
+    while not HasAnimDictLoaded("amb@world_human_hanging_out@female_a@idle_a") do Wait(10) end
+
+    RequestAnimDict("anim@heists@prison_heiststation@cop_reactions")
+    while not HasAnimDictLoaded("anim@heists@prison_heiststation@cop_reactions") do Wait(10) end
+
+    RequestAnimDict("anim@mp_player_intcelebrationfemale@salute")
+    while not HasAnimDictLoaded("anim@mp_player_intcelebrationfemale@salute") do Wait(10) end
+
     -- Teleporte do Player (Segurança)
     local playerPed = PlayerPedId()
     SetEntityCoords(playerPed, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z - 10.0)
@@ -43,41 +53,36 @@ Citizen.CreateThread(function()
     -- Configuração de Entidade 0 (Conceitual)
     SetEntityAsMissionEntity(nexusPed, true, true) 
     
-    -- 4. ESTILIZAÇÃO PREMIUM (NEXUS ANDROID)
+    -- 4. ESTILIZAÇÃO PREMIUM (NEXUS ANDROID - SPACE RANGER)
     
-    -- Rosto e Pele (Impecável)
-    SetPedHeadBlendData(nexusPed, 21, 21, 0, 21, 21, 0, 0.5, 0.5, 0.0, false) -- Face Simétrica
+    -- Rosto e Pele (Sintética)
+    SetPedHeadBlendData(nexusPed, 21, 21, 0, 21, 21, 0, 0.5, 0.5, 0.0, false)
     
-    -- Maquiagem e Detalhes
-    SetPedHeadOverlay(nexusPed, 4, 1, 1.0) -- Maquiagem (Delineado)
-    SetPedHeadOverlayColor(nexusPed, 4, 1, 0, 0) -- Cor Preta
-    SetPedHeadOverlay(nexusPed, 0, 255, 0.0) -- Remove imperfeições (Blemishes)
-    SetPedEyeColor(nexusPed, 1) -- Azul Brilhante
+    -- Maquiagem Cyber
+    SetPedHeadOverlay(nexusPed, 4, 1, 1.0) -- Maquiagem
+    SetPedHeadOverlayColor(nexusPed, 4, 1, 0, 0)
+    SetPedEyeColor(nexusPed, 7) -- Olhos Brancos/Cinza (Artificial)
 
-    -- Roupas (Branco e Dourado - Luxo)
-    SetPedComponentVariation(nexusPed, 2, 20, 0, 2) -- Cabelo: Coque Elegante
-    SetPedHairColor(nexusPed, 28, 33) -- Platinado
+    -- Roupas (Space Ranger / Android Platinum)
+    SetPedComponentVariation(nexusPed, 2, 20, 0, 2) -- Cabelo: Coque/Sleek
+    SetPedHairColor(nexusPed, 28, 33) -- Platinado Metálico
 
-    SetPedComponentVariation(nexusPed, 3, 15, 0, 2) -- Torso/Braços: Pele Perfeita
+    SetPedComponentVariation(nexusPed, 3, 15, 0, 2) -- Mãos (Luvas invisíveis ou pele)
     
-    -- Uniforme Futurista (Tentativa de ID Luxo - Ajuste conforme base)
-    SetPedComponentVariation(nexusPed, 11, 285, 1, 2) -- Top: Blazer Formal (Variação Branca)
-    SetPedComponentVariation(nexusPed, 8, 15, 0, 2)   -- Undershirt
-    SetPedComponentVariation(nexusPed, 4, 108, 1, 2)  -- Calça Social (Branca)
-    SetPedComponentVariation(nexusPed, 6, 29, 0, 2)   -- Sapatos: Salto Alto
+    -- Uniforme Tático-Futurista (Arena War / Deadline Style)
+    SetPedComponentVariation(nexusPed, 11, 306, 0, 2) -- Top: Bodysuit Futurista
+    SetPedComponentVariation(nexusPed, 8, 15, 0, 2)   -- Undershirt (Vazio)
+    SetPedComponentVariation(nexusPed, 4, 121, 0, 2)  -- Calça: Bodysuit Legs
+    SetPedComponentVariation(nexusPed, 6, 90, 0, 2)   -- Sapatos: Botas Sci-Fi
 
-    -- VFX: Iluminação de Estúdio & Olhar
+    -- VFX: Iluminação Cinematográfica (Humane Labs)
     Citizen.CreateThread(function()
         while DoesEntityExist(nexusPed) do
-            -- Luz Frontal (Branca/Dourada - Highlight)
-            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 1.0, lobbyCoords.z + 1.8, 255, 245, 220, 3.0, 10.0)
+            -- Luz Ambiente (Azul Neon / Cyberpunk)
+            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 1.0, lobbyCoords.z + 1.8, 0, 200, 255, 4.0, 10.0)
             
-            -- Luz de Contorno (Dourado Real para Criador, Azul Cyber padrão)
-            if isCreator then
-                DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 255, 215, 0, 4.0, 5.0) -- Gold
-            else
-                DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 0, 229, 255, 2.0, 3.0) -- Cyber Blue
-            end
+            -- Luz de Recorte (Dourada para Contraste)
+            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 255, 215, 0, 2.0, 5.0)
             
             -- Nexus sempre olha para a câmera
             TaskLookAtCoord(nexusPed, lobbyCoords.x, lobbyCoords.y + 1.5, lobbyCoords.z + 1.6, 2000, 2048, 3)
@@ -85,7 +90,7 @@ Citizen.CreateThread(function()
         end
     end)
 
-    -- Animação de Postura Elegante
+    -- Animação de Postura Robótica/Elegante
     TaskPlayAnim(nexusPed, "move_f@finesse", "idle", 8.0, -8.0, -1, 1, 0, false, false, false)
     
     -- Pré-carrega animação de despedida
@@ -95,12 +100,16 @@ Citizen.CreateThread(function()
     RequestAnimDict("anim@mp_player_intcelebrationfemale@salute")
     while not HasAnimDictLoaded("anim@mp_player_intcelebrationfemale@salute") do Wait(10) end
     
-    -- Configuração da Câmera (Retrato 35mm)   nexusCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
-    -- Posiciona a câmera focada no rosto/busto
-    SetCamCoord(nexusCam, lobbyCoords.x, lobbyCoords.y + 1.2, lobbyCoords.z + 1.6) 
-    PointCamAtPedBone(nexusCam, nexusPed, 31086, 0.0, 0.0, 0.0) -- Foca na Cabeça (Bone 31086)
-    SetCamActive(nexusCam, true)
-    RenderScriptCams(true, false, 0, true, true)
+    -- Configuração da Câmera (Cinematográfica)
+    if DoesCamExist(nexusCam) then
+        SetCamCoord(nexusCam, lobbyCoords.x, lobbyCoords.y + 1.5, lobbyCoords.z + 1.6) 
+        if nexusPed and DoesEntityExist(nexusPed) then
+            PointCamAtPedBone(nexusCam, nexusPed, 31086, 0.0, 0.0, 0.0)
+        end
+        SetCamFov(nexusCam, 50.0)
+        SetCamActive(nexusCam, true)
+        RenderScriptCams(true, false, 0, true, true)
+    end
     
     -- Atmosfera
     SetTimecycleModifier("prologue_ending_fog")
@@ -117,6 +126,8 @@ RegisterNUICallback('startLipSync', function(data, cb)
     if nexusPed and DoesEntityExist(nexusPed) then
         -- Animação facial de fala genérica
         PlayFacialAnim(nexusPed, "mic_chatter", "mp_facial")
+        -- [GODZ] Animação de corpo (Fala autoritária)
+        TaskPlayAnim(nexusPed, "anim@heists@prison_heiststation@cop_reactions", "cop_b_idle", 8.0, -8.0, -1, 49, 0, false, false, false)
     end
     cb('ok')
 end)
@@ -125,6 +136,8 @@ RegisterNUICallback('stopLipSync', function(data, cb)
     if nexusPed and DoesEntityExist(nexusPed) then
         -- Para animação ou volta ao neutro
         PlayFacialAnim(nexusPed, "mood_normal_1", "facials@gen_male@variations@normal")
+        -- Volta para idle
+        TaskPlayAnim(nexusPed, "move_f@finesse", "idle", 8.0, -8.0, -1, 1, 0, false, false, false)
     end
     cb('ok')
 end)
@@ -154,12 +167,12 @@ end)
 
 -- 3. TRANSIÇÃO E LIMPEZA
 AddEventHandler('playerSpawned', function()
-    -- [GODZ] Aguarda o término da fala da Nexus (Sync Perfeito)
-    local timeout = GetGameTimer() + 20000 -- 20s failsafe
-    while not speechDone and GetGameTimer() < timeout do
-        Wait(100)
-    end
+    -- [GODZ] NUI Cleanup (Overlay Fix)
+    SendNUIMessage({ action = "hide" })
 
+    -- [GODZ] Removido wait de sincronia de fala para evitar travamento em 3%
+    -- A fala pode continuar em background ou ser cortada, prioridade é o spawn.
+    
     -- Se não possuir WL, mantém a Nexus e bloqueia o jogador
     if not isWhitelistedClient then
         SetNuiFocus(true, true)
@@ -172,7 +185,7 @@ AddEventHandler('playerSpawned', function()
     if nexusPed and DoesEntityExist(nexusPed) then
         if isCreator then
             -- PROTOCOLO CRIADOR: Continência/Respeito Máximo
-            TaskPlayAnim(nexusPed, "anim@mp_player_intcelebrationfemale@salute", "salute", 8.0, -8.0, 3000, 0, 0, false, false, false)
+            playNexusAnimation("ACCESS_GRANTED")
             Wait(2000) -- Transição mais rápida para o chefe
         else
             -- Reverência Elegante (Padrão)
@@ -203,14 +216,17 @@ AddEventHandler('playerSpawned', function()
     end
     
     if nexusCam then 
-        RenderScriptCams(false, false, 0, true, true)
+        -- [GODZ] Transição Suave de Câmera (Interpolation)
+        RenderScriptCams(false, true, 3000, true, true)
         DestroyCam(nexusCam, false) 
     end
     
     ClearTimecycleModifier()
     
-    -- Restaura Player
+    -- Restaura Player e Define Spawn Inicial (Legion Square)
     local playerPed = PlayerPedId()
+    SetEntityCoords(playerPed, -205.5, -1011.5, 30.0) -- Legion Square
+    SetEntityHeading(playerPed, 320.0)
     FreezeEntityPosition(playerPed, false)
     SetEntityVisible(playerPed, true, false)
     

@@ -17,7 +17,7 @@
 }
 
 body {
-    background-color: transparent; /* Allows 3D Game View */
+    background-color: transparent !important; /* Allows 3D Game View */
     overflow: hidden;
     color: white;
 }

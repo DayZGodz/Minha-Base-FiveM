@@ -91,6 +91,105 @@ function src.openChest(chestName)
 	return false
 end
 
+vRP.prepare("factions_inv/get","SELECT item, amount FROM godz_factions_inventory WHERE chest_key = @key")
+vRP.prepare("factions_inv/get_item","SELECT amount FROM godz_factions_inventory WHERE chest_key = @key AND item = @item")
+vRP.prepare("factions_inv/upsert","INSERT INTO godz_factions_inventory(chest_key,item,amount) VALUES(@key,@item,@amount) ON DUPLICATE KEY UPDATE amount = amount + @amount")
+vRP.prepare("factions_inv/set_amount","UPDATE godz_factions_inventory SET amount = @amount WHERE chest_key = @key AND item = @item")
+vRP.prepare("factions_inv/cleanup","DELETE FROM godz_factions_inventory WHERE chest_key = @key AND amount <= 0")
+
+Citizen.CreateThread(function()
+    Wait(1500)
+    if exports and exports.oxmysql and exports.oxmysql.execute then
+        exports.oxmysql:execute([[CREATE TABLE IF NOT EXISTS `godz_factions_inventory` (
+            `chest_key` varchar(100) NOT NULL,
+            `item` varchar(100) NOT NULL,
+            `amount` int(11) NOT NULL DEFAULT 0,
+            PRIMARY KEY (`chest_key`,`item`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;]])
+    end
+end)
+
+local function factionChestWeight(key)
+    local rows = vRP.query("factions_inv/get",{ key = key })
+    local w = 0
+    for _,r in pairs(rows) do
+        if vRP.itemBodyList(r.item) then
+            w = w + vRP.getItemWeight(r.item) * parseInt(r.amount)
+        end
+    end
+    return w
+end
+
+function src.openFactionChest(chestName)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if user_id then
+        local hsinventory = {}
+        local myinventory = {}
+        local rows = vRP.query("factions_inv/get",{ key = tostring(chestName) })
+        for _,v in pairs(rows) do
+            if vRP.itemBodyList(v.item) then
+                table.insert(hsinventory,{ amount = parseInt(v.amount), name = vRP.itemNameList(v.item), index = vRP.itemIndexList(v.item), key = v.item, peso = vRP.getItemWeight(v.item) })
+            end
+        end
+        local inv = vRP.getInventory(parseInt(user_id))
+        for k,v in pairs(inv) do
+            if vRP.itemBodyList(k) then
+                table.insert(myinventory,{ amount = parseInt(v.amount), name = vRP.itemNameList(k), index = vRP.itemIndexList(k), key = k, peso = vRP.getItemWeight(k) })
+            end
+        end
+        local peso2 = factionChestWeight(tostring(chestName))
+        return hsinventory,myinventory,vRP.getInventoryWeight(user_id),vRP.getInventoryMaxWeight(user_id),peso2,5000
+    end
+    return false
+end
+
+function src.storeFactionItem(chestName,itemName,amount)
+    if itemName then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if user_id then
+            local cap = 5000
+            local peso2 = factionChestWeight(tostring(chestName))
+            local addw = vRP.getItemWeight(itemName) * parseInt(amount)
+            if peso2 + addw <= cap then
+                if vRP.tryGetInventoryItem(user_id,itemName,amount) then
+                    vRP.execute("factions_inv/upsert",{ key = tostring(chestName), item = itemName, amount = parseInt(amount) })
+                    TriggerClientEvent("Chest:UpdateChest",source,"updateChest")
+                else
+                    TriggerClientEvent("Notify",source,"negado","Você precisa especificar a quantidade.",10000)
+                end
+            else
+                TriggerClientEvent("Notify",source,"negado","Baú cheio.",10000)
+            end
+        end
+    end
+end
+
+function src.takeFactionItem(chestName,itemName,amount)
+    if itemName then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if user_id then
+            local rows = vRP.query("factions_inv/get_item",{ key = tostring(chestName), item = itemName })
+            local have = 0
+            if rows[1] then have = parseInt(rows[1].amount) end
+            local amt = parseInt(amount)
+            if amt <= 0 or have < amt then
+                TriggerClientEvent("Notify",source,"negado","Quantidade inválida.",10000)
+                return
+            end
+            if vRP.getInventoryWeight(user_id) + vRP.getItemWeight(itemName) * amt <= vRP.getInventoryMaxWeight(user_id) then
+                vRP.execute("factions_inv/set_amount",{ key = tostring(chestName), item = itemName, amount = have - amt })
+                vRP.execute("factions_inv/cleanup",{ key = tostring(chestName) })
+                vRP.giveInventoryItem(user_id,itemName,amt)
+                TriggerClientEvent("Chest:UpdateChest",source,"updateChest")
+            else
+                TriggerClientEvent("Notify",source,"negado","Mochila cheia.",10000)
+            end
+        end
+    end
+end
 --[ STOREITEM ]---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function src.storeItem(chestName,itemName,amount)
