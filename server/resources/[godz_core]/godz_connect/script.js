@@ -227,6 +227,14 @@ async function sendToGodzAi(text) {
     } catch (error) {
         console.error("AI Bridge Error:", error);
         speakAi("Falha na conexão com o núcleo neural.");
+        
+        // [GODZ SUPREME] RESGATE DA CONEXÃO: Fecha a UI se a IA falhar
+        setTimeout(() => {
+             forceKillNexusUI();
+             hideLoadingScreen();
+             document.body.innerHTML = '';
+             fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+        }, 3000); // 3s delay to let the fallback message play
     }
 }
 

@@ -97,13 +97,15 @@ Citizen.CreateThread(function()
             print("^2[GODZ Tuning] Master Config carregado com sucesso.^0")
         else
             print("^1[GODZ Tuning] Erro fatal ao decodificar JSON: " .. result .. "^0")
-            MasterConfig = nil 
+            MasterConfig = nil
         end
     else
         print("^1[GODZ Tuning] Arquivo GODZ_MASTER_CONFIG.json não encontrado.^0")
+        MasterConfig = nil
     end
 
     if not MasterConfig then
+        print("^3[GODZ Tuning] Usando Configuração de Fallback.^0")
         MasterConfig = { 
             SERVER_INFO = { server_name = "GODZ", discord_token = "YOUR_DISCORD_TOKEN_HERE" },
             ECONOMY = { tuning_prices = { engine_base = 5000, turbo_base = 15000, brakes_base = 2000, transmission_base = 3000, suspension_base = 2500, armor_base = 10000 } } 
@@ -112,18 +114,10 @@ Citizen.CreateThread(function()
 end)
 
 function GetMasterConfig()
+    if not MasterConfig then return nil end
     return MasterConfig
 end
 exports('GetMasterConfig', GetMasterConfig)
-
-exports("GetMasterConfig", function()
-    if not MasterConfig then return nil end
-    local ok, cloned = pcall(function()
-        return json.decode(json.encode(MasterConfig))
-    end)
-    if ok then return cloned end
-    return MasterConfig
-end)
 
 exports("ReloadMasterConfig", function()
     local config = LoadResourceFile(GetCurrentResourceName(), "GODZ_MASTER_CONFIG.json")
