@@ -140,34 +140,49 @@ function vRP.checkAntiTrigger(user_id, event_name, delay_ms)
 	return true
 end
 
-function vRP.getUserIdByIdentifiers(ids)
+function vRP.getUserIdByIdentifiers(ids, source)
 	if ids and #ids then
+		-- 1. BUSCA POR USUÁRIO EXISTENTE (Prioridade Máxima)
 		for i=1,#ids do
 			if (string.find(ids[i],"ip:") == nil) then
-				local status, user_id = pcall(function()
-					return exports.oxmysql:scalar_execute("SELECT user_id FROM godz_user_ids WHERE identifier = @identifier", { identifier = ids[i] })
+				-- [GODZ FIX] Usa Promise para garantir retorno síncrono
+				local p = promise.new()
+				exports.oxmysql:scalar("SELECT user_id FROM godz_user_ids WHERE identifier = ?", { ids[i] }, function(result)
+					p:resolve(result)
 				end)
+				
+				local user_id = Citizen.Await(p)
 
-				if not status then -- Fallback check
-					status, user_id = pcall(function()
-						return exports.oxmysql:scalar("SELECT user_id FROM godz_user_ids WHERE identifier = ?", { ids[i] })
-					end)
-				end
-
-				if status and user_id then
+				if user_id then
+					print("[GODZ] Jogador antigo detectado. ID: "..user_id.." carregado pelo identificador: "..ids[i])
 					return user_id
 				end
 			end
 		end
 
-		-- [FIX GODZ] Auto-Create User if Not Found
+		-- 2. CRIAÇÃO DE NOVO USUÁRIO (Somente se não encontrou nenhum ID acima)
 		print("[GODZ] Novo jogador detectado, criando identificadores....")
 		local status, result = pcall(function()
-			-- Usar insert para obter o ID diretamente (compatível com oxmysql async)
-			return exports.oxmysql:insert("INSERT INTO godz_users(whitelisted,banned) VALUES(false,false)", {})
+			-- [GODZ ENGINEERING] Criação de usuário com IP e Login Forçados
+			local endpoint = "0.0.0.0"
+			if source then endpoint = GetPlayerEndpoint(source) or "0.0.0.0" end
+			local datalogin = os.date("%d/%m/%Y %H:%M:%S")
+			
+			local p = promise.new()
+			exports.oxmysql:insert('INSERT INTO godz_users(ip, last_login, whitelisted, banned) VALUES(?, ?, 0, 0)', { 
+				endpoint, datalogin 
+			}, function(id) 
+				if id then 
+					print("[GODZ] Sucesso: ID "..id.." criado com IP "..endpoint) 
+					p:resolve(id)
+				else
+					p:resolve(nil)
+				end 
+			end)
+			return Citizen.Await(p)
 		end)
 
-		if not status then
+		if not status or not result then
 			print('[GODZ] ERRO CRÍTICO AO CRIAR USUÁRIO: ' .. (tostring(result) or 'Erro Desconhecido'))
 			return false
 		end
@@ -325,26 +340,19 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 		deferrals.update("Carregando...")
 		local user_id = nil
 		pcall(function()
-			user_id = vRP.getUserIdByIdentifiers(ids)
+			user_id = vRP.getUserIdByIdentifiers(ids, source)
 		end)
 		
 		if user_id then
-			-- [FIX GODZ] Atualização Forçada de IP e Login (Compatível com OxMySQL)
+			-- [FIX GODZ] Verificação redundante de IP e Login (Caso já exista)
 			local endpoint = GetPlayerEndpoint(source) 
 			local login_date = os.date("%d/%m/%Y %H:%M:%S") 
 			
-			-- Execute o UPDATE logo após a confirmação do user_id
 			exports.oxmysql:execute("UPDATE godz_users SET ip = ?, last_login = ? WHERE id = ?", { 
 				endpoint, 
 				login_date, 
 				user_id 
-			}, function(affected) 
-				if affected then 
-					print("[GODZ DEBUG] IP e Login registrados com sucesso para o ID: "..user_id) 
-				else 
-					print("[GODZ ERROR] Falha ao gravar IP no banco para o ID: "..user_id) 
-				end 
-			end)
+			})
 
 			deferrals.update("Verificando se você está banido.")
 			local banned = false

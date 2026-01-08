@@ -48,9 +48,9 @@ function vRPN.Identidade()
         local identity_check = vRP.query("godz/get_identity", {user_id = user_id})
         
         -- Retry Logic: Tenta buscar novamente se falhar na primeira (espera DB sync)
-        if not identity_check or #identity_check == 0 then
+        if not identity_check or #identity_check == 0 or not identity_check[1] then
             print("[GODZ] Identidade não encontrada, aguardando sincronização DB...")
-            Citizen.Wait(1000)
+            Citizen.Wait(2000) -- [GODZ ENGINEERING] Wait aumentado para 2s
             identity_check = vRP.query("godz/get_identity", {user_id = user_id})
         end
 

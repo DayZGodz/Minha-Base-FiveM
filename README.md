@@ -6,12 +6,11 @@
 
 ## 🧠 GODZ AI NEXUS (Inteligência Artificial)
 
-### 🤖 GODZ AI NEXUS (Phi-3 Mini)
-**A Mente da Cidade**
-O núcleo de inteligência artificial do servidor não é apenas um chatbot. É um modelo de linguagem local (Phi-3 Mini) treinado especificamente para roleplay, operando em uma ponte Python-Lua de baixa latência.
-*   **Context Awareness:** A IA sabe quem é o jogador, seu emprego, status financeiro e localização.
-*   **Latency Optimized:** Respostas em milissegundos graças ao cache inteligente em disco.
-*   **Roleplay Enforcer:** Garante que as interações mantenham a imersão do cenário.
+### 🤖 AI BRIDGE & HANDSHAKE
+**Integração Neural Segura**
+O servidor utiliza um protocolo de handshake criptografado para comunicação entre Lua e Python (LLM).
+*   **Bearer Token Authentication:** Cada requisição à IA é assinada digitalmente, impedindo injeções externas.
+*   **Contexto Dinâmico:** A IA recebe em tempo real o estado do jogador (fome, sede, emprego, saldo) para gerar respostas coerentes.
 
 ### 🆘 SISTEMA DE AJUDA INTELIGENTE (`/ajuda`)
 **Suporte Automatizado 24/7**
@@ -19,18 +18,17 @@ Esqueça os tickets de suporte repetitivos. O comando `/ajuda` conecta o jogador
 *   **Resolução de Dúvidas:** "Como compro um carro?", "Onde fica a prefeitura?". A IA responde com base na Wiki do servidor.
 *   **Filtragem de Tickets:** Reduz em 90% a carga da staff, permitindo foco em problemas reais.
 
-### 🚓 DESPACHO TÁTICO IMERSIVO (`/911`)
-**Coordenação Policial Avançada**
-O sistema de emergência não envia apenas um blip. Ele cria uma narrativa.
-*   **Relatórios Detalhados:** A IA analisa a chamada e gera um relatório de situação para a polícia (Cores, Veículos, Suspeitos).
-*   **Priorização Automática:** Classifica chamados baseados na gravidade descrita pelo jogador.
-
 ---
 
 ## 📦 GODZ CORE (Módulos Essenciais)
-*Localização: `server/resources/[godz_core]/`*
 
 A espinha dorsal do servidor, contendo os sistemas fundamentais para o funcionamento da cidade.
+
+### 🛡️ GODZ IDENTITY & SECURITY
+**Gestão de Identidade Blindada**
+Sistema de login reescrito do zero para evitar duplicação de IDs e garantir integridade dos dados.
+*   **Atomic Login Flow:** Uso de Promises e Await para garantir que o jogador só entre no servidor após o banco de dados confirmar a gravação do IP.
+*   **Anti-Duplicate:** Verificação robusta de identificadores (Steam, Discord, License) antes de gerar novos IDs.
 
 ### 🛡️ GODZ ADMIN (`godz_admin`)
 **Gestão Administrativa & Auditoria**
@@ -48,30 +46,13 @@ Algoritmo avançado que regula a inflação e os preços de mercado dinamicament
 **Multicharacter com Lore IA**
 Criação de personagens imersiva onde a IA gera biografias únicas baseadas nas escolhas do jogador. Interface visual premium para seleção de personagens.
 
-### 🏠 GODZ HOUSING (`godz_housing`)
-**Sistema Imobiliário & Decoração**
-Compra, venda e aluguel de propriedades com sistema de decoração livre, permitindo que os jogadores personalizem seus espaços.
-
 ### 🎒 GODZ INVENTORY (`godz_inventory`)
 **Gestão de Itens com Metadados**
 Inventário inteligente que suporta metadados (durabilidade, número de série, etc.) e drag-and-drop fluido.
 
-### 📋 LISTA COMPLETA DE MÓDULOS CORE
-*   **godz_chest:** Sistema de baús seguros e compartilhados.
-*   **godz_connect:** Gerenciamento de filas e conexões otimizado.
-*   **godz_dispatch:** Central de despachos unificada.
-*   **godz_events:** Sistema de eventos dinâmicos pelo mapa.
-*   **godz_garage:** Garagem pessoal com persistência de veículos.
-*   **godz_jobs:** Empregos interativos e diversificados.
-*   **godz_missions:** Missões diárias e semanais geradas proceduralmente.
-*   **godz_phone:** Smartphone funcional com apps reais (Twitter, Instagram, Banco).
-*   **godz_target:** Sistema de interação "olho" otimizado (ox_target).
-*   **godz_tuning:** Oficina mecânica com diagnóstico via IA.
-
 ---
 
 ## 🛡️ GODZ MODULES (Especializações)
-*Localização: `server/resources/[godz_modules]/`*
 
 Módulos de expansão que adicionam profundidade e gameplay avançado.
 
@@ -86,6 +67,7 @@ Ecossistema criminal profundo com rotas de produção de drogas, riscos calculad
 ### 🔥 GODZ SHIELD (`godz_shield`)
 **Firewall Anti-DDoS & Anticheat**
 Camada extra de proteção de rede para mitigar ataques de negação de serviço e manter o servidor online e estável.
+*   **Sentinel:** Módulo de detecção heurística de injeções (Godmode, TriggerBot, Executor).
 
 ### 🎫 GODZ SUPPORT (`godz_support`)
 **Sistema de Tickets In-Game**
@@ -97,29 +79,14 @@ Módulo estendido de garagens focado em empresas, permitindo frotas corporativas
 
 ---
 
-## 🗄️ ARQUITETURA DE DADOS (DB)
+## 🚀 INSTALAÇÃO & SUPORTE
 
-### 📊 GODZ USERS (TABELA MESTRA)
-**A Espinha Dorsal do Servidor**
-Estrutura otimizada para segurança e performance.
-*   **`id`**: Identificador único do cidadão.
-*   **`whitelisted`**: Status de aprovação.
-*   **`banned`**: Status de banimento global.
-*   **`ip`**: Rastreio de IP para segurança e auditoria (varchar 50).
-*   **`last_login`**: Data/Hora da última conexão (varchar 50).
-*   **Controle Integrado:** Moedas Premium, Pets e Slots de Garagem vinculados diretamente ao ID.
+1.  Clone o repositório.
+2.  Importe o arquivo `godz_database.sql`.
+3.  Configure o `server.cfg` com sua License Key e Steam Web API.
+4.  Inicie o servidor.
+
+Entre em contato com a equipe de desenvolvimento GODZ para suporte técnico.
 
 ---
-
-## 🛠️ TECHNICAL UPDATES
-**Patch Notes - Identidade e Persistência de Dados**
-
-O sistema de identificação recebeu atualizações críticas para garantir a estabilidade e a integridade dos dados desde a primeira conexão:
-
-*   **🛡️ Prioridade de Registro de IP (Async Fix):** O sistema de conexão (`vrp/base.lua`) agora executa a gravação do IP e Last Login no banco de dados **antes** de liberar o jogador para a verificação da IA. Isso é garantido por uma execução forçada via OxMySQL e um delay estratégico de sincronização.
-*   **🔄 Sincronização de IA (Wait Check):** O módulo `godz_shield` implementa um `Wait(500)` na conexão para assegurar que a IA apenas consulte a base de dados após o registro completo do jogador, eliminando falsos negativos na whitelist.
-*   **💾 Redundância de Identidade:** O `godz_identity` agora possui um sistema de **Retry Automático** se os dados retornarem nulos na primeira tentativa, além de um fallback seguro para perfis temporários, impedindo quedas de conexão por timeouts de banco de dados.
-
----
-
-> *GODZ ENGINE - Desenvolvido para quem exige a perfeição.*
+*Powered by GODZ AI NEXUS*

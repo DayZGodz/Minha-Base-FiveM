@@ -94,7 +94,7 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 AddEventHandler("playerConnecting", function(name, setKickReason, deferrals)
     deferrals.defer()
-    Wait(500) -- [GODZ FIX] Delay para garantir sincronização do IP com a IA
+    Wait(1000) -- [GODZ FIX] Delay aumentado para 1s para garantir integridade DB
     
     local playerName = name
     if not playerName then 
