@@ -59,13 +59,14 @@ local function SendAnalytics()
         active_user_ids = GetActiveUserIDs()
     }
     
-    PerformHttpRequest("http://127.0.0.1:5000/analytics_ingest", function(err, text, headers)
+    -- Timeout reduzido para 2 segundos conforme solicitado (evita travar spawn se chamado no inicio)
+    PerformHttpRequestWithTimeout("http://127.0.0.1:5000/analytics_ingest", function(err, text, headers)
         if err == 200 then
             print("^2[GODZ ANALYTICS] ^7Dados enviados com sucesso.")
         else
-            print("^1[GODZ ANALYTICS] ^7Erro ao enviar dados: " .. tostring(err))
+            print("^1[GODZ ANALYTICS] ^7Erro ou Timeout ao enviar dados: " .. tostring(err))
         end
-    end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' })
+    end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' }, 2000)
 end
 
 Citizen.CreateThread(function()

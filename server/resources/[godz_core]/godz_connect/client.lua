@@ -14,16 +14,12 @@ AddEventHandler('onClientResourceStart', function(resourceName)
       return
     end
     
-    -- [GODZ] Force Shutdown Loop (5s) to kill 3% bug
-    ShutdownLoadingScreen()
-    ShutdownLoadingScreenNui()
-    
+    -- [GODZ] Force Shutdown Loop (10x 100ms) to aggressively kill 3% bug
     Citizen.CreateThread(function()
-        local endTime = GetGameTimer() + 5000
-        while GetGameTimer() < endTime do
+        for i = 1, 10 do
             ShutdownLoadingScreen()
             ShutdownLoadingScreenNui()
-            Wait(0)
+            Wait(100)
         end
     end)
     
