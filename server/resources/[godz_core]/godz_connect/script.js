@@ -1,34 +1,25 @@
-const audio = document.getElementById("bg-music");
-const progressBar = document.getElementById("progress-bar");
-const loadingPercent = document.getElementById("loading-percent");
-const currentResource = document.getElementById("current-resource");
-
-// Initial Volume (Ambient Mode)
-const AMBIENT_VOL = 0.10; // 10%
-const DUCKING_VOL = 0.02; // 2%
-
-audio.volume = AMBIENT_VOL;
-
-// Audio Auto-Play
-document.addEventListener("click", () => {
-    if (audio.paused) {
-        audio.play().catch(e => console.log("Audio play blocked", e));
-    }
-});
-
 /* ==========================================================================
-   GODZ NEXUS AI INTERACTION (Loading Screen)
+   GODZ NEXUS AI INTERFACE & LOADING SYSTEM
    ========================================================================== */
 
-const aiAvatar = document.getElementById("ai-avatar");
-const aiStatusText = document.getElementById("ai-status-text");
+// DOM Elements
+const aiAvatarWrapper = document.querySelector(".ai-avatar-wrapper");
+const statusText = document.getElementById("status-text");
 const micBtn = document.getElementById("mic-btn");
+const loadingFill = document.querySelector(".cyber-fill");
+const loadingPercent = document.getElementById("loading-percent");
+const currentFile = document.querySelector(".current-file");
 
+// State Variables
 let isListening = false;
 let recognition;
 let synth = window.speechSynthesis;
+let count = 0;
+let thisCount = 0;
 
-// 1. Configurar Web Speech API (STT)
+/* ==========================================================================
+   WEB SPEECH API (STT) - VOICE RECOGNITION
+   ========================================================================== */
 if ('webkitSpeechRecognition' in window) {
     recognition = new webkitSpeechRecognition();
     recognition.continuous = false;
@@ -38,63 +29,61 @@ if ('webkitSpeechRecognition' in window) {
     recognition.onstart = function() {
         isListening = true;
         micBtn.classList.add("active");
-        aiAvatar.classList.add("listening");
-        aiStatusText.innerText = "OUVINDO...";
-        audio.volume = DUCKING_VOL; // Ducking
+        aiAvatarWrapper.classList.add("listening"); // Optional: Add specific listening anim
+        if (statusText) statusText.innerText = "OUVINDO...";
     };
 
     recognition.onend = function() {
         isListening = false;
         micBtn.classList.remove("active");
-        aiAvatar.classList.remove("listening");
-        if (!synth.speaking) {
-            audio.volume = AMBIENT_VOL; // Restore volume
-            aiStatusText.innerText = "GODZ NEXUS: ONLINE";
+        aiAvatarWrapper.classList.remove("listening");
+        if (!synth.speaking && statusText) {
+            statusText.innerText = "SYSTEM: ONLINE";
         }
     };
 
     recognition.onresult = function(event) {
         const transcript = event.results[0][0].transcript;
-        console.log("Player disse: " + transcript);
-        aiStatusText.innerText = "PROCESSANDO...";
+        console.log("Player Input: " + transcript);
+        if (statusText) statusText.innerText = "PROCESSANDO DADOS...";
         sendToGodzAi(transcript);
     };
 
     recognition.onerror = function(event) {
-        console.error("Erro STT:", event.error);
-        aiStatusText.innerText = "ERRO NO MICROFONE";
-        audio.volume = AMBIENT_VOL;
+        console.error("STT Error:", event.error);
+        if (statusText) statusText.innerText = "ERRO: INPUT DE VOZ";
     };
 } else {
-    console.log("Web Speech API não suportada neste navegador.");
+    console.log("Web Speech API not supported.");
     if (micBtn) micBtn.style.display = "none";
-    if (aiStatusText) aiStatusText.innerText = "IA: RECURSO NÃO SUPORTADO";
+    if (statusText) statusText.innerText = "ERRO: SISTEMA DE VOZ INCOMPATÍVEL";
 }
 
-function toggleMic() {
-    if (isListening) {
-        recognition.stop();
-    } else {
-        // Tenta iniciar (requer HTTPS ou localhost)
-        try {
-            recognition.start();
-        } catch (e) {
-            console.error(e);
-            aiStatusText.innerText = "ERRO AO INICIAR MIC";
+// Microphone Toggle Handler
+if (micBtn) {
+    micBtn.addEventListener("click", () => {
+        if (isListening) {
+            recognition.stop();
+        } else {
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Mic Start Error:", e);
+                if (statusText) statusText.innerText = "ERRO: ACESSO AO MIC NEGADO";
+            }
         }
-    }
+    });
 }
 
-// 2. Enviar para Python Bridge
+/* ==========================================================================
+   GODZ AI BRIDGE (PYTHON SERVER)
+   ========================================================================== */
 async function sendToGodzAi(text) {
     try {
-        // NOTA: Em produção, substitua 127.0.0.1 pelo IP Real do Servidor se acessado remotamente.
-        // Como é Loading Screen, 127.0.0.1 assume que o servidor roda na máquina local (Dev Mode).
+        // Dev Mode: 127.0.0.1. Production: Change to Server IP.
         const response = await fetch('http://127.0.0.1:5000/loading_chat', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: text })
         });
 
@@ -102,35 +91,29 @@ async function sendToGodzAi(text) {
         if (data.response) {
             speakAi(data.response);
         } else {
-            speakAi("Não consegui processar sua solicitação.");
+            speakAi("Não foi possível processar os dados solicitados.");
         }
     } catch (error) {
-        console.error("Erro ao conectar com GODZ AI:", error);
-        speakAi("Falha na conexão neural com o servidor.");
+        console.error("AI Bridge Error:", error);
+        speakAi("Falha na conexão com o núcleo neural.");
     }
 }
 
-// 3. Texto para Fala (TTS)
+/* ==========================================================================
+   TEXT TO SPEECH (TTS) - NEXUS VOICE
+   ========================================================================== */
 function speakAi(text) {
-    if (synth.speaking) {
-        console.error('speechSynthesis.speaking');
-        return;
-    }
+    if (synth.speaking) return;
 
-    aiStatusText.innerText = "RESPONDENDO...";
-    aiAvatar.classList.add("speaking");
-    smoothDucking(true); // Ducking Ativo
+    if (statusText) statusText.innerText = "TRANSMITINDO...";
+    aiAvatarWrapper.classList.add("speaking"); // Triggers visualizer overlay
 
     const utterThis = new SpeechSynthesisUtterance(text);
     utterThis.lang = 'pt-BR';
-    utterThis.pitch = 0.95; // Cadência mais natural (Human-like)
-    utterThis.rate = 0.9;   // Mais pausado e claro
-    utterThis.volume = 1.0; 
+    utterThis.volume = 1.0;
 
-    // Tentar selecionar uma voz Neural/Natural
+    // Voice Selection Logic (Prioritizing Natural/Neural voices)
     const voices = synth.getVoices();
-    
-    // Filtro de Prioridade: Francisca Online -> Natural/Online -> Google -> Qualquer PT-BR
     const voice = voices.find(v => v.name.includes('Microsoft Francisca Online (Natural)')) ||
                   voices.find(v => (v.name.includes('Natural') || v.name.includes('Online')) && v.lang.includes('pt-BR')) ||
                   voices.find(v => (v.name.includes('Natural') || v.name.includes('Neural')) && v.lang.includes('pt-BR')) ||
@@ -138,60 +121,46 @@ function speakAi(text) {
                   voices.find(v => v.lang.includes('pt-BR')) ||
                   voices[0];
                   
-    if (voice) {
-        console.log("Voz selecionada: " + voice.name);
-        utterThis.voice = voice;
-    }
+    if (voice) utterThis.voice = voice;
 
-    // Configurações de Cadência Neural
+    // Android/AI Cadence
     utterThis.pitch = 1.0; 
-    utterThis.rate = 0.9;
+    utterThis.rate = 1.0; 
 
-    if (utterThis) {
-        utterThis.onend = function (event) {
-            if (event && event.utterance) {
-                console.log('SpeechSynthesisUtterance.onend');
-                aiAvatar.classList.remove("speaking");
-                aiStatusText.innerText = "GODZ NEXUS: ONLINE";
-                smoothDucking(false); // Restore volume suavemente
-            }
-        };
+    utterThis.onend = function (event) {
+        aiAvatarWrapper.classList.remove("speaking");
+        if (statusText) statusText.innerText = "SYSTEM: ONLINE";
+    };
 
-        utterThis.onerror = function (event) {
-            console.error('SpeechSynthesisUtterance.onerror');
-            aiAvatar.classList.remove("speaking");
-            smoothDucking(false);
-        };
-    }
+    utterThis.onerror = function (event) {
+        console.error('TTS Error');
+        aiAvatarWrapper.classList.remove("speaking");
+        if (statusText) statusText.innerText = "ERRO: SÍNTESE DE VOZ";
+    };
 
     synth.speak(utterThis);
 }
 
-// Try auto-play immediately (browsers might block)
+// Initial Greeting
 window.onload = () => {
-    audio.play().catch(e => {
-        console.log("Autoplay blocked. User interaction required.");
-    });
-
-    // Proactive AI Narration (Explaining Systems)
     setTimeout(() => {
-        const introText = "Bem-vindo à GODZ City. Eu sou a Nexus, sua assistente virtual. " +
-                          "Enquanto carregamos seus dados, saiba que contamos com proteção anti-DDOS exclusiva, " +
-                          "economia balanceada e um sistema de facções dinâmico. " +
-                          "Você pode usar seu microfone para me fazer perguntas agora mesmo.";
+        const introText = "Bem-vindo à GODZ City. Sistemas operacionais em inicialização. " +
+                          "Protocolos de segurança ativos. " +
+                          "Estou pronta para responder suas dúvidas enquanto configuramos sua conexão.";
         speakAi(introText);
     }, 2000);
 };
 
-// FiveM Loading Events
+/* ==========================================================================
+   FIVEM LOADING HANDLERS
+   ========================================================================== */
 const handlers = {
     startInitFunctionOrder(data) {
         count = data.count;
     },
 
     initFunctionInvoking(data) {
-        document.querySelector('.progress-bar-fill').style.left = '0%';
-        document.querySelector('.progress-bar-fill').style.width = ((data.idx / count) * 100) + '%';
+        if (loadingFill) loadingFill.style.width = ((data.idx / count) * 100) + '%';
     },
 
     startDataFileEntries(data) {
@@ -199,36 +168,43 @@ const handlers = {
     },
 
     onDataFileEntry(data) {
-        document.querySelector('.progress-bar-fill').style.left = '0%';
-        document.querySelector('.progress-bar-fill').style.width = ((data.idx / count) * 100) + '%';
+        if (loadingFill) loadingFill.style.width = ((data.idx / count) * 100) + '%';
     },
 
     endDataFileEntries() {
-        document.querySelector('.progress-bar-fill').style.left = '0%';
-        document.querySelector('.progress-bar-fill').style.width = '100%';
+        if (loadingFill) loadingFill.style.width = '100%';
     },
 
     performMapLoadFunction(data) {
         ++thisCount;
-        document.querySelector('.progress-bar-fill').style.left = '0%';
-        document.querySelector('.progress-bar-fill').style.width = ((thisCount / count) * 100) + '%';
+        if (loadingFill) loadingFill.style.width = ((thisCount / count) * 100) + '%';
     },
 
     onLogLine(data) {
-        document.querySelector('.progress-bar-fill').style.left = '0%';
-        document.querySelector('.progress-bar-fill').style.width = (data.idx / count * 100) + '%';
+        if (loadingFill) loadingFill.style.width = (data.idx / count * 100) + '%';
     }
 };
 
 window.addEventListener('message', function (e) {
     if (e.data.eventName === 'loadProgress') {
         const pct = parseInt(e.data.loadFraction * 100);
-        progressBar.style.width = pct + "%";
-        loadingPercent.innerText = pct + "%";
+        if (loadingFill) loadingFill.style.width = pct + "%";
+        if (loadingPercent) loadingPercent.innerText = pct + "%";
     }
     
     if (e.data.eventName === 'onLogLine') {
-        // e.data.message contains info like "Loading resource xyz"
-        currentResource.innerText = e.data.message;
+        if (currentFile) currentFile.innerText = e.data.message;
     }
 });
+
+// Bridge between FiveM Native UI and standard web events
+if (!window.invokeNative) {
+    // Fallback for browser testing
+    let progress = 0;
+    setInterval(() => {
+        progress += 1;
+        if (progress > 100) progress = 100;
+        if (loadingFill) loadingFill.style.width = progress + "%";
+        if (loadingPercent) loadingPercent.innerText = progress + "%";
+    }, 100);
+}

@@ -8,75 +8,83 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Background Video -->
+    <!-- Background Video: Data Nexus Loop -->
     <div class="video-background">
+        <!-- Placeholder: Usuário deve substituir por 'assets/nexus_bg.webm' -->
         <video autoplay muted loop id="bg-video">
-            <source src="assets/background.mp4" type="video/mp4">
-            <!-- Fallback para imagem se o vídeo não carregar -->
-            <img src="assets/background.jpg" alt="Background" class="fallback-img">
+            <source src="assets/nexus_bg.webm" type="video/webm">
+            <source src="https://cdn.pixabay.com/video/2019/04/20/22908-331663432_large.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>
+        <div class="scanlines"></div>
     </div>
 
-    <!-- Main Container -->
+    <!-- Main Interface -->
     <div class="container">
         
-        <!-- Logo Section -->
-        <div class="logo-container">
-            <img src="assets/logo.png" alt="Familía God Logo" class="godz-logo-img">
-            <div class="pulse-ring"></div>
-            <p class="server-status">ESTABELECENDO CONEXÃO SEGURA...</p>
+        <!-- Header Status -->
+        <div class="system-header">
+            <div class="sys-status">
+                <span class="status-dot"></span> SYSTEM: ONLINE
+            </div>
+            <div class="sys-id">GODZ.NEXUS.V2</div>
         </div>
 
-        <!-- GODZ AI NEXUS (Interactive Avatar) -->
-        <div class="ai-avatar-container">
-            <div class="ai-visual-wrapper">
-                <div class="ai-circle" id="ai-avatar"></div>
-                <div class="ai-wave w1"></div>
-                <div class="ai-wave w2"></div>
-                <div class="ai-wave w3"></div>
+        <!-- Central Holographic AI -->
+        <div class="nexus-core-container">
+            <div class="hologram-ring outer-ring"></div>
+            <div class="hologram-ring inner-ring"></div>
+            
+            <!-- AI Avatar Video Loop -->
+            <div class="ai-avatar-wrapper">
+                <video autoplay muted loop id="ai-avatar-video" class="ai-video">
+                    <!-- Placeholder: Usuário deve substituir por 'assets/avatar_loop.webm' -->
+                    <source src="assets/avatar_loop.webm" type="video/webm">
+                    <source src="https://cdn.pixabay.com/video/2020/05/25/40149-424930030_large.mp4" type="video/mp4">
+                </video>
+                <!-- Audio Visualizer Overlay -->
+                <div class="visualizer-overlay" id="visualizer">
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
             </div>
-            <p class="ai-status" id="ai-status-text">GODZ NEXUS: AGUARDANDO COMANDO...</p>
-            <div class="ai-controls">
-                <button class="mic-button" id="mic-btn" onclick="toggleMic()">
+
+            <div class="ai-status-display">
+                <p id="status-text">AGUARDANDO INPUT DE VOZ...</p>
+            </div>
+        </div>
+
+        <!-- Interaction Module -->
+        <div class="interaction-module">
+            <button class="holo-mic-btn" id="mic-btn">
+                <div class="mic-icon-wrapper">
                     <i class="fas fa-microphone"></i>
-                </button>
-                <span class="mic-hint">Pergunte: "Quem é você?" ou "Como funciona o banco?"</span>
-            </div>
+                </div>
+                <div class="mic-ripple"></div>
+            </button>
+            <p class="instruction-text">CLIQUE PARA FALAR</p>
         </div>
 
-        <!-- Info Panel (Left) -->
-        <div class="glass-panel info-panel">
-            <div class="panel-header">
-                <i class="fas fa-info-circle"></i> REGRAS RÁPIDAS
-            </div>
-            <ul class="rules-list">
-                <li><i class="fas fa-check"></i> Valorize a vida em primeiro lugar (Amor à Vida).</li>
-                <li><i class="fas fa-check"></i> Respeite o RP dos outros jogadores.</li>
-                <li><i class="fas fa-check"></i> Proibido RDM e VDM.</li>
-                <li><i class="fas fa-check"></i> Uso obrigatório de microfone.</li>
-                <li><i class="fas fa-check"></i> Siga as diretrizes do Discord.</li>
+        <!-- Info Data Stream (Left) -->
+        <div class="data-stream-left">
+            <div class="stream-header">/// PROTOCOLS</div>
+            <ul class="data-list">
+                <li>> AMOR_A_VIDA.exe ...... [ACTIVE]</li>
+                <li>> NO_RDM_VDM.dll ....... [LOADED]</li>
+                <li>> ROLEPLAY_CORE ........ [SYNCED]</li>
+                <li>> DISCORD_LINK ......... [READY]</li>
             </ul>
-            <div class="discord-box">
-                <i class="fab fa-discord"></i> discord.gg/DayZGodz
-            </div>
         </div>
 
-        <!-- Hidden Audio Player (Ambient) -->
-        <audio id="bg-music" loop>
-            <source src="assets/music.mp3" type="audio/mp3">
-        </audio>
-
-        <!-- Loading Progress (Bottom Center) -->
-        <div class="loading-container">
-            <div class="loading-text">
-                <span id="loading-status">Carregando recursos...</span>
+        <!-- Loading Bar (Bottom) -->
+        <div class="loading-sector">
+            <div class="loading-info">
+                <span class="current-file" id="current-resource">INITIALIZING...</span>
                 <span id="loading-percent">0%</span>
             </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-bar"></div>
+            <div class="cyber-progress-bar">
+                <div class="cyber-fill" id="progress-bar"></div>
             </div>
-            <div class="current-resource" id="current-resource">Inicializando...</div>
         </div>
 
     </div>
