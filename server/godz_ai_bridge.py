@@ -229,8 +229,8 @@ GODZ_CONNECT_SOUNDS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)
 if not os.path.exists(GODZ_CONNECT_SOUNDS_DIR):
     os.makedirs(GODZ_CONNECT_SOUNDS_DIR, exist_ok=True)
 
-# Garantir modelo Thalita
-PIPER_MODEL_NAME = "pt_BR-thalita-medium.onnx"
+# Garantir modelo Faber (Substituindo Thalita)
+PIPER_MODEL_NAME = "pt_BR-faber-medium.onnx"
 PIPER_MODEL_PATH = os.path.join(PIPER_MODELS_DIR, PIPER_MODEL_NAME)
 PIPER_MODEL_JSON = PIPER_MODEL_PATH + ".json"
 
