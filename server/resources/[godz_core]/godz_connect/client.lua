@@ -18,16 +18,23 @@ AddEventHandler('onClientResourceStart', function(resourceName)
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
     DoScreenFadeOut(0)
-    Wait(100)
+    DisplayRadar(false) -- [GODZ] Disable Radar Immediately
+    Wait(0) -- [GODZ] Instant Transition
     DoScreenFadeIn(1000)
 end)
 
 Citizen.CreateThread(function()
-    -- 1. SETUP DO LOBBY 3D
-    Wait(1000) -- Thread de Segurança para NUI
+    -- 1. SETUP DO LOBBY 3D (PRIORIDADE MÁXIMA)
+    DisplayRadar(false)
+    Wait(0) -- [GODZ] Remove Artificial Delay
     DoScreenFadeOut(0)
-    Wait(500)
     
+    -- Teleporte do Player (Segurança Imediata)
+    local playerPed = PlayerPedId()
+    SetEntityCoords(playerPed, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z - 10.0)
+    FreezeEntityPosition(playerPed, true)
+    SetEntityVisible(playerPed, false, false)
+
     -- Carrega Modelos
     local model = GetHashKey("mp_f_freemode_01") -- Modelo Feminino Base
     RequestModel(model)

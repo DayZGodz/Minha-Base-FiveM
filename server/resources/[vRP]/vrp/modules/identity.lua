@@ -101,23 +101,22 @@ AddEventHandler("vRP:playerJoin",function(user_id,source,name)
         
         local ok, err = pcall(function()
             -- [GODZ FIX] Garantir que dados não sejam nulos (Proteção Anti-Crash 3%)
-            -- Verifica se vRP.generate... retornou nil
-            if registration == nil then registration = "" end
-            if phone == nil then phone = "" end
+            if not registration or registration == "" then registration = vRP.generateRegistrationNumber() end
+            if not phone or phone == "" then phone = vRP.generatePhoneNumber() end
             
-            -- Se vazios, tenta gerar novamente ou define fallback seguro
-            if registration == "" then registration = vRP.generateRegistrationNumber() or "AA000AAA" end
-            if phone == "" then phone = vRP.generatePhoneNumber() or "000-000" end
+            -- FALLBACK FINAL (Se a geração falhar)
+            if not registration or registration == "" then registration = "AA" .. math.random(100,999) .. "AA" end
+            if not phone or phone == "" then phone = "555-" .. math.random(1000,9999) end
             
             local def_firstname = "Indigente"
             local def_name = "Individuo"
             local def_age = 21
 
-            -- [GODZ] ID 1 Fallback Protection
+            -- [GODZ] ID 1 Force Override (Bob Godz)
             if tonumber(user_id) == 1 then
                 def_firstname = "Bob"
                 def_name = "Godz"
-                def_age = 25
+                def_age = 30
             end
 
             vRP.execute("vRP/init_user_identity",{
