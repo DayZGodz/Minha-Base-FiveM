@@ -1,7 +1,7 @@
 {
     "SERVER_INFO": {
         "server_name": "GODZ",
-        "discord_token": "YOUR_TOKEN_HERE",
+        "discord_token": "YOUR_DISCORD_TOKEN_HERE",
         "guild_id": 1394591451597246494
     },
     "DATABASE": {

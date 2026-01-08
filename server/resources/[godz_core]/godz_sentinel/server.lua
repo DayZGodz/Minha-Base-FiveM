@@ -8,7 +8,7 @@ local ENTITY_TIME = 1000 -- 1 segundo
 
 -- Webhook (Configure aqui)
 local WEBHOOK_SENTINEL = "YOUR_DISCORD_WEBHOOK_HERE"
-local AI_ENDPOINT = "http://localhost:5000/sentinel_check"
+local AI_ENDPOINT = "http://127.0.0.1:5000/sentinel_check"
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 -- LOGS EM EMBED PREMIUM

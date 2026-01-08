@@ -53,7 +53,7 @@ AddEventHandler("godz_jobs:startJob", function(jobId)
         local prompt = "Gere um contexto de missão curto (max 15 palavras) para um emprego de " .. job.name .. ". Exemplo: 'Entrega urgente no hospital'."
         
         -- Simulando ou chamando endpoint real
-        PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+        PerformHttpRequest("http://127.0.0.1:5000/ai_assist", function(err, text, headers)
             local context = "Missão iniciada. Siga os objetivos."
             
             if err == 200 and text then

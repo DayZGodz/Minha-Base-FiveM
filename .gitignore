@@ -35,3 +35,7 @@ version.txt
 *.rar
 *.zip
 *.7z
+
+# AI Models (Large Files)
+*.safetensors
+server/asset/

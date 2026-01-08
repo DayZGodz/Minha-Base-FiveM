@@ -4,7 +4,7 @@ local Proxy = module("vrp", "lib/Proxy")
 vRP = Proxy.getInterface("vRP")
 vRPclient = Tunnel.getInterface("vRP")
 
-local AI_ENDPOINT = "http://localhost:5000/ai_assist"
+local AI_ENDPOINT = "http://127.0.0.1:5000/ai_assist"
 local DEBUG_MODE = true
 
 --[ UTILS ]-------------------------------------------------------------------------------------------------------

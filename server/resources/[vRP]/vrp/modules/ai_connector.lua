@@ -2,7 +2,7 @@
 -- GODZ AI CONNECTOR
 -- Módulo responsável pela comunicação entre o servidor FiveM e a API Python (Godz AI Bridge)
 
-local API_URL = "http://localhost:5000"
+local API_URL = "http://127.0.0.1:5000"
 local API_KEY = "godz_secret_key_123"
 
 -- Função Global de Requisição

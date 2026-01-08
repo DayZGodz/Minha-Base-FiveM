@@ -156,7 +156,7 @@ Citizen.CreateThread(function()
                         -- Vou assumir que existe uma implementação de PerformHttpRequest para a IA ou usar a função nativa do vRP se houver.
                         -- Vou implementar usando PerformHttpRequest direto para garantir.
                         
-                        PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+                        PerformHttpRequest("http://127.0.0.1:5000/ai_assist", function(err, text, headers)
                             if err == 200 then
                                 local data = json.decode(text)
                                 if data and data.response then

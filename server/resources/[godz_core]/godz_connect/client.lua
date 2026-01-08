@@ -172,10 +172,19 @@ AddEventHandler("godz_connect:receiveStatus", function(status)
     end
 end)
 
--- Fallback de Segurança
+-- Fallback de Segurança (Force Spawn se travar em 3% ou NUI falhar)
 Citizen.CreateThread(function()
-    Wait(15000)
-    if isCreator and nexusPed then
+    Wait(5000) -- 5 segundos de tolerância
+    
+    -- Verifica se o jogador ainda não spawnou (ainda está no lobby ou loading)
+    if nexusPed or GetIsLoadingScreenActive() then
+        print("[GODZ CONNECT] Force Spawn Activated due to timeout.")
+        
+        -- Garante que o loading morra
+        ShutdownLoadingScreen()
+        ShutdownLoadingScreenNui()
+        
+        -- Força a sequência de jogo
         StartGameSequence()
     end
 end)
