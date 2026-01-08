@@ -4,7 +4,7 @@
 
 ---
 
-## 🧠 O CÉREBRO: GODZ AI NEXUS & BOT
+## 🧠 GODZ AI NEXUS (Inteligência Artificial)
 
 ### 🤖 GODZ AI NEXUS (Phi-3 Mini)
 **A Mente da Cidade**
@@ -13,71 +13,50 @@ O núcleo de inteligência artificial do servidor não é apenas um chatbot. É 
 *   **Latency Optimized:** Respostas em milissegundos graças ao cache inteligente em disco.
 *   **Roleplay Enforcer:** Garante que as interações mantenham a imersão do cenário.
 
----
-
 ### 🆘 SISTEMA DE AJUDA INTELIGENTE (`/ajuda`)
 **Suporte Automatizado 24/7**
 Esqueça os tickets de suporte repetitivos. O comando `/ajuda` conecta o jogador diretamente à IA.
 *   **Resolução de Dúvidas:** "Como compro um carro?", "Onde fica a prefeitura?". A IA responde com base na Wiki do servidor.
 *   **Filtragem de Tickets:** Reduz em 90% a carga da staff, permitindo foco em problemas reais.
-*   **Aprendizado Contínuo:** O sistema aprende com as perguntas mais frequentes.
-
----
 
 ### 🚓 DESPACHO TÁTICO IMERSIVO (`/911`)
 **Coordenação Policial Avançada**
 O sistema de emergência não envia apenas um blip. Ele cria uma narrativa.
 *   **Relatórios Detalhados:** A IA analisa a chamada e gera um relatório de situação para a polícia (Cores, Veículos, Suspeitos).
 *   **Priorização Automática:** Classifica chamados baseados na gravidade descrita pelo jogador.
-*   **Audio Dispatch:** (Roadmap) Integração futura com TTS para despacho por voz.
 
 ---
 
-## 📦 NÚCLEO GODZ ([godz_core])
+## 📦 GODZ CORE (Módulos Essenciais)
+*Localização: `server/resources/[godz_core]/`*
 
-### 🛡️ GODZ ADMIN
+A espinha dorsal do servidor, contendo os sistemas fundamentais para o funcionamento da cidade.
+
+### 🛡️ GODZ ADMIN (`godz_admin`)
 **Gestão Administrativa & Auditoria**
-Painel administrativo completo com ferramentas de monitoramento em tempo real e logs de auditoria detalhados para garantir a integridade do servidor.
+Painel administrativo completo com ferramentas de monitoramento em tempo real e logs de auditoria detalhados.
 
----
-
-### 💰 GODZ BANK
+### 💰 GODZ BANK (`godz_bank`)
 **Finanças, PIX e Histórico Digital**
 Sistema bancário moderno com interface Glassmorphism, suporte a transferências instantâneas (PIX), extratos detalhados e gestão de cartões de crédito.
 
----
-
-### 📉 GODZ ECONOMY
+### 📉 GODZ ECONOMY (`godz_economy`)
 **Inteligência Econômica**
 Algoritmo avançado que regula a inflação e os preços de mercado dinamicamente, mantendo o equilíbrio financeiro do servidor.
 
----
-
-### ⚔️ GODZ SENTINEL
-**Proteção Ativa**
-Sistema de segurança robusto que atua como um escudo contra injetores e tentativas de exploração, garantindo um ambiente justo para todos.
-
----
-
-### 👥 GODZ IDENTITY
+### 👥 GODZ IDENTITY (`godz_identity`)
 **Multicharacter com Lore IA**
 Criação de personagens imersiva onde a IA gera biografias únicas baseadas nas escolhas do jogador. Interface visual premium para seleção de personagens.
 
----
-
-### 🏠 GODZ HOUSING
+### 🏠 GODZ HOUSING (`godz_housing`)
 **Sistema Imobiliário & Decoração**
 Compra, venda e aluguel de propriedades com sistema de decoração livre, permitindo que os jogadores personalizem seus espaços.
 
----
-
-### 🎒 GODZ INVENTORY
+### 🎒 GODZ INVENTORY (`godz_inventory`)
 **Gestão de Itens com Metadados**
 Inventário inteligente que suporta metadados (durabilidade, número de série, etc.) e drag-and-drop fluido.
 
----
-
-### 📋 OUTROS MÓDULOS CORE
+### 📋 LISTA COMPLETA DE MÓDULOS CORE
 *   **godz_chest:** Sistema de baús seguros e compartilhados.
 *   **godz_connect:** Gerenciamento de filas e conexões otimizado.
 *   **godz_dispatch:** Central de despachos unificada.
@@ -91,33 +70,28 @@ Inventário inteligente que suporta metadados (durabilidade, número de série, 
 
 ---
 
-## 🛡️ ESPECIALIZAÇÕES ([godz_modules])
+## 🛡️ GODZ MODULES (Especializações)
+*Localização: `server/resources/[godz_modules]/`*
 
-### ⚔️ GODZ FACTIONS
+Módulos de expansão que adicionam profundidade e gameplay avançado.
+
+### ⚔️ GODZ FACTIONS (`godz_factions`)
 **Gestão de Organizações**
-Painel completo para líderes de facções gerenciarem membros, cargos, salários e o cofre da organização, seja ela criminosa ou legal.
+Painel completo para líderes de facções gerenciarem membros, cargos, salários e o cofre da organização.
 
----
-
-### 💊 GODZ ILLEGAL
+### 💊 GODZ ILLEGAL (`godz_illegal`)
 **Rotas de Drogas & Lavagem**
-Ecossistema criminal profundo com rotas de produção de drogas, riscos calculados e sistemas de lavagem de dinheiro através de empresas de fachada.
+Ecossistema criminal profundo com rotas de produção de drogas, riscos calculados e sistemas de lavagem de dinheiro.
 
----
-
-### 🔥 GODZ SHIELD
-**Firewall Anti-DDoS**
+### 🔥 GODZ SHIELD (`godz_shield`)
+**Firewall Anti-DDoS & Anticheat**
 Camada extra de proteção de rede para mitigar ataques de negação de serviço e manter o servidor online e estável.
 
----
-
-### 🎫 GODZ SUPPORT
+### 🎫 GODZ SUPPORT (`godz_support`)
 **Sistema de Tickets In-Game**
 Ferramenta integrada para jogadores reportarem bugs ou denúncias diretamente para a staff sem sair do jogo.
 
----
-
-### 🚗 GODZ GARAGES
+### 🚗 GODZ GARAGES (`godz_garages`)
 **Expansão Empresarial**
 Módulo estendido de garagens focado em empresas, permitindo frotas corporativas e compartilhamento de veículos entre funcionários.
 
@@ -131,8 +105,8 @@ Estrutura otimizada para segurança e performance.
 *   **`id`**: Identificador único do cidadão.
 *   **`whitelisted`**: Status de aprovação.
 *   **`banned`**: Status de banimento global.
-*   **`ip`**: Rastreio de IP para segurança e auditoria.
-*   **`last_login`**: Data/Hora da última conexão (`%d/%m/%Y %H:%M:%S`).
+*   **`ip`**: Rastreio de IP para segurança e auditoria (varchar 50).
+*   **`last_login`**: Data/Hora da última conexão (varchar 50).
 *   **Controle Integrado:** Moedas Premium, Pets e Slots de Garagem vinculados diretamente ao ID.
 
 ---

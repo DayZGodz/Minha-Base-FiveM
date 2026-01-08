@@ -332,13 +332,17 @@ AddEventHandler("queue:playerConnecting",function(source,ids,name,setKickReason,
 			-- [FIX GODZ] Atualização Forçada de IP e Login (Compatível com OxMySQL)
 			local endpoint = GetPlayerEndpoint(source) 
 			local login_date = os.date("%d/%m/%Y %H:%M:%S") 
+			
+			-- Execute o UPDATE logo após a confirmação do user_id
 			exports.oxmysql:execute("UPDATE godz_users SET ip = ?, last_login = ? WHERE id = ?", { 
 				endpoint, 
 				login_date, 
 				user_id 
 			}, function(affected) 
 				if affected then 
-					print("[GODZ DB] Identificadores gravados com sucesso para o ID: "..user_id) 
+					print("[GODZ DEBUG] IP e Login registrados com sucesso para o ID: "..user_id) 
+				else 
+					print("[GODZ ERROR] Falha ao gravar IP no banco para o ID: "..user_id) 
 				end 
 			end)
 
