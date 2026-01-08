@@ -158,16 +158,22 @@ function speakAi(text) {
 
 // Initial Greeting
 window.onload = () => {
+    // Aguarda um pouco para verificar se recebe o evento de Criador
     setTimeout(() => {
-        const greetings = [
-            "Sincronizando assinatura neural... Seja bem-vindo à GODZ. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.",
-            "Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor.",
-            "Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City. Protocolos iniciais ativos."
-        ];
-        
-        // Random Selection
-        const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-        speakAi(randomGreeting);
+        if (window.isCreatorMode) {
+            const creatorGreeting = "Assinatura de comando detectada. Protocolo do Criador ativado. Bem-vindo de volta, Senhor. Todos os sistemas da GODZ estão operando em 100% sob seu comando.";
+            speakAi(creatorGreeting);
+        } else {
+            const greetings = [
+                "Sincronizando assinatura neural... Seja bem-vindo à GODZ. Eu sou a Nexus. Seu perfil de cidadão acaba de ser validado.",
+                "Otimizando ambiente de simulação... Olá. Eu sou a Nexus. Estou preparando sua transição para o setor.",
+                "Conexão segura estabelecida. Identidade confirmada. Bem-vindo à GODZ City. Protocolos iniciais ativos."
+            ];
+            
+            // Random Selection
+            const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+            speakAi(randomGreeting);
+        }
     }, 2000);
 };
 
@@ -206,6 +212,10 @@ const handlers = {
 };
 
 window.addEventListener('message', function (e) {
+    if (e.data.eventName === 'setCreatorMode') {
+        window.isCreatorMode = e.data.isCreator;
+    }
+    
     if (e.data.eventName === 'loadProgress') {
         const pct = parseInt(e.data.loadFraction * 100);
         if (loadingFill) loadingFill.style.width = pct + "%";

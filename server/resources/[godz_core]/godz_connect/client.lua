@@ -60,14 +60,18 @@ Citizen.CreateThread(function()
     -- VFX: Iluminação de Estúdio & Olhar
     Citizen.CreateThread(function()
         while DoesEntityExist(nexusPed) do
-            -- Luz Dourada Frontal (Key Light)
-            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 1.0, lobbyCoords.z + 1.8, 255, 223, 128, 3.0, 4.0)
+            -- Luz Frontal (Branca/Dourada - Highlight)
+            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y + 1.0, lobbyCoords.z + 1.8, 255, 245, 220, 3.0, 10.0)
             
-            -- Luz de Contorno Azul (Rim Light - Cyber)
-            DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 0, 229, 255, 2.0, 3.0)
+            -- Luz de Contorno (Dourado Real para Criador, Azul Cyber padrão)
+            if isCreator then
+                DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 255, 215, 0, 4.0, 5.0) -- Gold
+            else
+                DrawLightWithRange(lobbyCoords.x, lobbyCoords.y - 1.5, lobbyCoords.z + 1.0, 0, 229, 255, 2.0, 3.0) -- Cyber Blue
+            end
             
             -- Nexus sempre olha para a câmera
-            TaskLookAtCoord(nexusPed, lobbyCoords.x, lobbyCoords.y + 1.2, lobbyCoords.z + 1.6, 2000, 2048, 3)
+            TaskLookAtCoord(nexusPed, lobbyCoords.x, lobbyCoords.y + 1.5, lobbyCoords.z + 1.6, 2000, 2048, 3)
             Wait(0)
         end
     end)
@@ -78,6 +82,9 @@ Citizen.CreateThread(function()
     -- Pré-carrega animação de despedida
     RequestAnimDict("anim@mp_player_intcelebrationfemale@bow")
     while not HasAnimDictLoaded("anim@mp_player_intcelebrationfemale@bow") do Wait(10) end
+
+    RequestAnimDict("anim@mp_player_intcelebrationfemale@salute")
+    while not HasAnimDictLoaded("anim@mp_player_intcelebrationfemale@salute") do Wait(10) end
     
     -- Configuração da Câmera (Retrato 35mm)   nexusCam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
     -- Posiciona a câmera focada no rosto/busto
@@ -115,9 +122,27 @@ end)
 
 -- 3. TRANSIÇÃO E LIMPEZA
 AddEventHandler('playerSpawned', function()
+    -- Gesto de Finalização (Despedida da Nexus)
+    if nexusPed and DoesEntityExist(nexusPed) then
+        if isCreator then
+            -- PROTOCOLO CRIADOR: Continência/Respeito Máximo
+            TaskPlayAnim(nexusPed, "anim@mp_player_intcelebrationfemale@salute", "salute", 8.0, -8.0, 3000, 0, 0, false, false, false)
+            Wait(2000) -- Transição mais rápida para o chefe
+        else
+            -- Reverência Elegante (Padrão)
+            TaskPlayAnim(nexusPed, "anim@mp_player_intcelebrationfemale@bow", "bow", 8.0, -8.0, 3000, 0, 0, false, false, false)
+            Wait(3000)
+        end
+    end
+
     -- Fade Out Dramático (Transição)
-    DoScreenFadeOut(1000)
-    Wait(1000)
+    if isCreator then
+        DoScreenFadeOut(500) -- Fade rápido para ID 1
+        Wait(500)
+    else
+        DoScreenFadeOut(1500)
+        Wait(1500)
+    end
 
     -- Fecha Loading Screen Manualmente
     ShutdownLoadingScreen()

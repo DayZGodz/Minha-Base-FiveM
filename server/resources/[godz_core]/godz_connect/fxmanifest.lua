@@ -7,6 +7,7 @@ version '1.0.0'
 
 loadscreen 'index.html'
 
+server_script 'server.lua'
 client_script 'client.lua'
 
 files {
