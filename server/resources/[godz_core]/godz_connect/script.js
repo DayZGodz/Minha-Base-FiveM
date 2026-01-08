@@ -242,18 +242,27 @@ async function sendToGodzAi(text) {
    TEXT TO SPEECH (TTS) - NEXUS VOICE
    ========================================================================== */
 function speakAi(text) {
+    // [GODZ] IMMEDIATE VISUAL UNLOCK
+    // Force transparency/hide immediately so player is not stuck
+    const loadingSector = document.querySelector(".loading-sector");
+    if (loadingSector) loadingSector.style.display = 'none';
+
     // Stop any existing speech
     if (synth.speaking) synth.cancel();
 
     if (statusText) statusText.innerText = "TRANSMITINDO...";
     if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
 
-    // [GODZ] Edge TTS Integration / Piper Local
-    // Uses local bridge.
-    // Flow: JS -> Python (Generate) -> Python (OK) -> JS (Play local file)
-    
+    // Timeout Wrapper for Fetch
+    const fetchWithTimeout = (url, options, timeout = 5000) => {
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+        ]);
+    };
+
     // 1. Request Generation
-    fetch(`http://127.0.0.1:5000/tts?text=${encodeURIComponent(text)}`)
+    fetchWithTimeout(`http://127.0.0.1:5000/tts?text=${encodeURIComponent(text)}`, {}, 5000)
     .then(response => response.json())
     .then(data => {
         if (data.status === "ok") {
@@ -269,21 +278,21 @@ function speakAi(text) {
                 fallbackSpeak(text);
              });
 
+             // [GODZ SUPREME] UNLOCK IMMEDIATELY (Don't wait for audio end)
+             // The user wants to play seeing the 3D world while listening.
+             if (window.shouldAutoCloseAfterElite || true) { // Force for all
+                 setTimeout(() => {
+                    forceKillNexusUI();
+                    hideLoadingScreen();
+                    document.body.innerHTML = ''; // Kill DOM
+                    fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+                 }, 1000); // 1s delay to ensure audio starts
+             }
+
              audio.onended = () => {
                 if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
                 if (statusText) statusText.innerText = "SYSTEM: ONLINE";
                 fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
-                
-                // [GODZ SUPREME] Auto-Close after AI speaks (Elite UX)
-                if (window.shouldAutoCloseAfterElite) {
-                     console.log("GODZ ELITE: Closing Interface after AI Speech.");
-                     setTimeout(() => {
-                        forceKillNexusUI();
-                        hideLoadingScreen();
-                        document.body.innerHTML = '';
-                        fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
-                     }, 1000);
-                }
              };
 
              audio.onerror = () => {
@@ -296,8 +305,11 @@ function speakAi(text) {
         }
     })
     .catch(e => {
-        console.error("Bridge Connection Error:", e);
-        fallbackSpeak(text);
+        console.error("Bridge Connection Error/Timeout:", e);
+        // [GODZ] FAILSAFE: Unlock on error
+        forceKillNexusUI();
+        hideLoadingScreen();
+        fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
     });
 }
 

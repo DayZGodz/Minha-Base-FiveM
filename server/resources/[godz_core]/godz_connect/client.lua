@@ -17,17 +17,16 @@ AddEventHandler('onClientResourceStart', function(resourceName)
     end
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
-    DoScreenFadeOut(0)
+    -- [GODZ] REMOVED DoScreenFadeOut(0) to prevent black screen
     DisplayRadar(false) -- [GODZ] Disable Radar Immediately
     Wait(0) -- [GODZ] Instant Transition
-    DoScreenFadeIn(1000)
+    DoScreenFadeIn(500) -- [GODZ] Quick Fade In
 end)
 
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D (PRIORIDADE MÁXIMA)
     DisplayRadar(false)
-    Wait(0) -- [GODZ] Remove Artificial Delay
-    DoScreenFadeOut(0)
+    -- [GODZ] REMOVED DoScreenFadeOut(0)
     
     -- Teleporte do Player (Segurança Imediata)
     local playerPed = PlayerPedId()

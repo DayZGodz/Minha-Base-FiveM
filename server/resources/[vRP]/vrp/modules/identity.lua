@@ -13,13 +13,13 @@ function vRP.getUserIdentity(user_id,cbr)
     -- Se o banco falhar ou demorar, garantimos que o ID 1 sempre tenha identidade.
     if tonumber(user_id) == 1 then
         local ok, rows = pcall(vRP.query, "vRP/get_user_identity",{ user_id = user_id })
-        if not ok or not rows or #rows == 0 then
-            print("[GODZ] ID 1 (Diretor Bob) Identity Bypass Activated")
+        if not ok or not rows or type(rows) ~= "table" or #rows == 0 then
+            print("^1[GODZ] ID 1 (Diretor Bob) FORCED SPAWN BYPASS ACTIVATED^0")
             return {
                 user_id = 1,
                 registration = "GODZ001",
                 phone = "000-000",
-                firstname = "Bob",
+                firstname = "Diretor Bob",
                 name = "Godz",
                 age = 30
             }

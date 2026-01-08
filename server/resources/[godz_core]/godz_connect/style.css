@@ -14,10 +14,12 @@
     box-sizing: border-box;
     font-family: 'Rajdhani', sans-serif;
     user-select: none;
+    background-color: transparent; /* [GODZ] Global Transparency Safety */
 }
 
-body {
-    background-color: transparent !important; /* Allows 3D Game View */
+html, body {
+    background: transparent !important;
+    background-color: rgba(0,0,0,0) !important;
     overflow: hidden;
     color: white;
 }
