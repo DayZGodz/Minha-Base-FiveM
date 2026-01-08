@@ -280,17 +280,29 @@ def run_discord_bot():
 
     bot = GodzDiscordBot()
 
-    @bot.tree.command(name="setup_godz", description="Configura automaticamente o ecossistema GODZ no Discord.")
+    @bot.tree.command(name="setup-godz", description="Configura automaticamente o ecossistema GODZ no Discord (restrito CEOS/Admins).")
     async def setup_godz(interaction: discord.Interaction):
-        if not interaction.user.guild_permissions.administrator:
-            await interaction.response.send_message("❌ Apenas administradores podem usar este comando.", ephemeral=True)
+        perms = MASTER_CONFIG.get("PERMISSIONS", {})
+        allowed_ids = set()
+        for key in ("ceos", "admins"):
+            for i in perms.get(key, []) or []:
+                try:
+                    allowed_ids.add(int(i))
+                except Exception:
+                    pass
+        if int(interaction.user.id) not in allowed_ids and not interaction.user.guild_permissions.administrator:
+            await interaction.response.send_message("❌ Acesso restrito: apenas CEOS/Admins configurados.", ephemeral=True)
             return
 
         await interaction.response.send_message("⚙️ Iniciando configuração do Ecossistema GODZ...", ephemeral=True)
         guild = interaction.guild
+        me_perms = guild.me.guild_permissions
+        if not me_perms.manage_channels or not me_perms.manage_roles:
+            await interaction.followup.send("❌ Permissões insuficientes. Conceda 'Manage Channels' e 'Manage Roles' ao Bot.", ephemeral=True)
+            return
         
         # 1. Criar Categoria
-        category_name = "GODZ | ECOSSISTEMA"
+        category_name = "GODZ | SISTEMAS"
         category = discord.utils.get(guild.categories, name=category_name)
         if not category:
             category = await guild.create_category(category_name)
@@ -298,13 +310,9 @@ def run_discord_bot():
         else:
             await interaction.followup.send(f"ℹ️ Categoria **{category_name}** já existe.")
 
-        # 2. Criar Canais e Webhooks
+        # 2. Criar Canais essenciais
         channels_config = {
             "godz-logs": "audit",
-            "godz-shield": "sentinel",
-            "godz-bank": "bank",
-            "godz-support": "support",
-            "godz-staff": "staff",
             "godz-news": "news"
         }
 
@@ -339,6 +347,43 @@ def run_discord_bot():
             MASTER_CONFIG["WEBHOOKS"][config_key] = webhook.url
             updated_count += 1
 
+        # 2.1 Criar canal de whitelist com botão
+        wl_channel = discord.utils.get(guild.text_channels, name="fazer-whitelist", category=category)
+        if not wl_channel:
+            wl_channel = await guild.create_text_channel(
+                "fazer-whitelist",
+                category=category,
+                overwrites={guild.default_role: discord.PermissionOverwrite(read_messages=True)}
+            )
+            await interaction.followup.send("✅ Canal **fazer-whitelist** criado.")
+
+        class WhitelistView(discord.ui.View):
+            def __init__(self, category_id: int):
+                super().__init__(timeout=None)
+                self.category_id = category_id
+
+            @discord.ui.button(label="🔰 Iniciar Whitelist", style=discord.ButtonStyle.success)
+            async def open_ticket(self, button_interaction: discord.Interaction, _button):
+                guild2 = button_interaction.guild
+                category2 = discord.utils.get(guild2.categories, id=self.category_id)
+                overwrites = {
+                    guild2.default_role: discord.PermissionOverwrite(read_messages=False),
+                    guild2.me: discord.PermissionOverwrite(read_messages=True),
+                    button_interaction.user: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+                }
+                chan_name = f"wl-{button_interaction.user.name.lower().replace(' ', '-')}-{button_interaction.user.id}"
+                ticket = await guild2.create_text_channel(chan_name, category=category2, overwrites=overwrites)
+                await button_interaction.response.send_message(f"🎫 Ticket criado: {ticket.mention}", ephemeral=True)
+
+        wl_embed = discord.Embed(
+            title="GODZ Whitelist",
+            description="Clique no botão abaixo para abrir seu ticket privado de Whitelist.",
+            color=COLOR_NEON_CYAN
+        )
+        try:
+            await wl_channel.send(embed=wl_embed, view=WhitelistView(category.id))
+        except Exception:
+            pass
         # 3. Salvar Configuração
         save_master_config()
         
@@ -379,9 +424,35 @@ def run_discord_bot():
         emoji_players = "📈" if growth_players >= 0 else "📉"
         emoji_eco = "📈" if growth_eco >= 0 else "📉"
         
-        jobs = latest["active_jobs"]
-        sorted_jobs = sorted(jobs.items(), key=lambda item: item[1], reverse=True)[:3]
-        jobs_str = "\n".join([f"**{k}:** {v}" for k,v in sorted_jobs])
+        jobs = latest.get("active_jobs", {})
+        top_jobs = []
+        try:
+            if isinstance(jobs, dict):
+                top_jobs = sorted(jobs.items(), key=lambda item: (item[1] if isinstance(item[1], (int, float)) else 0), reverse=True)[:3]
+            elif isinstance(jobs, list):
+                if len(jobs) > 0 and isinstance(jobs[0], dict):
+                    normalized = []
+                    for row in jobs:
+                        name = str(row.get("job") or row.get("name") or "Indefinido")
+                        try:
+                            count = int(row.get("count") or row.get("value") or 0)
+                        except Exception:
+                            count = 0
+                        normalized.append((name, count))
+                    top_jobs = sorted(normalized, key=lambda item: item[1], reverse=True)[:3]
+                else:
+                    normalized = []
+                    for entry in jobs:
+                        try:
+                            name, val = entry
+                            count = int(val) if isinstance(val, (int, float, str)) else 0
+                            normalized.append((str(name), count))
+                        except Exception:
+                            continue
+                    top_jobs = sorted(normalized, key=lambda item: item[1], reverse=True)[:3]
+        except Exception:
+            top_jobs = []
+        jobs_str = "\n".join([f"**{k}:** {v}" for k, v in top_jobs])
         
         embed = discord.Embed(title="📊 GODZ Executive Report", color=COLOR_NEON_CYAN)
         embed.add_field(name="👥 Jogadores Online", value=f"**{latest['online_players']}** ({emoji_players} {growth_players:+})", inline=True)
