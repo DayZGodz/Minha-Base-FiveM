@@ -16,6 +16,7 @@ let recognition;
 let synth = window.speechSynthesis;
 let count = 0;
 let thisCount = 0;
+let playerName = "Cidadão"; // Default fallback
 
 /* ==========================================================================
    WEB SPEECH API (STT) - VOICE RECOGNITION
@@ -218,8 +219,11 @@ const handlers = {
 };
 
 window.addEventListener('message', function (e) {
-    if (e.data.eventName === 'setCreatorMode') {
+    if (e.data.eventName === 'setCreatorMode' || e.data.action === 'setupIdentity') {
         window.isCreatorMode = e.data.isCreator;
+        if (e.data.playerName || e.data.name) {
+            playerName = e.data.playerName || e.data.name;
+        }
     }
     
     if (e.data.eventName === 'loadProgress') {

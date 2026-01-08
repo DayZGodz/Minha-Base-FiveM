@@ -207,7 +207,9 @@ AddEventHandler("godz_connect:setCreatorMode", function(status, name)
     isCreator = status
     SendNUIMessage({
         eventName = 'setCreatorMode',
+        action = 'setupIdentity', -- Compatibility
         isCreator = isCreator,
-        playerName = name
+        playerName = name,
+        name = name -- Compatibility
     })
 end)
