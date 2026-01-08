@@ -17,7 +17,6 @@ files {
     'index.html',
     'style.css',
     'script.js',
-    'assets/*.*'
 }
 
 loadscreen_manual_shutdown 'yes'
