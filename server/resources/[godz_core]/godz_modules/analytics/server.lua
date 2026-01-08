@@ -51,6 +51,56 @@ local function GetActiveEconomy()
     return total
 end
 
+-- Função de Retry Suave para IA (Evita travar o servidor)
+local function PerformHttpRequestWithRetry(url, cb, method, data, headers, max_retries)
+    local retries = 0
+    local success = false
+    
+    Citizen.CreateThread(function()
+        while retries < (max_retries or 3) and not success do
+            local finished = false
+            local function finish(err, text, resp_headers)
+                if finished then return end
+                finished = true
+                if err == 0 or err == nil then
+                    -- Falha de rede/timeout
+                    if retries >= 1 then
+                        print("^3[GODZ MODULES] Tentativa de conexão com IA (" .. (retries + 1) .. "/" .. max_retries .. ") falhou. Retentando em breve...^0")
+                    end
+                else
+                    success = true
+                    if cb then cb(err, text, resp_headers) end
+                end
+            end
+
+            PerformHttpRequest(url, function(err, text, resp_headers)
+                finish(err, text, resp_headers)
+            end, method, data, headers)
+
+            -- Timeout de segurança interno da função wrapper
+            SetTimeout(5000, function()
+                finish(0, nil, nil)
+            end)
+
+            -- Espera resposta ou timeout
+            local wait_count = 0
+            while not finished and wait_count < 60 do -- Espera até ~6s
+                Wait(100)
+                wait_count = wait_count + 1
+            end
+
+            if not success then
+                retries = retries + 1
+                Wait(2000) -- Espera 2s antes de tentar de novo (Suave)
+            end
+        end
+
+        if not success then
+             print("^1[GODZ MODULES] IA Inacessível após várias tentativas. Operação cancelada sem travar o servidor.^0")
+        end
+    end)
+end
+
 local function SendAnalytics()
     local data = {
         online_players = GetOnlinePlayers(),
@@ -59,14 +109,14 @@ local function SendAnalytics()
         active_user_ids = GetActiveUserIDs()
     }
     
-    -- Timeout reduzido para 2 segundos conforme solicitado (evita travar spawn se chamado no inicio)
-    PerformHttpRequestWithTimeout("http://127.0.0.1:5000/analytics_ingest", function(err, text, headers)
+    -- Usando o sistema de Retry Suave
+    PerformHttpRequestWithRetry("http://127.0.0.1:5000/analytics_ingest", function(err, text, headers)
         if err == 200 then
             print("^2[GODZ ANALYTICS] ^7Dados enviados com sucesso.")
         else
-            print("^1[GODZ ANALYTICS] ^7Erro ou Timeout ao enviar dados: " .. tostring(err))
+            print("^1[GODZ ANALYTICS] ^7Erro na resposta da API: " .. tostring(err))
         end
-    end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' }, 2000)
+    end, 'POST', json.encode(data), { ['Content-Type'] = 'application/json' }, 3)
 end
 
 Citizen.CreateThread(function()

@@ -21,6 +21,21 @@ function TogglePhone()
     end
 end
 
+-- Input de Voz / Atalho Rápido para IA
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        if isPhoneOpen then
+            -- Tecla E (38) para abrir IA rapidamente ou ativar voz
+            if IsControlJustPressed(0, 38) then
+                SendNUIMessage({
+                    type = "openAI"
+                })
+            end
+        end
+    end
+end)
+
 -- Callbacks NUI
 
 RegisterNUICallback("close", function(data, cb)
@@ -41,10 +56,11 @@ end)
 -- Eventos do Servidor
 
 RegisterNetEvent("godz_phone:receiveAIResponse")
-AddEventHandler("godz_phone:receiveAIResponse", function(response)
+AddEventHandler("godz_phone:receiveAIResponse", function(response, audio)
     SendNUIMessage({
         type = "aiResponse",
-        text = response
+        text = response,
+        audio = audio
     })
 end)
 

@@ -100,12 +100,26 @@ createApp({
                 visible.value = data.status;
             }
 
+            if (data.type === "openAI") {
+                openApp('ai');
+            }
+
             if (data.type === "aiResponse") {
                 isAiThinking.value = false;
                 aiMessages.value.push({
                     text: data.text,
                     type: 'ai'
                 });
+                
+                if (data.audio) {
+                    try {
+                        const audio = new Audio("data:audio/wav;base64," + data.audio);
+                        audio.play();
+                    } catch (e) {
+                        console.error("Erro ao reproduzir áudio da IA:", e);
+                    }
+                }
+
                 scrollToBottom();
             }
 
