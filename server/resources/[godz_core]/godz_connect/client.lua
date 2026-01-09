@@ -7,22 +7,14 @@ local lobbyCoords = vector3(3525.5, 3704.3, 21.0) -- Humane Labs Interior
 local isCreator = false -- Variável de controle do Criador
 local isWhitelistedClient = false -- [GODZ] Status WL para gating
 local currentToken = nil -- [GODZ] Token de validação dinâmica
+local introCompleted = false
 
 -- [GODZ] Force Shutdown Loading Screen ASAP
 AddEventHandler('onClientResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end
-    
-    -- [GODZ] Force Shutdown Loop (10x 100ms) to aggressively kill 3% bug
-    Citizen.CreateThread(function()
-        for i = 1, 10 do
-            ShutdownLoadingScreen()
-            ShutdownLoadingScreenNui()
-            Wait(100)
-        end
-    end)
-    
+
     DisplayRadar(false)
     Wait(0)
     DoScreenFadeIn(500)
@@ -145,11 +137,6 @@ Citizen.CreateThread(function()
     TriggerServerEvent("godz_connect:checkPlayerStatus")
 end)
 
-AddEventHandler('playerSpawned', function()
-    ShutdownLoadingScreen()
-    ShutdownLoadingScreenNui()
-end)
-
 RegisterNetEvent("godz_connect:receiveStatus")
 AddEventHandler("godz_connect:receiveStatus", function(status)
     isCreator = status.isCreator
@@ -177,10 +164,10 @@ end)
 
 -- Fallback de Segurança (Force Spawn se travar em 3% ou NUI falhar)
 Citizen.CreateThread(function()
-    Wait(20000) -- [GODZ] Increased to 20s to allow Nexus Intro Speech
+    Wait(90000)
     
     -- Verifica se o jogador ainda não spawnou (ainda está no lobby ou loading)
-    if nexusPed or GetIsLoadingScreenActive() then
+    if not introCompleted and (nexusPed or GetIsLoadingScreenActive()) then
         print("[GODZ CONNECT] Force Spawn Activated due to timeout.")
         
         -- Garante que o loading morra
@@ -209,6 +196,7 @@ end)
 
 -- [GODZ] Callback when Nexus finishes introduction
 RegisterNUICallback('introFinished', function(data, cb)
+    introCompleted = true
     StartGameSequence()
     if cb then cb('OK') end
 end)

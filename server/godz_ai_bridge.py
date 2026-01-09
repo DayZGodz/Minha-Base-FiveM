@@ -1,5 +1,7 @@
 import sys
 import os
+import unicodedata
+from types import SimpleNamespace
 
 os.environ['HF_HOME'] = 'D:/servidor FIVEM/PROJETO_SUPER_BASE/ai_cache'
 
@@ -61,7 +63,7 @@ import requests
 import asyncio
 import discord
 from discord.ext import commands
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory, abort
 from waitress import serve
 import numpy as np
 from datetime import datetime, timedelta
@@ -107,6 +109,58 @@ def apply_radio_effect(audio_data, sample_rate):
         print(f"Radio Effect Error: {e}")
         return audio_data
 
+def sanitize_tts_text(text):
+    if text is None:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
+
+    text = text.strip()
+    if not text:
+        return ""
+
+    normalized = unicodedata.normalize("NFKD", text)
+    ascii_text = normalized.encode("ascii", "ignore").decode("ascii")
+    ascii_text = "".join(ch for ch in ascii_text if ch.isprintable())
+    ascii_text = " ".join(ascii_text.split())
+    return ascii_text
+
+def chattts_infer_safe(text, spk_emb=None):
+    safe_text = sanitize_tts_text(text)
+    if not safe_text:
+        raise ValueError("Empty TTS text")
+
+    params_refine_text_obj = SimpleNamespace(prompt="[oral_5][break_6]")
+    params_infer_code_obj = SimpleNamespace(
+        spk_emb=spk_emb,
+        top_P=0.7,
+        top_K=20,
+        temperature=0.3,
+        repetition_penalty=1.05,
+    )
+
+    params_refine_text_dict = {"prompt": "[oral_5][break_6]"}
+    params_infer_code_dict = {
+        "spk_emb": spk_emb,
+        "top_P": 0.7,
+        "top_K": 20,
+        "temperature": 0.3,
+        "repetition_penalty": 1.05,
+    }
+
+    last_error = None
+    for args in (
+        {"params_refine_text": params_refine_text_obj, "params_infer_code": params_infer_code_obj},
+        {"params_refine_text": params_refine_text_dict, "params_infer_code": params_infer_code_dict},
+        {},
+    ):
+        try:
+            return chat.infer([safe_text], **args)
+        except Exception as e:
+            last_error = e
+
+    raise last_error
+
 # [GODZ SUPREME] Common Phrases Cache
 # Pre-defined hash map for instant response
 COMMON_PHRASES_CACHE = {
@@ -140,6 +194,9 @@ def tts_endpoint():
 
         # Generation
         generated = False
+        tts_text = sanitize_tts_text(text)
+        if not tts_text:
+            return jsonify({"error": "Invalid text"}), 400
         
         if CHATTTS_AVAILABLE and sf is not None:
             try:
@@ -158,31 +215,30 @@ def tts_endpoint():
 
                 spk_emb = CHATTTS_SPEAKERS.get("vitoria") or CHATTTS_SPEAKERS.get("thalita")
 
-                params_refine_text = {
-                    "prompt": "[oral_5][break_6]"
-                }
-                params_infer_code = {
-                    "spk_emb": spk_emb,
-                    "top_P": 0.7,
-                    "top_K": 20,
-                    "temperature": 0.3,
-                    "repetition_penalty": 1.05
-                }
-
-                wavs = chat.infer([text], params_refine_text=params_refine_text, params_infer_code=params_infer_code)
+                wavs = chattts_infer_safe(tts_text, spk_emb=spk_emb)
                 
                 # [GODZ SUPREME] Apply Radio Effect
                 audio_data = wavs[0]
                 # Convert list to numpy if needed (ChatTTS usually returns list of numpy arrays)
                 if isinstance(audio_data, list):
-                    audio_data = np.array(audio_data)
+                    audio_data = np.array(audio_data, dtype=np.float32)
+                else:
+                    audio_data = np.asarray(audio_data, dtype=np.float32)
+
+                if audio_data.size < 1:
+                    raise ValueError("Empty audio")
                 
                 final_audio = apply_radio_effect(audio_data, 24000)
+                if final_audio is None:
+                    raise ValueError("Empty audio")
+                final_audio = np.asarray(final_audio, dtype=np.float32)
+                if final_audio.size < 1:
+                    raise ValueError("Empty audio")
 
                 # Save to file
-                sf.write(output_file, final_audio, 24000)
+                sf.write(file=output_file, data=final_audio, samplerate=24000, subtype="PCM_16")
                 generated = True
-                print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via ChatTTS (Voz: Vitoria) + Rádio FX: {text[:30]}...")
+                print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via ChatTTS (Voz: Vitoria) + Rádio FX: {tts_text[:30]}...")
             except Exception as e:
                 print(f"{Fore.RED}[GODZ AI] {Fore.WHITE}Erro no ChatTTS, tentando fallback: {e}")
         
@@ -193,9 +249,9 @@ def tts_endpoint():
             
             voice = PiperVoice.load(PIPER_MODEL_PATH)
             with wave.open(output_file, "wb") as wav_file:
-                voice.synthesize(text, wav_file)
+                voice.synthesize(tts_text, wav_file)
             generated = True
-            print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via Piper: {text[:30]}...")
+            print(f"{Fore.GREEN}[GODZ AI] {Fore.WHITE}Áudio gerado via Piper: {tts_text[:30]}...")
 
         if not generated:
             return jsonify({"error": "No TTS engine available"}), 500
@@ -210,7 +266,8 @@ def tts_endpoint():
             }
             threading.Thread(target=send_discord_webhook, args=(DISCORD_WEBHOOK_AUDIT, embed)).start()
         
-        return jsonify({"status": "ok", "file": output_filename})
+        url = f"http://127.0.0.1:5000/static/voices/{output_filename}"
+        return jsonify({"status": "ok", "file": output_filename, "url": url})
 
     except Exception as e:
         logger.error(f"TTS Error: {e}")
@@ -221,13 +278,24 @@ def tts_endpoint():
 # ==================================================================================
 API_KEY = "godz_secret_key_123"
 
-# [GODZ AI] Piper TTS Config
+# [GODZ] Piper TTS Config
 PIPER_MODELS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "piper_models")
 # Caminho exato para a pasta sounds do godz_connect
 GODZ_CONNECT_SOUNDS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources", "[godz_core]", "godz_connect", "sounds")
 
+VOICE_OUTPUT_DIR = GODZ_CONNECT_SOUNDS_DIR
+
 if not os.path.exists(GODZ_CONNECT_SOUNDS_DIR):
     os.makedirs(GODZ_CONNECT_SOUNDS_DIR, exist_ok=True)
+
+if not os.path.exists(VOICE_OUTPUT_DIR):
+    os.makedirs(VOICE_OUTPUT_DIR, exist_ok=True)
+
+@app.route('/static/voices/<path:filename>', methods=['GET'])
+def serve_voice_file(filename):
+    if not filename or ".." in filename or filename.startswith(("/", "\\")):
+        abort(400)
+    return send_from_directory(VOICE_OUTPUT_DIR, filename, mimetype='audio/wav')
 
 # Garantir modelo Faber (Substituindo Thalita)
 PIPER_MODEL_NAME = "pt_BR-faber-medium.onnx"
@@ -297,20 +365,24 @@ def check_and_generate_intro_audio():
 
                     spk_emb = CHATTTS_SPEAKERS.get("vitoria")
                     
-                    params_refine_text = { "prompt": "[oral_5][break_6]" }
-                    params_infer_code = {
-                        "spk_emb": spk_emb,
-                        "top_P": 0.7,
-                        "top_K": 20,
-                        "temperature": 0.3,
-                        "repetition_penalty": 1.05
-                    }
-
-                    wavs = chat.infer([intro_text], params_refine_text=params_refine_text, params_infer_code=params_infer_code)
+                    wavs = chattts_infer_safe(intro_text, spk_emb=spk_emb)
                     audio_data = wavs[0]
-                    if isinstance(audio_data, list): audio_data = np.array(audio_data)
+                    if isinstance(audio_data, list):
+                        audio_data = np.array(audio_data, dtype=np.float32)
+                    else:
+                        audio_data = np.asarray(audio_data, dtype=np.float32)
+
+                    if audio_data.size < 1:
+                        raise ValueError("Empty audio")
+
                     final_audio = apply_radio_effect(audio_data, 24000)
-                    sf.write(output_file, final_audio, 24000)
+                    if final_audio is None:
+                        raise ValueError("Empty audio")
+                    final_audio = np.asarray(final_audio, dtype=np.float32)
+                    if final_audio.size < 1:
+                        raise ValueError("Empty audio")
+
+                    sf.write(file=output_file, data=final_audio, samplerate=24000, subtype="PCM_16")
                     generated = True
                     print(f"{Fore.GREEN}[GODZ AI] Audio Intro gerado via ChatTTS.")
                 except Exception as e:
@@ -322,7 +394,7 @@ def check_and_generate_intro_audio():
                  if os.path.exists(PIPER_MODEL_PATH) and os.path.exists(PIPER_MODEL_JSON):
                     voice = PiperVoice.load(PIPER_MODEL_PATH)
                     with wave.open(output_file, "wb") as wav_file:
-                        voice.synthesize(intro_text, wav_file)
+                        voice.synthesize(sanitize_tts_text(intro_text), wav_file)
                     generated = True
                     print(f"{Fore.GREEN}[GODZ AI] Audio Intro gerado via Piper.")
             
