@@ -18,8 +18,7 @@ files {
     'index.html',
     'style.css',
     'script.js',
-    'sounds/nexus_voice.wav',
-    'sounds/Hack_Success.wav'
+    'sounds/nexus_voice.wav'
 }
 
 loadscreen_manual_shutdown 'yes'

@@ -17,10 +17,15 @@ AddEventHandler('onClientResourceStart', function(resourceName)
 
     DisplayRadar(false)
     Wait(0)
-    DoScreenFadeIn(500)
+    -- [GODZ] Removed immediate fade-in to allow loading screen to persist
+    -- DoScreenFadeIn(500) 
 end)
 
 function StartGameSequence()
+    -- [GODZ] Delay shutdown to sync with audio (approx 12s or callback)
+    -- We add a small safety delay here just in case
+    Wait(1000) 
+
     -- 1. Garante que NUI e Loading Screen sumam
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
@@ -73,6 +78,11 @@ end
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
     DisplayRadar(false)
+    
+    -- [GODZ] Delay for Loading Screen Sync (Request: 12s delay)
+    -- This keeps the loading screen active for at least 12 seconds to match audio
+    local minWait = 12000
+    local startTime = GetGameTimer()
     
     local playerPed = PlayerPedId()
     SetEntityCoords(playerPed, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z - 10.0)
