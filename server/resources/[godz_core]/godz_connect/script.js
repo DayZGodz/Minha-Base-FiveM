@@ -104,32 +104,22 @@ window.addEventListener('load', () => {
 
 function playNexusAudioImmediate() {
     console.log("[GODZ] Starting Nexus Audio Sequence...");
-    const audioUrl = 'sounds/nexus_voice.wav'; // Local file access
-    const audio = new Audio(audioUrl);
-    audio.volume = 0.0; // Start silent for fade-in
-
-    // Fade In Logic
-    const fadeInterval = setInterval(() => {
-        if (audio.volume < 0.9) {
-            audio.volume = Math.min(audio.volume + 0.05, 1.0);
-        } else {
-            clearInterval(fadeInterval);
-        }
-    }, 100); // Adjust speed of fade
-
+    // [GODZ] User Requested Simple Audio Logic
+    const introAudio = new Audio('sounds/nexus_voice.wav');
+    introAudio.volume = 0.8;
+    
     // Visual Sync
     if (statusText) statusText.innerText = "TRANSMITINDO...";
     if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
 
-    audio.play().then(() => {
+    introAudio.play().then(() => {
         console.log("[GODZ] Audio playing successfully.");
     }).catch(e => {
         console.error("[GODZ] Audio play failed:", e);
-        // Fallback TTS if local file fails
         speakAi("Sistemas da Nexus online. Bem-vindo.");
     });
 
-    audio.onended = () => {
+    introAudio.onended = () => {
         console.log("[GODZ] Audio finished.");
         if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SISTEMA NEXUS: ONLINE";
@@ -141,7 +131,7 @@ function playNexusAudioImmediate() {
         if (introHud) introHud.style.opacity = '0';
     };
 
-    audio.onerror = () => {
+    introAudio.onerror = () => {
         console.error("[GODZ] Audio file not found or error.");
         if (statusText) statusText.innerText = "ERRO DE AUDIO";
     };

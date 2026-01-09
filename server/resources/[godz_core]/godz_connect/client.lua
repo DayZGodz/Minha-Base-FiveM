@@ -24,7 +24,7 @@ end)
 function StartGameSequence()
     -- [GODZ] Delay shutdown to sync with audio (approx 12s or callback)
     -- We add a small safety delay here just in case
-    Wait(1000) 
+    Wait(12000) 
 
     -- 1. Garante que NUI e Loading Screen sumam
     ShutdownLoadingScreen()
@@ -158,12 +158,15 @@ AddEventHandler("godz_connect:receiveStatus", function(status)
         PlaySoundFrontend(-1, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS", true)
         
         -- [GODZ] Nexus Awakening Protocol
-        -- Instead of starting immediately, we trigger the intro sequence
+        -- Trigger intro sequence and START GAME SEQUENCE with 12s delay
         SendNUIMessage({ 
             action = "startIntro", 
             playerName = status.playerName,
             isCreator = isCreator
         })
+        
+        -- Start the sequence immediately (it has the 12s wait inside)
+        StartGameSequence()
     else
         -- Acesso Negado (Nativo)
         SetNotificationTextEntry("STRING")
@@ -207,6 +210,6 @@ end)
 -- [GODZ] Callback when Nexus finishes introduction
 RegisterNUICallback('introFinished', function(data, cb)
     introCompleted = true
-    StartGameSequence()
+    -- StartGameSequence() -- Handled by main thread now to ensure sync
     if cb then cb('OK') end
 end)
