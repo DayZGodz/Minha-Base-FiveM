@@ -100,4 +100,4 @@ Módulos exclusivos desenvolvidos para imersão e performance.
 
 ---
 
-*Desenvolvido por DayZGodz Team - 2025*
+*Desenvolvido por DayZGodz Team - 2026*
