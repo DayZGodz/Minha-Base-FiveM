@@ -38,17 +38,23 @@ AddEventHandler("godz_phone:askAI", function(question)
 
     PerformHttpRequest("http://127.0.0.1:5000/ai_chat", function(errorCode, resultData, resultHeaders)
         local answer = "A IA está dormindo no momento..."
+        local audio = nil
         
         if errorCode == 200 then
             local data = json.decode(resultData)
-            if data and data.response then
-                answer = data.response
+            if data then
+                if data.response then
+                    answer = data.response
+                end
+                if data.audio then
+                    audio = data.audio
+                end
             end
         else
             print("[GODZ AI] Erro na conexão com a ponte: " .. tostring(errorCode))
         end
 
-        TriggerClientEvent("godz_phone:receiveAIResponse", source, answer)
+        TriggerClientEvent("godz_phone:receiveAIResponse", source, answer, audio)
     end, "POST", json.encode({
         user_id = user_id,
         message = question,

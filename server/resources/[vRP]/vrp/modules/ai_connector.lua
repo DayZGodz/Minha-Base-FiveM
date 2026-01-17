@@ -2,18 +2,40 @@
 -- GODZ AI CONNECTOR
 -- Módulo responsável pela comunicação entre o servidor FiveM e a API Python (Godz AI Bridge)
 
-local API_URL = "http://localhost:5000"
+local API_URL = "http://127.0.0.1:5000/"
 local API_KEY = "godz_secret_key_123"
 
--- Função Global de Requisição
-function vRP.askGodzAI(endpoint, data, callback)
-    print("[GODZ] Tentando conectar com a IA...")
+local function buildAiUrl(endpoint)
+    local ep = tostring(endpoint or "")
+    ep = string.gsub(ep, "^/+", "")
+    return API_URL .. ep
+end
+
+-- Função Global de Requisição com Retry Automático
+function vRP.askGodzAI(endpoint, data, callback, attempt)
+    local currentAttempt = attempt or 1
+    local maxAttempts = 8
+
+    print("[GODZ] Tentando conectar com a IA (Tentativa " .. currentAttempt .. ")...")
     local headers = {
         ["Content-Type"] = "application/json",
         ["Authorization"] = "Bearer " .. API_KEY
     }
     
-    PerformHttpRequest(API_URL .. endpoint, function(errorCode, resultData, resultHeaders)
+    PerformHttpRequest(buildAiUrl(endpoint), function(errorCode, resultData, resultHeaders)
+        -- Se der erro 0 (Connection Refused) e ainda tiver tentativas
+        if (errorCode == 0 or errorCode == 404 or errorCode == 500) and currentAttempt < maxAttempts then
+            print("[NEXUS] Tentando reconectar ao cérebro... (Tentativa " .. currentAttempt .. ")")
+            local delay = 8000
+            if currentAttempt <= 2 then
+                delay = 20000
+            end
+            SetTimeout(delay, function()
+                vRP.askGodzAI(endpoint, data, callback, currentAttempt + 1)
+            end)
+            return
+        end
+
         if callback then
             callback(errorCode, resultData, resultHeaders)
         end
@@ -31,7 +53,7 @@ RegisterCommand('ajuda', function(source, args, rawCommand)
     local user_id = vRP.getUserId(source)
 
     -- Health Check antes de enviar
-    PerformHttpRequest(API_URL .. "/health", function(err, text, headers)
+    PerformHttpRequest(buildAiUrl("health"), function(err, text, headers)
         if err ~= 200 then
              TriggerClientEvent("Notify", source, "negado", "O suporte inteligente está offline no momento.")
              return
@@ -40,7 +62,7 @@ RegisterCommand('ajuda', function(source, args, rawCommand)
         TriggerClientEvent("Notify", source, "importante", "Aguarde, o Godz AI está pensando...")
 
         -- Envia pergunta para a IA
-        vRP.askGodzAI("/ai_assist", {
+        vRP.askGodzAI("ai_assist", {
             question = question,
             user_id = user_id
         }, function(code, res, headers)
@@ -63,7 +85,7 @@ AddEventHandler("vRP:playerJoin", function(user_id, source, name)
     local ip = GetPlayerEndpoint(source)
     
     -- Envia dados para análise assim que o jogador entra
-    vRP.askGodzAI("/sentinel_check", {
+    vRP.askGodzAI("sentinel_check", {
         user_id = user_id,
         ip = ip,
         name = name,

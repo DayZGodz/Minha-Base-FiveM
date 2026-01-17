@@ -80,8 +80,67 @@ window.addEventListener('message', function(event) {
         hideLoadingScreen();
         // [GODZ SUPREME] Total Cleanup
         document.body.innerHTML = '';
+    } else if (event.data.action === "toggleVoice") {
+        if (micBtn) micBtn.click();
+    } else if (event.data.action === "startIntro") {
+        const playerName = event.data.playerName || "Cidadão";
+        const isCreator = event.data.isCreator;
+
+        window.isIntroMode = true;
+        
+        // Show HUD
+        const introHud = document.querySelector('.intro-hud');
+        if (introHud) introHud.style.opacity = '1';
+        
+        // [GODZ] Play Pre-Generated Nexus Voice
+        // playNexusIntro(); // Removed to play immediately on load
     }
 });
+
+// [GODZ] Immediate Audio Playback with Fade-In
+window.addEventListener('load', () => {
+    playNexusAudioImmediate();
+});
+
+function playNexusAudioImmediate() {
+    console.log("[GODZ] Starting Nexus Audio Sequence...");
+    // [GODZ] User Requested Simple Audio Logic
+    const introAudio = new Audio('sounds/nexus_voice.wav');
+    introAudio.volume = 0.8;
+    
+    // Visual Sync
+    if (statusText) statusText.innerText = "TRANSMITINDO...";
+    if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
+
+    introAudio.play().then(() => {
+        console.log("[GODZ] Audio playing successfully.");
+    }).catch(e => {
+        console.error("[GODZ] Audio play failed:", e);
+        speakAi("Sistemas da Nexus online. Bem-vindo.");
+    });
+
+    introAudio.onended = () => {
+        console.log("[GODZ] Audio finished.");
+        if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
+        if (statusText) statusText.innerText = "SISTEMA NEXUS: ONLINE";
+        
+        // Notify Client
+        fetch('https://godz_connect/introFinished', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+        
+        const introHud = document.querySelector('.intro-hud');
+        if (introHud) introHud.style.opacity = '0';
+    };
+
+    introAudio.onerror = () => {
+        console.error("[GODZ] Audio file not found or error.");
+        if (statusText) statusText.innerText = "ERRO DE AUDIO";
+    };
+}
+
+function playNexusIntro() {
+    // Legacy function kept for reference or manual triggers
+    // implementation merged into playNexusAudioImmediate
+}
 
 function forceKillNexusUI() {
     const ids = ["protocols-list", "system-status", "mic-container"];
@@ -209,10 +268,35 @@ if (micBtn) {
 /* ==========================================================================
    GODZ AI BRIDGE (PYTHON SERVER)
    ========================================================================== */
+const AI_BASE_URL = 'http://127.0.0.1:5000/';
+
+const fetchWithTimeout = (url, options, timeout = 20000) => {
+    return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+    ]);
+};
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchJsonWithRetry(url, options, attempts = 6, timeoutMs = 20000) {
+    let lastError = null;
+    for (let i = 0; i < attempts; i++) {
+        try {
+            const response = await fetchWithTimeout(url, options, timeoutMs);
+            return await response.json();
+        } catch (e) {
+            lastError = e;
+            await delay(4000);
+        }
+    }
+    throw lastError;
+}
+
 async function sendToGodzAi(text) {
     try {
         // Dev Mode: 127.0.0.1. Production: Change to Server IP.
-        const response = await fetch('http://127.0.0.1:5000/loading_chat', {
+        const response = await fetch(`${AI_BASE_URL}loading_chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: text })
@@ -253,21 +337,20 @@ function speakAi(text) {
     if (statusText) statusText.innerText = "TRANSMITINDO...";
     if (aiAvatarWrapper) aiAvatarWrapper.classList.add("speaking");
 
-    // Timeout Wrapper for Fetch
-    const fetchWithTimeout = (url, options, timeout = 5000) => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-        ]);
-    };
+    (async () => {
+        let data;
+        try {
+            data = await fetchJsonWithRetry(`${AI_BASE_URL}tts?text=${encodeURIComponent(text)}`, {}, 6, 20000);
+        } catch (e) {
+            console.error("Bridge Connection Error/Timeout:", e);
+            fallbackSpeak(text);
+            return;
+        }
 
-    // 1. Request Generation
-    fetchWithTimeout(`http://127.0.0.1:5000/tts?text=${encodeURIComponent(text)}`, {}, 5000)
-    .then(response => response.json())
-    .then(data => {
         if (data.status === "ok") {
              const fileName = data.file || 'nexus_voice.wav';
-             const audioUrl = `./sounds/${fileName}?t=${new Date().getTime()}`;
+             const baseUrl = data.url || `${AI_BASE_URL}static/voices/${fileName}`;
+             const audioUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}t=${new Date().getTime()}`;
              const audio = new Audio(audioUrl);
              
              // Lip Sync Triggers
@@ -278,21 +361,25 @@ function speakAi(text) {
                 fallbackSpeak(text);
              });
 
-             // [GODZ SUPREME] UNLOCK IMMEDIATELY (Don't wait for audio end)
-             // The user wants to play seeing the 3D world while listening.
-             if (window.shouldAutoCloseAfterElite || true) { // Force for all
-                 setTimeout(() => {
-                    forceKillNexusUI();
-                    hideLoadingScreen();
-                    document.body.innerHTML = ''; // Kill DOM
-                    fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
-                 }, 1000); // 1s delay to ensure audio starts
-             }
-
              audio.onended = () => {
                 if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
                 if (statusText) statusText.innerText = "SYSTEM: ONLINE";
                 fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
+
+                if (window.isIntroMode) {
+                    window.isIntroMode = false;
+                    fetch('https://godz_connect/introFinished', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+                    const introHud = document.querySelector('.intro-hud');
+                    if (introHud) introHud.style.opacity = '0';
+                    return;
+                }
+
+                if (window.shouldAutoCloseAfterElite) {
+                    forceKillNexusUI();
+                    hideLoadingScreen();
+                    document.body.innerHTML = '';
+                    fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+                }
              };
 
              audio.onerror = () => {
@@ -303,14 +390,7 @@ function speakAi(text) {
             console.error("TTS Generation Failed:", data.error);
             fallbackSpeak(text);
         }
-    })
-    .catch(e => {
-        console.error("Bridge Connection Error/Timeout:", e);
-        // [GODZ] FAILSAFE: Unlock on error
-        forceKillNexusUI();
-        hideLoadingScreen();
-        fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
-    });
+    })();
 }
 
 function fallbackSpeak(text) {
@@ -328,6 +408,21 @@ function fallbackSpeak(text) {
         if (aiAvatarWrapper) aiAvatarWrapper.classList.remove("speaking");
         if (statusText) statusText.innerText = "SYSTEM: ONLINE";
         fetch(`https://godz_connect/stopLipSync`, { method: 'POST', body: JSON.stringify({}) }).catch(()=>{});
+
+        if (window.isIntroMode) {
+            window.isIntroMode = false;
+            fetch('https://godz_connect/introFinished', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+            const introHud = document.querySelector('.intro-hud');
+            if (introHud) introHud.style.opacity = '0';
+            return;
+        }
+
+        if (window.shouldAutoCloseAfterElite) {
+            forceKillNexusUI();
+            hideLoadingScreen();
+            document.body.innerHTML = '';
+            fetch('https://godz_connect/close', { method: 'POST', body: JSON.stringify({}) }).catch(e => {});
+        }
     };
 
     synth.speak(utterance);

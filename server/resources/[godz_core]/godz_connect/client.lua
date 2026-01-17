@@ -7,32 +7,25 @@ local lobbyCoords = vector3(3525.5, 3704.3, 21.0) -- Humane Labs Interior
 local isCreator = false -- Variável de controle do Criador
 local isWhitelistedClient = false -- [GODZ] Status WL para gating
 local currentToken = nil -- [GODZ] Token de validação dinâmica
+local introCompleted = false
 
 -- [GODZ] Force Shutdown Loading Screen ASAP
 AddEventHandler('onClientResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
       return
     end
-    
-    -- [GODZ] Force Shutdown Loop (5s) to kill 3% bug
-    ShutdownLoadingScreen()
-    ShutdownLoadingScreenNui()
-    
-    Citizen.CreateThread(function()
-        local endTime = GetGameTimer() + 5000
-        while GetGameTimer() < endTime do
-            ShutdownLoadingScreen()
-            ShutdownLoadingScreenNui()
-            Wait(0)
-        end
-    end)
-    
+
     DisplayRadar(false)
     Wait(0)
-    DoScreenFadeIn(500)
+    -- [GODZ] Removed immediate fade-in to allow loading screen to persist
+    -- DoScreenFadeIn(500) 
 end)
 
 function StartGameSequence()
+    -- [GODZ] Delay shutdown to sync with audio (approx 12s or callback)
+    -- We add a small safety delay here just in case
+    Wait(12000) 
+
     -- 1. Garante que NUI e Loading Screen sumam
     ShutdownLoadingScreen()
     ShutdownLoadingScreenNui()
@@ -85,6 +78,11 @@ end
 Citizen.CreateThread(function()
     -- 1. SETUP DO LOBBY 3D
     DisplayRadar(false)
+    
+    -- [GODZ] Delay for Loading Screen Sync (Request: 12s delay)
+    -- This keeps the loading screen active for at least 12 seconds to match audio
+    local minWait = 12000
+    local startTime = GetGameTimer()
     
     local playerPed = PlayerPedId()
     SetEntityCoords(playerPed, lobbyCoords.x, lobbyCoords.y, lobbyCoords.z - 10.0)
@@ -149,11 +147,6 @@ Citizen.CreateThread(function()
     TriggerServerEvent("godz_connect:checkPlayerStatus")
 end)
 
-AddEventHandler('playerSpawned', function()
-    ShutdownLoadingScreen()
-    ShutdownLoadingScreenNui()
-end)
-
 RegisterNetEvent("godz_connect:receiveStatus")
 AddEventHandler("godz_connect:receiveStatus", function(status)
     isCreator = status.isCreator
@@ -163,6 +156,16 @@ AddEventHandler("godz_connect:receiveStatus", function(status)
     if isWhitelistedClient or isCreator then
         -- Se estiver na WL, inicia sequência de jogo
         PlaySoundFrontend(-1, "Hack_Success", "DLC_HEIST_BIOLAB_PREP_HACKING_SOUNDS", true)
+        
+        -- [GODZ] Nexus Awakening Protocol
+        -- Trigger intro sequence and START GAME SEQUENCE with 12s delay
+        SendNUIMessage({ 
+            action = "startIntro", 
+            playerName = status.playerName,
+            isCreator = isCreator
+        })
+        
+        -- Start the sequence immediately (it has the 12s wait inside)
         StartGameSequence()
     else
         -- Acesso Negado (Nativo)
@@ -172,10 +175,41 @@ AddEventHandler("godz_connect:receiveStatus", function(status)
     end
 end)
 
--- Fallback de Segurança
+-- Fallback de Segurança (Force Spawn se travar em 3% ou NUI falhar)
 Citizen.CreateThread(function()
-    Wait(15000)
-    if isCreator and nexusPed then
+    Wait(90000)
+    
+    -- Verifica se o jogador ainda não spawnou (ainda está no lobby ou loading)
+    if not introCompleted and (nexusPed or GetIsLoadingScreenActive()) then
+        print("[GODZ CONNECT] Force Spawn Activated due to timeout.")
+        
+        -- Garante que o loading morra
+        ShutdownLoadingScreen()
+        ShutdownLoadingScreenNui()
+        
+        -- Força a sequência de jogo
         StartGameSequence()
     end
+end)
+
+-- [GODZ] Voice Interaction Trigger (Key E)
+RegisterKeyMapping('godz_ai_talk', 'Falar com Nexus AI', 'keyboard', 'E')
+
+RegisterCommand('godz_ai_talk', function()
+    -- Only allow if 3D sequence is active or explicitly allowed
+    if not GetIsLoadingScreenActive() then
+        SendNUIMessage({ action = "toggleVoice" })
+        -- Visual feedback
+        local playerPed = PlayerPedId()
+        RequestAnimDict("mp_facial")
+        while not HasAnimDictLoaded("mp_facial") do Wait(0) end
+        PlayFacialAnim(playerPed, "mic_chatter", "mp_facial")
+    end
+end)
+
+-- [GODZ] Callback when Nexus finishes introduction
+RegisterNUICallback('introFinished', function(data, cb)
+    introCompleted = true
+    -- StartGameSequence() -- Handled by main thread now to ensure sync
+    if cb then cb('OK') end
 end)

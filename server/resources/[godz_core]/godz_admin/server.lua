@@ -64,7 +64,7 @@ AddEventHandler("godz_admin:analyzePlayer", function(target_id)
 
     local prompt = "Analise os logs do jogador ID " .. target_id .. ": " .. logText .. ". O comportamento é legítimo ou suspeito (money cheat/dupe)? Responda curto para um admin."
 
-    PerformHttpRequest("http://localhost:5000/ai_assist", function(err, text, headers)
+    PerformHttpRequest("http://127.0.0.1:5000/ai_assist", function(err, text, headers)
         local report = "IA Indisponível."
         if err == 200 and text then
             local data = json.decode(text)
@@ -144,7 +144,7 @@ RegisterCommand('testia', function(source, args, rawCommand)
         ["Content-Type"] = "application/json", 
         ["Authorization"] = "Bearer godz_secret_key_123" 
     }
-    PerformHttpRequest("http://localhost:5000/health", function(err, text, headers)
+    PerformHttpRequest("http://127.0.0.1:5000/health", function(err, text, headers)
         if err == 200 then
             print("[GODZ DEBUG] Conexão bem sucedida! Resposta: " .. tostring(text))
         else
